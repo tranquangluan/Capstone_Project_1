@@ -1,0 +1,5 @@
+1.viết quy trình :
+từng function : người ta share như thế nào ?
+2.code thử
+3. làm việc backlog userstory
+4. trello
