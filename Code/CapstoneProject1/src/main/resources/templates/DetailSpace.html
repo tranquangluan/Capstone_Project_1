@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+</head>
+<body>
+
+<table th:object="${space}">
+    <tr>
+        <td>Space_Id</td>
+        <td th:text="*{id}"></td>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td th:text="*{status}"></td>
+    </tr>
+    <tr>
+        <td>Price</td>
+        <td th:text="*{price}"></td>
+    </tr>
+    <tr>
+        <td>Image</td>
+        <td th:text="*{image}"></td>
+    </tr>
+    <tr>
+        <td>Description</td>
+        <td th:text="*{description}"></td>
+    </tr>
+    <tr>
+        <td>Category_name</td>
+        <td th:text="*{categorySpace.categoryName}"></td>
+    </tr>
+
+
+</table>
+</body>
+</html>

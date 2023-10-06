@@ -19,6 +19,11 @@ public class Space {
     private String image;
     @Column(name = "Description")
     private String description;
+    @Column(name = "Address")
+    private String address;
+
+
+
     @ManyToOne
     @JoinColumn(name = "Category_id")
     private CategorySpace categorySpace ;
@@ -26,12 +31,13 @@ public class Space {
     public Space() {
     }
 
-    public Space(Integer id, Boolean status, BigDecimal price, String image, String description, CategorySpace categorySpace) {
+    public Space(Integer id, Boolean status, BigDecimal price, String image, String description, String address, CategorySpace categorySpace) {
         this.id = id;
         this.status = status;
         this.price = price;
         this.image = image;
         this.description = description;
+        this.address = address;
         this.categorySpace = categorySpace;
     }
 
@@ -81,5 +87,13 @@ public class Space {
 
     public void setCategorySpace(CategorySpace categorySpace) {
         this.categorySpace = categorySpace;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
