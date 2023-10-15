@@ -4,9 +4,9 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
-public class Payment {
+public class Invoice {
     @Id
-    @Column(name = "Payment_Id")
+    @Column(name = "Invoice_Id")
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "User_id")
@@ -14,10 +14,10 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "Booking_id")
     private Booking bookingId;
-    @Column(name = "Payment_date")
-    private Date date;
+    @Column(name = "Invoice_date")
+    private Date invoiceDate;
     @Column(name = "Amount")
     private Integer amount;
-    @Column(name = "Payment_method")
-    private String method;
+    @Column(name = "Payment_status")
+    private boolean status;
 }
