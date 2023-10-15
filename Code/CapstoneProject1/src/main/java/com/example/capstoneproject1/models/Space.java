@@ -15,30 +15,44 @@ public class Space {
     private Boolean status;
     @Column(name = "Price")
     private BigDecimal price;
-    @Column(name = "Image")
-    private String image;
+    @Column(name = "Images")
+    private String images;
     @Column(name = "Description")
     private String description;
-    @Column(name = "Address")
-    private String address;
+    @Column(name = "Bathroom_numbers")
+    private Integer bathroomNumbers;
+    @Column(name = "Bedroom_numbers")
+    private Integer bedroomNumbers;
+    @Column(name = "Area")
+    private String area;
+    @ManyToOne
+    @JoinColumn(name = "Location_id")
+    private Location locationId;
 
 
 
     @ManyToOne
     @JoinColumn(name = "Category_id")
-    private CategorySpace categorySpace ;
+    private CategorySpace categoryId ;
+    @ManyToOne
+    @JoinColumn(name = "User_id")
+    private User userId ;
 
     public Space() {
     }
 
-    public Space(Integer id, Boolean status, BigDecimal price, String image, String description, String address, CategorySpace categorySpace) {
+    public Space(Integer id, Boolean status, BigDecimal price, String images, String description, Integer bathroomNumbers, Integer bedroomNumbers, String area, Location locationId, CategorySpace categoryId, User userId) {
         this.id = id;
         this.status = status;
         this.price = price;
-        this.image = image;
+        this.images = images;
         this.description = description;
-        this.address = address;
-        this.categorySpace = categorySpace;
+        this.bathroomNumbers = bathroomNumbers;
+        this.bedroomNumbers = bedroomNumbers;
+        this.area = area;
+        this.locationId = locationId;
+        this.categoryId = categoryId;
+        this.userId = userId;
     }
 
     public Integer getId() {
@@ -65,12 +79,12 @@ public class Space {
         this.price = price;
     }
 
-    public String getImage() {
-        return image;
+    public String getImages() {
+        return images;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImages(String images) {
+        this.images = images;
     }
 
     public String getDescription() {
@@ -81,19 +95,51 @@ public class Space {
         this.description = description;
     }
 
-    public CategorySpace getCategorySpace() {
-        return categorySpace;
+    public Integer getBathroomNumbers() {
+        return bathroomNumbers;
     }
 
-    public void setCategorySpace(CategorySpace categorySpace) {
-        this.categorySpace = categorySpace;
+    public void setBathroomNumbers(Integer bathroomNumbers) {
+        this.bathroomNumbers = bathroomNumbers;
     }
 
-    public String getAddress() {
-        return address;
+    public Integer getBedroomNumbers() {
+        return bedroomNumbers;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setBedroomNumbers(Integer bedroomNumbers) {
+        this.bedroomNumbers = bedroomNumbers;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public Location getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Location locationId) {
+        this.locationId = locationId;
+    }
+
+    public CategorySpace getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(CategorySpace categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public User getUserId() {
+        return userId;
+    }
+
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 }
