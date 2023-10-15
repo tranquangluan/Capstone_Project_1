@@ -15,8 +15,9 @@ public class Space {
     private Boolean status;
     @Column(name = "Price")
     private BigDecimal price;
-    @Column(name = "Images")
-    private String images;
+    @ManyToOne
+    @JoinColumn(name = "Image_id")
+    private Image imageId;
     @Column(name = "Description")
     private String description;
     @Column(name = "Bathroom_numbers")
@@ -41,11 +42,12 @@ public class Space {
     public Space() {
     }
 
-    public Space(Integer id, Boolean status, BigDecimal price, String images, String description, Integer bathroomNumbers, Integer bedroomNumbers, String area, Location locationId, CategorySpace categoryId, User userId) {
+
+    public Space(Integer id, Boolean status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, String area, Location locationId, CategorySpace categoryId, User userId) {
         this.id = id;
         this.status = status;
         this.price = price;
-        this.images = images;
+        this.imageId = imageId;
         this.description = description;
         this.bathroomNumbers = bathroomNumbers;
         this.bedroomNumbers = bedroomNumbers;
@@ -79,12 +81,12 @@ public class Space {
         this.price = price;
     }
 
-    public String getImages() {
-        return images;
+    public Image getImageId() {
+        return imageId;
     }
 
-    public void setImages(String images) {
-        this.images = images;
+    public void setImageId(Image imageId) {
+        this.imageId = imageId;
     }
 
     public String getDescription() {
