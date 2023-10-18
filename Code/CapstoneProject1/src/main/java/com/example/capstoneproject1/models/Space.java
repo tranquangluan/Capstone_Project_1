@@ -10,34 +10,34 @@ import java.math.BigDecimal;
 public class Space {
     @Id
     @GeneratedValue
-    @Column(name = "Space_Id")
+    @Column(name = "spaceId")
     private Integer id;
-    @Column(name = "Status")
+    @Column(name = "status")
     private Boolean status;
-    @Column(name = "Price")
+    @Column(name = "price")
     private BigDecimal price;
     @ManyToOne
-    @JoinColumn(name = "Image_id")
+    @JoinColumn(name = "imageId")
     private Image imageId;
-    @Column(name = "Description")
+    @Column(name = "description")
     private String description;
-    @Column(name = "Bathroom_numbers")
+    @Column(name = "bathroomNumbers")
     private Integer bathroomNumbers;
-    @Column(name = "Bedroom_numbers")
+    @Column(name = "bedroomNumbers")
     private Integer bedroomNumbers;
-    @Column(name = "Area")
+    @Column(name = "area")
     private String area;
     @ManyToOne
-    @JoinColumn(name = "Location_id")
+    @JoinColumn(name = "locationId")
     private Location locationId;
 
 
 
     @ManyToOne
-    @JoinColumn(name = "Category_id")
+    @JoinColumn(name = "categoryId")
     private CategorySpace categoryId ;
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "userId")
     private User userId ;
 
     public Space() {

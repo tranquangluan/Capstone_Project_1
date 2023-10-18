@@ -6,15 +6,15 @@ import java.math.BigDecimal;
 @Entity
 public class Location {
     @Id
-    @Column(name = "Location_id")
+    @Column(name = "locationId")
     private Integer id;
-    @Column(name = "Province")
+    @Column(name = "province")
     private String province;
-    @Column(name = "District")
+    @Column(name = "district")
     private String district;
-    @Column(name = "Ward")
+    @Column(name = "ward")
     private String ward;
-    @Column(name = "Street")
+    @Column(name = "street")
     private String street;
 
 }

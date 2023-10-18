@@ -5,8 +5,8 @@ import javax.persistence.*;
 @Entity
 public class Role {
     @Id
-    @Column(name = "Role_code")
-    private Integer code;
-    @Column(name = "Role_name")
-    private Boolean name;
+    @Column(name = "roleCode")
+    private String roleCode;
+    @Column(name = "roleValue")
+    private String roleValue;
 }

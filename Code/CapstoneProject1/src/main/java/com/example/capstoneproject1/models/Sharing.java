@@ -5,14 +5,14 @@ import javax.persistence.*;
 @Entity
 public class Sharing {
     @Id
-    @Column(name = "Sharing_Id")
+    @Column(name = "sharingId")
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "Space_id")
+    @JoinColumn(name = "spaceId")
     private Space spaceId;
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "userId")
     private User userId;
-    @Column(name = "Status")
+    @Column(name = "status")
     private Boolean status;
 }

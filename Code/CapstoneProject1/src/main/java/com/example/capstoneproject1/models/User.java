@@ -6,40 +6,40 @@ import java.sql.Date;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "User_ID")
+    @Column(name = "userID")
     private Integer userId;
-    @Column(name = "User_Name")
+    @Column(name = "userName")
     private String userName;
     @Column(columnDefinition = "TEXT", name = "Password")
     private String password;
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
     @ManyToOne
-    @JoinColumn(name = "Location_id")
+    @JoinColumn(name = "locationId")
     private Location locationId;
-    @Column(name = "DateOfBirth")
-    private Date date_of_birth;
-    @Column(name = "Phone")
+    @Column(name = "dateOfBirth")
+    private Date dateOfBirth;
+    @Column(name = "phone")
     private Integer phone;
-    @Column(name = "Avatar")
+    @Column(name = "avatar")
     private String avatar;
     @ManyToOne
-    @JoinColumn(name = "Role_code")
-    private Role code;
+    @JoinColumn(name = "roleCode")
+    private Role roleCode;
 
     public User() {
     }
 
-    public User(Integer userId, String userName, String password, String email, Location locationId, Date date_of_birth, Integer phone, String avatar, Role code) {
+    public User(Integer userId, String userName, String password, String email, Location locationId, Date dateOfBirth, Integer phone, String avatar, Role roleCode) {
         this.userId = userId;
         this.userName = userName;
         this.password = password;
         this.email = email;
         this.locationId = locationId;
-        this.date_of_birth = date_of_birth;
+        this.dateOfBirth = dateOfBirth;
         this.phone = phone;
         this.avatar = avatar;
-        this.code = code;
+        this.roleCode = roleCode;
     }
 
     public Integer getUserId() {
@@ -82,12 +82,12 @@ public class User {
         this.locationId = locationId;
     }
 
-    public Date getDate_of_birth() {
-        return date_of_birth;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setDate_of_birth(Date date_of_birth) {
-        this.date_of_birth = date_of_birth;
+    public void setDateOfBirth(Date date_of_birth) {
+        this.dateOfBirth = date_of_birth;
     }
 
     public Integer getPhone() {
@@ -106,11 +106,11 @@ public class User {
         this.avatar = avatar;
     }
 
-    public Role getCode() {
-        return code;
+    public Role getRoleCode() {
+        return roleCode;
     }
 
-    public void setCode(Role code) {
-        this.code = code;
+    public void setRoleCode(Role code) {
+        this.roleCode = code;
     }
 }

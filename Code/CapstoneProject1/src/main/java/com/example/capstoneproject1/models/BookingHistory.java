@@ -7,21 +7,21 @@ import java.sql.Date;
 @Entity
 public class BookingHistory {
     @Id
-    @Column(name = "History_booking_id")
+    @Column(name = "historyBookingId")
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "userId")
     private User userId;
     @ManyToOne
-    @JoinColumn(name = "Space_id")
+    @JoinColumn(name = "spaceId")
     private Space spaceId;
-    @Column(name = "Total_price")
+    @Column(name = "totalPrice")
     private BigDecimal totalPrice;
-    @Column(name = "Status")
+    @Column(name = "status")
     private boolean status;
-    @Column(name = "Booking_date")
+    @Column(name = "bookingDate")
     private Date date;
     @ManyToOne
-    @JoinColumn(name = "Invoice_id")
+    @JoinColumn(name = "invoiceId")
     private Invoice invoiceId;
 }

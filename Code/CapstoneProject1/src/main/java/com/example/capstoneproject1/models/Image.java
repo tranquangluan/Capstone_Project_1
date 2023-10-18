@@ -6,9 +6,9 @@ import javax.persistence.*;
 
 public class Image {
     @Id
-    @Column(name = "Image_Id")
+    @Column(name = "imageId")
     private Integer id;
-    @Column(name = "Image")
+    @Column(name = "image")
     private String image;
 
 }

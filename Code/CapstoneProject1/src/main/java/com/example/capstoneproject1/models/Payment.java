@@ -6,18 +6,18 @@ import java.sql.Date;
 @Entity
 public class Payment {
     @Id
-    @Column(name = "Payment_Id")
+    @Column(name = "paymentId")
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "userId")
     private User userId;
     @ManyToOne
-    @JoinColumn(name = "Booking_id")
+    @JoinColumn(name = "bookingId")
     private Booking bookingId;
-    @Column(name = "Payment_date")
+    @Column(name = "paymentDate")
     private Date date;
-    @Column(name = "Amount")
+    @Column(name = "amount")
     private Integer amount;
-    @Column(name = "Payment_method")
+    @Column(name = "paymentMethod")
     private String method;
 }

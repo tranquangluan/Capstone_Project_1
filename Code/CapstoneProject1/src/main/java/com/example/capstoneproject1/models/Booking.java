@@ -6,15 +6,15 @@ import java.math.BigDecimal;
 @Entity
 public class Booking {
     @Id
-    @Column(name = "Booking_id")
+    @Column(name = "bookingId")
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "userId")
     private  User userId;
     @ManyToOne
-    @JoinColumn(name = "Space_id")
+    @JoinColumn(name = "spaceId")
     private  Space spaceId;
-    @Column(name = "Total_price")
+    @Column(name = "totalPrice")
     private BigDecimal totalPrice;
     @Column(name = "status")
     private  boolean status;
