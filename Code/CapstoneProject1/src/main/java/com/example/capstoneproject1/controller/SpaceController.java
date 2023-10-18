@@ -41,7 +41,7 @@ public class SpaceController {
     }
 
     // Update đối tượng
-    @PutMapping(value = "/update/{id}")
+    @PutMapping(value = "/update")
     public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "id") Integer id,
                                                            @RequestBody Space space){
         Space spaceTemp = spaceService.findById(id); //.orElse(null)
