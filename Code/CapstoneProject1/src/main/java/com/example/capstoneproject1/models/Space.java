@@ -9,9 +9,10 @@ import java.math.BigDecimal;
 @Entity
 public class Space {
     @Id
-    @GeneratedValue
     @Column(name = "spaceId")
     private Integer id;
+    @Column(name = "title")
+    private String title;
     @Column(name = "status")
     private Boolean status;
     @Column(name = "price")
@@ -25,14 +26,18 @@ public class Space {
     private Integer bathroomNumbers;
     @Column(name = "bedroomNumbers")
     private Integer bedroomNumbers;
+    @Column(name = "peopleNumbers")
+    private Integer peopleNumbers;
     @Column(name = "area")
-    private String area;
-    @ManyToOne
-    @JoinColumn(name = "locationId")
-    private Location locationId;
-
-
-
+    private float area;
+    @Column(name = "province")
+    private String province;
+    @Column(name = "district")
+    private String district;
+    @Column(name = "ward")
+    private String ward;
+    @Column(name = "address")
+    private String address;
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategorySpace categoryId ;
@@ -44,16 +49,21 @@ public class Space {
     }
 
 
-    public Space(Integer id, Boolean status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, String area, Location locationId, CategorySpace categoryId, User userId) {
+    public Space(Integer id, String title, Boolean status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User userId) {
         this.id = id;
+        this.title = title;
         this.status = status;
         this.price = price;
         this.imageId = imageId;
         this.description = description;
         this.bathroomNumbers = bathroomNumbers;
         this.bedroomNumbers = bedroomNumbers;
+        this.peopleNumbers = peopleNumbers;
         this.area = area;
-        this.locationId = locationId;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
         this.categoryId = categoryId;
         this.userId = userId;
     }
@@ -64,6 +74,14 @@ public class Space {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Boolean getStatus() {
@@ -114,20 +132,52 @@ public class Space {
         this.bedroomNumbers = bedroomNumbers;
     }
 
-    public String getArea() {
+    public Integer getPeopleNumbers() {
+        return peopleNumbers;
+    }
+
+    public void setPeopleNumbers(Integer peopleNumbers) {
+        this.peopleNumbers = peopleNumbers;
+    }
+
+    public float getArea() {
         return area;
     }
 
-    public void setArea(String area) {
+    public void setArea(float area) {
         this.area = area;
     }
 
-    public Location getLocationId() {
-        return locationId;
+    public String getProvince() {
+        return province;
     }
 
-    public void setLocationId(Location locationId) {
-        this.locationId = locationId;
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public CategorySpace getCategoryId() {

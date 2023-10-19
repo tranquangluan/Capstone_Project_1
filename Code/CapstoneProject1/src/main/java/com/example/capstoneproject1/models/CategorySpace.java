@@ -6,16 +6,16 @@ import javax.persistence.*;
 public class CategorySpace {
     @Id
     @Column(name = "categoryId")
-    private Integer categoryId;
+    private Integer id;
     @Column(name = "categoryName")
     private String categoryName;
 
-    public Integer getCategoryId() {
-        return categoryId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getCategoryName() {

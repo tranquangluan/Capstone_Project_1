@@ -7,6 +7,7 @@ import com.example.capstoneproject1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -27,6 +28,12 @@ public class SpaceServiceImpl implements SpaceService{
     @Override
     public void delete(Integer id) {
         spaceRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Space> search(BigDecimal price, float area, Integer categoryId, String province, String district, String ward, String address) {
+        List<Space> spaceList = spaceRepository.search(price, area, categoryId, province, district, ward, address);
+        return spaceList;
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,18 @@ public class SpaceController {
 //            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
         }
         return new ResponseEntity<>(space, HttpStatus.OK);
+    }
+    @GetMapping(value = "/search", produces = "application/json")
+    public List<Space> getSpaceBy(@RequestParam(name = "price") BigDecimal price ,
+                                            @RequestParam(name = "area") float area,
+                                            @RequestParam(name = "categoryId") Integer categoryId,
+                                            @RequestParam(name = "province") String province,
+                                            @RequestParam(name = "district") String district,
+                                            @RequestParam(name = "ward") String ward,
+                                            @RequestParam(name = "address") String address) {
+
+        List<Space> spacelist = spaceService.search(price,area,categoryId,province,district,ward,address);
+        return spacelist;
     }
 
 
