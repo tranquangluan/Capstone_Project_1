@@ -10,7 +10,9 @@ public class Image {
     private Integer id;
     @Column(name = "image")
     private String image;
-
+    @ManyToOne
+    @JoinColumn(name = "spaceId")
+    private Space spaceId;
 
 
 }
