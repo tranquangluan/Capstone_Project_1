@@ -62,17 +62,17 @@ public class SpaceController {
         if(spaceTemp == null){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        Space space1 = new Space();
-        space1.setId(id);
-        space1.setStatus(space.getStatus());
-        space1.setPrice(space.getPrice());
-//        space1.setImage(space.getImage());
-        space1.setDescription(space.getDescription());
-        space1.setBathroomNumbers(space.getBathroomNumbers());
-        space1.setBedroomNumbers(space.getBedroomNumbers());
-        space1.setArea(space.getArea());
-        spaceService.update(space1);
-        return new ResponseEntity<>(space1, HttpStatus.OK);
+        Space spa = new Space();
+        spa.setId(id);
+        spa.setStatus(space.getStatus());
+        spa.setPrice(space.getPrice());
+//        spa.setImage(space.getImage());
+        spa.setDescription(space.getDescription());
+        spa.setBathroomNumbers(space.getBathroomNumbers());
+        spa.setBedroomNumbers(space.getBedroomNumbers());
+        spa.setArea(space.getArea());
+        spaceService.update(spa);
+        return new ResponseEntity<>(spa, HttpStatus.OK);
     }
 
     // Delete đối tượng
@@ -88,5 +88,12 @@ public class SpaceController {
         return new ResponseEntity<>("Delete Success", HttpStatus.OK);
     }
 
-    
+    @GetMapping(value = "/booking", produces = "application/json")
+    public ResponseEntity<Space> getBooking(@RequestParam(name = "id") Integer id) {
+        Space space = spaceService.findById(id); //.orElse(null)
+        if(space == null){
+//            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
+        }
+        return new ResponseEntity<>(space, HttpStatus.OK);
+    }
 }

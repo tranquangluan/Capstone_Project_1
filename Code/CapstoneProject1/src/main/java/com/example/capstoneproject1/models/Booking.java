@@ -18,4 +18,15 @@ public class Booking {
     private BigDecimal totalPrice;
     @Column(name = "status")
     private  boolean status;
+
+    public Booking() {
+    }
+
+    public Booking(Integer id, User userId, Space spaceId, BigDecimal totalPrice, boolean status) {
+        this.id = id;
+        this.userId = userId;
+        this.spaceId = spaceId;
+        this.totalPrice = totalPrice;
+        this.status = status;
+    }
 }

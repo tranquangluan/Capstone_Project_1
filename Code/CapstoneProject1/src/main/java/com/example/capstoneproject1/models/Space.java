@@ -13,8 +13,9 @@ public class Space {
     private Integer id;
     @Column(name = "title")
     private String title;
-    @Column(name = "status")
-    private Boolean status;
+    @ManyToOne
+    @JoinColumn(name = "status")
+    private SpaceStatus status;
     @Column(name = "price")
     private BigDecimal price;
     @ManyToOne
@@ -48,8 +49,7 @@ public class Space {
     public Space() {
     }
 
-
-    public Space(Integer id, String title, Boolean status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User userId) {
+    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User userId) {
         this.id = id;
         this.title = title;
         this.status = status;
@@ -84,11 +84,11 @@ public class Space {
         this.title = title;
     }
 
-    public Boolean getStatus() {
+    public SpaceStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(SpaceStatus status) {
         this.status = status;
     }
 

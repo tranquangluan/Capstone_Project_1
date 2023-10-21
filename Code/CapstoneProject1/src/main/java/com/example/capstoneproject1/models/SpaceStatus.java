@@ -3,14 +3,10 @@ package com.example.capstoneproject1.models;
 import javax.persistence.*;
 
 @Entity
-
-public class Image {
+public class SpaceStatus {
     @Id
-    @Column(name = "imageId")
+    @Column(name="statusId")
     private Integer id;
-    @Column(name = "image")
-    private String image;
-
-
-
+    @Column(name="status")
+    private String status;
 }

@@ -8,7 +8,12 @@ project plan
 sửa trường db done
 
 
-code 
+code done
 
 
 sprint
+
+quy:19
+luan:20
+tan:19
+hoang:20
