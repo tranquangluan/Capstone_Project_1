@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface SpaceRepository extends CrudRepository<Space, Integer> {
+    @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id",nativeQuery = true)
+    List<Space> getList();
     @Query(value= "Select * from Space where price = :price and area= :area and category_id = :categoryId and province= :province and district= :district and ward = :ward and address= :address",nativeQuery = true)
     List<Space> search(BigDecimal price, float area, Integer categoryId, String province, String district, String ward, String address);
     @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id where space_id = :id",nativeQuery = true)

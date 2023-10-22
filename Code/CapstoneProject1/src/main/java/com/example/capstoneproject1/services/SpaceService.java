@@ -13,5 +13,6 @@ public interface SpaceService {
     void delete(Integer id);
     List<Space> search(BigDecimal price, float area, Integer categoryId,String province, String district, String ward, String address);
     Space detailSpace(Integer id);
+    List<Space> getList();
     Iterable<Space> findAll();
 }

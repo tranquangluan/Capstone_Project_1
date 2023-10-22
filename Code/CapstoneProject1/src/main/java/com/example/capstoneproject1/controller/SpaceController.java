@@ -27,13 +27,13 @@ public class SpaceController {
 
     @GetMapping(value = "")
     public List<Space> getSpaces(){
-        return (List<Space>) spaceService.findAll();
+        return spaceService.getList();
     }
 
     // Lấy đối tượng khi truyền ID
     @GetMapping(value = "/detail", produces = "application/json")
     public ResponseEntity<Space> getSpaceById(@RequestParam(name = "id") Integer id) {
-        Space space = spaceService.detailSpace(id); //.orElse(null)
+        Space space = spaceService.detailSpace(id);
         if(space == null){
 //            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
         }
@@ -79,8 +79,13 @@ public class SpaceController {
         }
         Space spa = new Space();
         spa.setId(id);
+        spa.setTitle(space.getTitle());
         spa.setStatus(space.getStatus());
         spa.setPrice(space.getPrice());
+        spa.setDistrict(space.getDistrict());
+        spa.setProvince(space.getProvince());
+        spa.setWard(space.getWard());
+        spa.setPeopleNumbers(space.getPeopleNumbers());
 //        spa.setImage(space.getImage());
         spa.setDescription(space.getDescription());
         spa.setBathroomNumbers(space.getBathroomNumbers());

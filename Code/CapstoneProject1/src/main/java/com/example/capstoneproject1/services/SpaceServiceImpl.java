@@ -42,6 +42,11 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    public List<Space> getList() {
+        return spaceRepository.getList();
+    }
+
+    @Override
     public Iterable<Space> findAll() {
         return (List<Space>) spaceRepository.findAll();
     }
