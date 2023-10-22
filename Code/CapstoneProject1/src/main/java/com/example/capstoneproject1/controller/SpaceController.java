@@ -90,6 +90,8 @@ public class SpaceController {
         spa.setDescription(space.getDescription());
         spa.setBathroomNumbers(space.getBathroomNumbers());
         spa.setBedroomNumbers(space.getBedroomNumbers());
+        spa.setAddress(space.getAddress());
+        spa.setCategoryId(space.getCategoryId());
         spa.setArea(space.getArea());
         spaceService.update(spa);
         return new ResponseEntity<>(spa, HttpStatus.OK);

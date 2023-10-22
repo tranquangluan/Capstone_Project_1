@@ -30,6 +30,7 @@ public class User {
     private String ward;
     @Column(name = "address")
     private String address;
+
     @ManyToOne
     @JoinColumn(name = "roleCode")
     private Role roleCode;

@@ -43,13 +43,13 @@ public class Space {
     @JoinColumn(name = "categoryId")
     private CategorySpace categoryId ;
     @ManyToOne
-    @JoinColumn(name = "userId")
-    private User userId ;
+    @JoinColumn(name = "ownerId")
+    private User ownerId ;
 
     public Space() {
     }
 
-    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User userId) {
+    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
         this.id = id;
         this.title = title;
         this.status = status;
@@ -65,7 +65,7 @@ public class Space {
         this.ward = ward;
         this.address = address;
         this.categoryId = categoryId;
-        this.userId = userId;
+        this.ownerId = ownerId;
     }
 
     public Integer getId() {
@@ -188,11 +188,11 @@ public class Space {
         this.categoryId = categoryId;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getOwnerId() {
+        return ownerId;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setOwnerId(User ownerId) {
+        this.ownerId = ownerId;
     }
 }
