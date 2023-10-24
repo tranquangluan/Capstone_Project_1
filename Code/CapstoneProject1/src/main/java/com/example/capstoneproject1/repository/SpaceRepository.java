@@ -10,10 +10,16 @@ import java.util.List;
 
 @Repository
 public interface SpaceRepository extends CrudRepository<Space, Integer> {
+    @Query(value= "Select address from space",nativeQuery = true)
+    List<Space> getAddress();
     @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id",nativeQuery = true)
     List<Space> getList();
-    @Query(value= "Select * from Space where price = :price and area= :area and category_id = :categoryId and province= :province and district= :district and ward = :ward and address= :address",nativeQuery = true)
-    List<Space> search(BigDecimal price, float area, Integer categoryId, String province, String district, String ward, String address);
+    @Query(value= "Select * from Space where (price between :priceMin and :priceMax) and (area between :areaMin and :areaMax) and category_id = :categoryId and province like %:province and district like %:district and ward like %:ward and address like %:address",nativeQuery = true)
+    List<Space> search(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
+    @Query(value= "Select * from Space where (price between :priceMin and :priceMax) and (area between :areaMin and :areaMax) and category_id = :categoryId and province like %:province and district like %:district and ward like %:ward and address like %:address order by price asc",nativeQuery = true)
+    List<Space> sortAsc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
+    @Query(value= "Select * from Space where (price between :priceMin and :priceMax) and (area between :areaMin and :areaMax) and category_id = :categoryId and province like %:province and district like %:district and ward like %:ward and address like %:address order by price desc",nativeQuery = true)
+    List<Space> sortDesc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
     @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id where space_id = :id",nativeQuery = true)
     Space detailSpace(Integer id);
 }

@@ -1,8 +1,10 @@
 package com.example.capstoneproject1.controller;
 
+import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.services.BookingService;
+import com.example.capstoneproject1.services.CategorySpaceService;
 import com.example.capstoneproject1.services.SpaceService;
 import com.example.capstoneproject1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class SpaceController {
     UserService userService;
     @Autowired
     BookingService bookingService;
+    @Autowired
+    CategorySpaceService categorySpaceService;
 
     @GetMapping(value = "")
     public List<Space> getSpaces(){
@@ -31,8 +35,8 @@ public class SpaceController {
     }
 
     // Lấy đối tượng khi truyền ID
-    @GetMapping(value = "/detail", produces = "application/json")
-    public ResponseEntity<Space> getSpaceById(@RequestParam(name = "id") Integer id) {
+    @GetMapping(value = "", produces = "application/json")
+    public ResponseEntity<Space> getSpaceById(@RequestParam(name = "spaceId") Integer id) {
         Space space = spaceService.detailSpace(id);
         if(space == null){
 //            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
@@ -47,17 +51,29 @@ public class SpaceController {
         }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-    @GetMapping(value = "/search", produces = "application/json")
-    public List<Space> getSpaceBy(@RequestParam(name = "price") BigDecimal price ,
-                                            @RequestParam(name = "area") float area,
-                                            @RequestParam(name = "categoryId") Integer categoryId,
-                                            @RequestParam(name = "province") String province,
-                                            @RequestParam(name = "district") String district,
-                                            @RequestParam(name = "ward") String ward,
-                                            @RequestParam(name = "address") String address) {
+    @GetMapping(value = "/", produces = "application/json")
+    public List<Space> searchAndSortSpace(@RequestParam(name = "priceMin", required = false, defaultValue = "0") BigDecimal priceMin ,
+                                                    @RequestParam(name = "priceMax", required = false, defaultValue = "50000000000") BigDecimal priceMax,
+                                                    @RequestParam(name = "areaMin",required = false, defaultValue = "10") float areaMin,
+                                                    @RequestParam(name = "areaMax",required = false, defaultValue = "1000000") float areaMax,
+                                                    @RequestParam(name = "categoryId",required = false) Integer categoryId,
+                                                    @RequestParam(name = "province",required = false, defaultValue = "") String province,
+                                                    @RequestParam(name = "district",required = false, defaultValue = "") String district,
+                                                    @RequestParam(name = "ward",required = false, defaultValue = "") String ward,
+                                                    @RequestParam(name = "address",required = false, defaultValue = "") String address,
+                                                    @RequestParam(name = "order",required = false, defaultValue = "null") String order) {
+        List<Space> spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
+        if (order.toString().equals("null")){
+            spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
 
-        List<Space> spacelist = spaceService.search(price,area,categoryId,province,district,ward,address);
-        return spacelist;
+        }else if(order.toString().equals("asc")){
+            spaceList = spaceService.sortAsc(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
+
+        }else if (order.toString().equals("desc")){
+            spaceList = spaceService.sortDesc(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
+        }
+        System.out.println(order);
+        return spaceList;
     }
 
 
@@ -69,8 +85,8 @@ public class SpaceController {
     }
 
     // Update đối tượng
-    @PutMapping(value = "/update")
-    public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "id") Integer id,
+    @PutMapping(value = "")
+    public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "spaceId") Integer id,
                                                            @RequestBody Space space){
         Space spaceTemp = spaceService.findById(id); //.orElse(null)
 
@@ -98,8 +114,8 @@ public class SpaceController {
     }
 
     // Delete đối tượng
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> updateSpaceByID(@RequestParam(name = "id") Integer id){
+    @DeleteMapping("")
+    public ResponseEntity<String> deleteSpaceByID(@RequestParam(name = "spaceId") Integer id){
         Space spaceTemp = spaceService.findById(id); //.orElse(null)
 
         if(spaceTemp == null){
@@ -141,5 +157,9 @@ public class SpaceController {
         return new ResponseEntity<>(user1, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/category")
+    public List<CategorySpace> getCategorySpaces(){
+        return (List<CategorySpace>) categorySpaceService.findAll();
+    }
 
 }
