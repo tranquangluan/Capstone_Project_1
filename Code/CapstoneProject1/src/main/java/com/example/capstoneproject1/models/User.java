@@ -1,6 +1,8 @@
 package com.example.capstoneproject1.models;
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -8,7 +10,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userID")
     private Integer id;
-    @Column(name = "userName", unique = true,nullable = false)
+    @Column(name = "userName")
     private String name;
     @Column(name = "gender")
     private String gender;
@@ -31,14 +33,16 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @ManyToOne
+    @ManyToMany
     @JoinColumn(name = "roleCode")
-    private Role roleCode;
+   // private Role roleCode;
+    Set<Role> roles = new HashSet<>();
 
     public User() {
     }
 
-    public User(Integer id, String name, String gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Role roleCode) {
+
+    public User(Integer id, String name, String gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -51,8 +55,33 @@ public class User {
         this.district = district;
         this.ward = ward;
         this.address = address;
-        this.roleCode = roleCode;
+        this.roles = roles;
     }
+
+    public User( String name,  String email, String password, String province, String district, String ward, String address) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+    }
+
+    //    public User(Integer id, String name, String gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Role roleCode) {
+//        this.id = id;
+//        this.name = name;
+//        this.gender = gender;
+//        this.dateOfBirth = dateOfBirth;
+//        this.phone = phone;
+//        this.email = email;
+//        this.password = password;
+//        this.avatar = avatar;
+//        this.province = province;
+//        this.district = district;
+//        this.ward = ward;
+//        this.address = address;//       this.roleCode = roleCode;
+//    }
 
     public Integer getId() {
         return id;
@@ -150,11 +179,20 @@ public class User {
         this.address = address;
     }
 
-    public Role getRoleCode() {
-        return roleCode;
+//    public Role getRoleCode() {
+//        return roleCode;
+//    }
+
+//    public void setRoleCode(Role roleCode) {
+ //       this.roleCode = roleCode;
+ //   }
+
+
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setRoleCode(Role roleCode) {
-        this.roleCode = roleCode;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

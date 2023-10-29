@@ -1,7 +1,7 @@
 package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.User;
+//import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.services.BookingService;
 import com.example.capstoneproject1.services.SpaceService;
 import com.example.capstoneproject1.services.UserService;
@@ -39,14 +39,14 @@ public class SpaceController {
         }
         return new ResponseEntity<>(space, HttpStatus.OK);
     }
-    @GetMapping(value = "/detailOwner", produces = "application/json")      //có vấn đề chỗ owner
-    public ResponseEntity<User> getOwnerById(@RequestParam(name = "id") Integer id) {
-        User user = userService.findById(id);
-        if(user == null){
-//            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
-        }
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/detailOwner", produces = "application/json")      //có vấn đề chỗ owner
+//    public ResponseEntity<User> getOwnerById(@RequestParam(name = "id") Integer id) {
+//        User user = userService.findById(id);
+//        if(user == null){
+////            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
+//        }
+//        return new ResponseEntity<>(user, HttpStatus.OK);
+//    }
     @GetMapping(value = "/search", produces = "application/json")
     public List<Space> getSpaceBy(@RequestParam(name = "price") BigDecimal price ,
                                             @RequestParam(name = "area") float area,
@@ -110,36 +110,36 @@ public class SpaceController {
         return new ResponseEntity<>("Delete Success", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/booking", produces = "application/json") // xung đột user khó hiểu
-    public ResponseEntity<Space> getBooking(@RequestParam(name = "id") Integer id,
-                                            @RequestBody User user) {
-        Space space = spaceService.detailSpace(id); //.orElse(null)
-        if(space == null){
+//@GetMapping(value = "/booking", produces = "application/json") // xung đột user khó hiểu
+  //  public ResponseEntity<Space> getBooking(@RequestParam(name = "id") Integer id,
+        //                                    @RequestBody User user) {
+      //  Space space = spaceService.detailSpace(id); //.orElse(null)
+      //  if(space == null){
 //            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
-        }
-        return new ResponseEntity<>(space, HttpStatus.OK);
-    }
+        //}
+       // return new ResponseEntity<>(space, HttpStatus.OK);
+  //  }
 
-    @PutMapping(value = "/user/profile")
-    public ResponseEntity<User> updateUserInformation(@RequestParam(name = "id") Integer id,
-                                                @RequestBody User user){
-        User userTemp = userService.findById(id); //.orElse(null)
-
-        if(userTemp == null){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        User user1 = new User();
-        user1.setId(id);
-        user1.setAvatar(user.getAvatar());
-        user1.setName(user.getName());
-        user1.setGender(user.getGender());
-        user1.setDateOfBirth(user.getDateOfBirth());
-        user1.setPhone(user.getPhone());
-        user1.setEmail(user.getEmail());
-        user1.setAddress(user.getAddress());
-        userService.update(user1);
-        return new ResponseEntity<>(user1, HttpStatus.OK);
-    }
-
-
+//    @PutMapping(value = "/user/profile")
+//    public ResponseEntity<User> updateUserInformation(@RequestParam(name = "id") Integer id,
+//                                                @RequestBody User user){
+//        User userTemp = userService.findById(id); //.orElse(null)
+//
+//        if(userTemp == null){
+//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+//        }
+//        User user1 = new User();
+//        user1.setId(id);
+//        user1.setAvatar(user.getAvatar());
+//        user1.setName(user.getName());
+//        user1.setGender(user.getGender());
+//        user1.setDateOfBirth(user.getDateOfBirth());
+//        user1.setPhone(user.getPhone());
+//        user1.setEmail(user.getEmail());
+//        user1.setAddress(user.getAddress());
+//        userService.update(user1);
+//        return new ResponseEntity<>(user1, HttpStatus.OK);
+//    }
+//
+//
 }
