@@ -5,9 +5,9 @@ import javax.persistence.*;
 @Entity
 public class Role {
     @Id
-    @Column(name = "roleCode")
+    @Column(name = "roleCode" , length = 10)
     private String roleCode;
-    @Column(name = "roleValue")
+    @Column(name = "roleValue" , length = 10)
     private String roleValue;
 
     public String getRoleCode() {

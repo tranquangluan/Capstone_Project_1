@@ -2,7 +2,6 @@ package com.example.capstoneproject1.repository;
 
 import com.example.capstoneproject1.models.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,4 +12,6 @@ public interface RoleRepository extends JpaRepository<Role, String> {
 //    Role findByRoleCode(String roleCode);
 
     Optional<Role> findByRoleCode(String roleCode);
+
+
 }

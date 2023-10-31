@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +57,8 @@ public class AuthController {
     private UserDetailService userDetailService;
 
     @PostMapping(value = "/register" , produces  = "application/json")
-    public ResponseEntity<?>  register(@RequestBody SignUpForm signUpForm) {
+    public ResponseEntity<?>  register(@Valid @RequestBody SignUpForm signUpForm) {
+            System.out.printf(signUpForm.getEmail());
            if(userServiceImpl.existsByEmail(signUpForm.getEmail())) {
                return new ResponseEntity<> (new ResponseMessage("Email is existed"), HttpStatus.OK );
            }
@@ -66,18 +68,18 @@ public class AuthController {
            roles.add(roleUser);
            user.setRoles(roles);
            userServiceImpl.save(user);
-           return new ResponseEntity<>(new ResponseMessage("Created successfully") ,HttpStatus.OK);
+           return new ResponseEntity<>(new ResponseMessage("Created account successfully") ,HttpStatus.OK);
     }
 
-
     @PostMapping(value = "/login" , produces  = "application/json")
-    public ResponseEntity<?> login(@RequestBody SignInForm signInForm) {
+    public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtTokenProvider.generateToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return ResponseEntity.ok(new JwtResponse("Login Successful", token,"Bearer", userPrinciple.getAuthorities()));
+        return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken,"Bearer", userPrinciple.getAuthorities()));
     }
 
     @GetMapping(value = "/refresh-token")
@@ -87,7 +89,7 @@ public class AuthController {
             String token = jwtTokenFilter.getJwtFromRequest(request);
 
             if (token != null && jwtTokenProvider.validateToken(token)) {
-                String userName = jwtTokenProvider.getUserNameFromToken(token);
+                String userName = jwtTokenProvider.getUserEmailFromToken(token);
                 UserDetails userDetails = userDetailService.loadUserByUsername(userName);
                 if(userDetails != null) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

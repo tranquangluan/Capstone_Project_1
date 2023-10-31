@@ -1,4 +1,5 @@
 package com.example.capstoneproject1.models;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.HashSet;
@@ -33,10 +34,9 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @ManyToMany
-    @JoinColumn(name = "roleCode")
-   // private Role roleCode;
-    Set<Role> roles = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
@@ -68,20 +68,6 @@ public class User {
         this.address = address;
     }
 
-    //    public User(Integer id, String name, String gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Role roleCode) {
-//        this.id = id;
-//        this.name = name;
-//        this.gender = gender;
-//        this.dateOfBirth = dateOfBirth;
-//        this.phone = phone;
-//        this.email = email;
-//        this.password = password;
-//        this.avatar = avatar;
-//        this.province = province;
-//        this.district = district;
-//        this.ward = ward;
-//        this.address = address;//       this.roleCode = roleCode;
-//    }
 
     public Integer getId() {
         return id;
@@ -178,15 +164,6 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-
-//    public Role getRoleCode() {
-//        return roleCode;
-//    }
-
-//    public void setRoleCode(Role roleCode) {
- //       this.roleCode = roleCode;
- //   }
-
 
     public Set<Role> getRoles() {
         return roles;

@@ -1,8 +1,7 @@
 package com.example.capstoneproject1.security.jwt;
 
 import com.example.capstoneproject1.security.userPrincal.UserDetailService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,40 +16,58 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class JwtTokenFilter extends OncePerRequestFilter {
-    private static final Logger logger= LoggerFactory.getLogger(JwtTokenFilter.class);
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private UserDetailService userDetailService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (request.getServletPath().contains("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String token = getJwtFromRequest(request);
 
             if (token != null && jwtTokenProvider.validateToken(token)) {
-                String userName = jwtTokenProvider.getUserNameFromToken(token);
-                UserDetails userDetails = userDetailService.loadUserByUsername(userName);
-                if(userDetails != null) {
+                String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+                UserDetails userDetails = userDetailService.loadUserByUsername(userEmail);
+                if (userDetails != null) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null , userDetails.getAuthorities() );
+                            userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    filterChain.doFilter(request, response);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    Map<String, String> errorMessage = new HashMap<>();
+                    errorMessage.put("error", "User not found");
+                    response.setContentType("application/json");
+                    new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
                 }
-                else {
-                    logger.error("Do not have userDetails");
-                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, String> errorMessage = new HashMap<>();
+                errorMessage.put("Error", jwtTokenProvider.getMessage());
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
             }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION);
+            Map<String, String> errorMessage = new HashMap<>();
+            errorMessage.put("Error", e.getMessage());
+            response.setContentType("application/json");
+            new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
         }
-        catch (Exception e) {
-            logger.error("Can not set user authentication: " + e);
-        }
-
-        filterChain.doFilter(request,response);
-
     }
 
     public String getJwtFromRequest(HttpServletRequest request) {

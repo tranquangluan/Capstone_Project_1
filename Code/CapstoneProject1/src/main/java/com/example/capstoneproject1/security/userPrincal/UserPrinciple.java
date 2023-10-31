@@ -33,9 +33,6 @@ public class UserPrinciple implements UserDetails {
         return role;
     }
 
-    public UserPrinciple() {
-    }
-
     public UserPrinciple(Integer id, String name, String gender, Date dateOfBirth, String email, String phone, String password, String avatar, String province, String district, String ward, String address, Collection<? extends GrantedAuthority> role) {
         this.id = id;
         this.name = name;
@@ -52,7 +49,7 @@ public class UserPrinciple implements UserDetails {
         this.role = role;
     }
 
-    public  static UserPrinciple build(User user) {
+    public static UserPrinciple build(User user) {
         // convert set  to list syntax
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleValue())).collect(Collectors.toList());
         return new UserPrinciple(
@@ -70,6 +67,14 @@ public class UserPrinciple implements UserDetails {
                 user.getAddress(),
                 authorities
         );
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @Override

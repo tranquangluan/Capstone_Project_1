@@ -1,15 +1,23 @@
 package com.example.capstoneproject1.dto.request;
 
+import javax.validation.constraints.NotNull;
+
 public class SignUpForm {
 
+    @NotNull
     private String name;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
+    @NotNull
     private String province;
+    @NotNull
     private String district;
+    @NotNull
     private String ward;
+    @NotNull
     private String address;
-
 
 
     public SignUpForm(String name, String email, String password, String province, String district, String ward, String address) {
@@ -21,6 +29,8 @@ public class SignUpForm {
         this.ward = ward;
         this.address = address;
     }
+
+
 
     public String getName() {
         return name;

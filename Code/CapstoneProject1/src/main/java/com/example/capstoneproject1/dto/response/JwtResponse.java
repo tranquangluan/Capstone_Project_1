@@ -9,15 +9,20 @@ public class JwtResponse {
     private String message;
     private String accessToken;
 
+
+
+    private String refreshToken;
+
     private String type;
     private Collection<? extends GrantedAuthority> roles;
 
     public JwtResponse() {
     }
 
-    public JwtResponse(String message, String accessToken, String type, Collection<? extends GrantedAuthority> roles) {
+    public JwtResponse(String message, String accessToken, String refreshToken, String type, Collection<? extends GrantedAuthority> roles) {
         this.message = message;
         this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.type = type;
         this.roles = roles;
     }
@@ -36,6 +41,12 @@ public class JwtResponse {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getType() {

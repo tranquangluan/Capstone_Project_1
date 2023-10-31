@@ -55,14 +55,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors() // Prevent requests from another domain
                 .and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll() // Cho phép tất cả mọi người truy cập vào địa chỉ này
-                .anyRequest().authenticated() // Tất cả các request khác đều cần phải xác thực mới được truy cập
+                .antMatchers("/**").permitAll()
+                .antMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and().sessionManagement( session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
                 // Thêm một lớp Filter kiểm tra jwt
-            httpSecurity.addFilterBefore(jwtTokenFilterOne(),     UsernamePasswordAuthenticationFilter.class);
+            httpSecurity.addFilterBefore(jwtTokenFilterOne(), UsernamePasswordAuthenticationFilter.class);
     }
 
 }

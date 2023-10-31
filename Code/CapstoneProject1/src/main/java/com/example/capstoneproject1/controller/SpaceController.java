@@ -1,14 +1,12 @@
 package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.models.Space;
-//import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.services.BookingService;
 import com.example.capstoneproject1.services.SpaceService;
 import com.example.capstoneproject1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -30,7 +28,7 @@ public class SpaceController {
         return spaceService.getList();
     }
 
-    // Lấy đối tượng khi truyền ID
+
     @GetMapping(value = "/detail", produces = "application/json")
     public ResponseEntity<Space> getSpaceById(@RequestParam(name = "id") Integer id) {
         Space space = spaceService.detailSpace(id);

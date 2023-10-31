@@ -1,49 +1,99 @@
 package com.example.capstoneproject1.security.jwt;
 
 
-
 import com.example.capstoneproject1.security.userPrincal.UserPrinciple;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
     private String message;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     // Đoạn JWT_SECRET này là bí mật, chỉ có phía server biết
-    private final String JWT_SECRET = "lodaaaaaa";
+    private static final String JWT_SECRET = "F2C583391C63F2D39E3EE2955677A";
 
     //Thời gian có hiệu lực của chuỗi jwt
     private final long JWT_EXPIRATION = 86400;
 
-    // Tạo ra jwt từ thông tin user
+    // generated jwt from information of user
     public String generateToken(Authentication authentication ) {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
 
-        return  Jwts.builder()
+        List<String> roles = userPrinciple.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return Jwts.builder()
+                .setId(userPrinciple.getId().toString())
                 .setSubject(userPrinciple.getUsername())
-                .setIssuedAt(new Date()).setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION*1000))
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
+                .claim("roles", roles) // add accessControl in claims
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 2000))
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
     }
+
+    public String generateRefreshToken(Authentication authentication ) {
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+
+        return Jwts.builder()
+                .setId(userPrinciple.getId().toString())
+                .setSubject(userPrinciple.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 1000))
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
+    }
+
 
     // get information from jwt secret
-    public String getUserNameFromToken(String token) {
-       String userEmail = Jwts.parser()
+    public String getUserEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
-                .getBody().getSubject();
+                .getBody();
 
-        return userEmail;
+        return claims.getSubject();
     }
+
+    public static String getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(JWT_SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getId();
+    }
+
+    public static Collection<GrantedAuthority> getRolesFromToken(String token) {
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(JWT_SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+
+        List<String> rolesList = claims.get("roles", List.class);
+
+        String[] roles = rolesList.toArray(new String[rolesList.size()]);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        Arrays.stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+
+        return authorities;
+    }
+
 
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
+            setMessage("Validation token is valid");
             return true;
         } catch (MalformedJwtException ex) {
             setMessage("Invalid JWT token");
