@@ -11,17 +11,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userID")
     private Integer id;
-    @Column(name = "userName")
+    @Column(name = "userName", length = 50)
     private String name;
-    @Column(name = "gender")
+    @Column(name = "gender", length = 10)
     private String gender;
     @Column(name = "dateOfBirth")
     private Date dateOfBirth;
-    @Column(name = "phone")
+    @Column(name = "phone", length = 11)
     private String phone;
     @Column(name = "email",unique = true,nullable = false)
     private String email;
-    @Column(columnDefinition = "TEXT", name = "Password",nullable = false)
+    @Column(name = "password",nullable = false)
     private String password;
     @Column(name = "avatar")
     private String avatar;
@@ -33,6 +33,9 @@ public class User {
     private String ward;
     @Column(name = "address")
     private String address;
+
+    @Column(name = "refreshToken")
+    private String refreshToken;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -163,6 +166,14 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public Set<Role> getRoles() {

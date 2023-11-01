@@ -33,6 +33,22 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    public Boolean existPassword(String password) {
+        return userRepository.existsByPassword(password);
+    }
+
+    @Override
+    public Boolean existsByRefreshToken(String refreshToken) {
+        return userRepository.existsByRefreshToken(refreshToken);
+    }
+
+    @Override
+    public String getPasswordByEmail(String email) {
+        return userRepository.getPasswordByEmail(email);
+    }
+
     @Override
     public void update(User user) {
         userRepository.save(user);
@@ -64,7 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addToUser(String username, String roleName) {
-
+    public User findByRefreshToken(String refreshToken) {
+        return userRepository.findByRefreshToken(refreshToken);
     }
 }

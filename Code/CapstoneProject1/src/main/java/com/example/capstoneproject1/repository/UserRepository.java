@@ -12,7 +12,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value= "Select * from user where user_name = :name ",nativeQuery = true)
     User findByUsername(String name);
 
+    User findByRefreshToken(String refreshToken);
+
+    String getPasswordByEmail(String email);
 
     Optional<User> findByEmail(String email);
     Boolean existsByEmail(String email);
+    Boolean existsByPassword(String password);
+    Boolean existsByRefreshToken(String refreshToken);
 }

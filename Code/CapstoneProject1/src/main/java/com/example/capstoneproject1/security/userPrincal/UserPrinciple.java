@@ -49,6 +49,12 @@ public class UserPrinciple implements UserDetails {
         this.role = role;
     }
 
+    public UserPrinciple(String email, Collection<? extends GrantedAuthority> role) {
+
+        this.email = email;
+        this.role = role;
+    }
+
     public static UserPrinciple build(User user) {
         // convert set  to list syntax
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleValue())).collect(Collectors.toList());

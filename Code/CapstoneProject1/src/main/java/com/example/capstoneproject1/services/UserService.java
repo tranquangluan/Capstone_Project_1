@@ -11,11 +11,13 @@ public interface UserService {
     void delete(Integer id);
     User findByUsername(String name);
     Iterable<User> findAll();
-
     Role saveRole(Role role);
-    void addToUser(String username, String roleName);
+    User findByRefreshToken(String refreshToken);
 
     Optional<User> findByEmail(String email);
     Boolean existsByEmail(String email);
     User save(User user);
+    Boolean existPassword(String password);
+    Boolean existsByRefreshToken(String refreshToken);
+    String getPasswordByEmail(String email);
 }

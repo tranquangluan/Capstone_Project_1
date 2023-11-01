@@ -1,10 +1,12 @@
 package com.example.capstoneproject1.dto.response;
 
+import org.springframework.http.HttpStatus;
+
 public class ResponseMessage {
 
     private  String message;
 
-    public ResponseMessage() {
+    public ResponseMessage(String s, HttpStatus badRequest) {
     }
 
     public ResponseMessage(String message) {
