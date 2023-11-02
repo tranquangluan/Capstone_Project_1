@@ -11,7 +11,9 @@ public interface SpaceService {
     void update(Space space);
     Space findById(Integer id);
     void delete(Integer id);
-    List<Space> search(BigDecimal price, float area, Integer categoryId,String province, String district, String ward, String address);
+    List<Space> search(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
+    List<Space> sortAsc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
+    List<Space> sortDesc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
     Space detailSpace(Integer id);
     List<Space> getList();
     Iterable<Space> findAll();

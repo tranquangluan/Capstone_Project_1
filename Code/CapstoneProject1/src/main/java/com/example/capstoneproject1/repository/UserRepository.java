@@ -11,11 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value= "Select * from user where user_name = :name ",nativeQuery = true)
     User findByUsername(String name);
-
     User findByRefreshToken(String refreshToken);
-
     String getPasswordByEmail(String email);
-
     Optional<User> findByEmail(String email);
     Optional<User> findById(Integer userId);
     Boolean existsByEmail(String email);

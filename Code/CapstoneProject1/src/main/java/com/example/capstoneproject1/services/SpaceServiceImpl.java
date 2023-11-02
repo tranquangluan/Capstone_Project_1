@@ -31,8 +31,20 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
-    public List<Space> search(BigDecimal price, float area, Integer categoryId, String province, String district, String ward, String address) {
-        List<Space> spaceList = spaceRepository.search(price, area, categoryId, province, district, ward, address);
+    public List<Space> search(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address) {
+        List<Space> spaceList = spaceRepository.search(priceMin, priceMax, areaMin,areaMax, categoryId, province, district, ward, address);
+        return spaceList;
+    }
+
+    @Override
+    public List<Space> sortAsc(BigDecimal priceMin, BigDecimal priceMax, float areaMin, float areaMax, Integer categoryId, String province, String district, String ward, String address) {
+        List<Space> spaceList = spaceRepository.sortAsc(priceMin, priceMax, areaMin,areaMax, categoryId, province, district, ward, address);
+        return spaceList;
+    }
+
+    @Override
+    public List<Space> sortDesc(BigDecimal priceMin, BigDecimal priceMax, float areaMin, float areaMax, Integer categoryId, String province, String district, String ward, String address) {
+        List<Space> spaceList = spaceRepository.sortDesc(priceMin, priceMax, areaMin,areaMax, categoryId, province, district, ward, address);
         return spaceList;
     }
 

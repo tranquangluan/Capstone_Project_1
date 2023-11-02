@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserService {
     void update(User user);
-//    User findById(Integer id);
+    User findByUserId(Integer id);
     void delete(Integer id);
     User findByUsername(String name);
     Iterable<User> findAll();
