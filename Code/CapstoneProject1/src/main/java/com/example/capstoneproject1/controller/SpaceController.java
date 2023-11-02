@@ -10,11 +10,11 @@ import com.example.capstoneproject1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/space")
@@ -45,7 +45,7 @@ public class SpaceController {
     }
     @GetMapping(value = "/detailOwner", produces = "application/json")      //có vấn đề chỗ owner
     public ResponseEntity<User> getOwnerById(@RequestParam(name = "id") Integer id) {
-        User user = userService.findById(id);
+        User user = userService.findByUserId(id);
         if(user == null){
 //            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
         }
@@ -53,15 +53,15 @@ public class SpaceController {
     }
     @GetMapping(value = "/", produces = "application/json")
     public List<Space> searchAndSortSpace(@RequestParam(name = "priceMin", required = false, defaultValue = "0") BigDecimal priceMin ,
-                                                    @RequestParam(name = "priceMax", required = false, defaultValue = "50000000000") BigDecimal priceMax,
-                                                    @RequestParam(name = "areaMin",required = false, defaultValue = "10") float areaMin,
-                                                    @RequestParam(name = "areaMax",required = false, defaultValue = "1000000") float areaMax,
-                                                    @RequestParam(name = "categoryId",required = false) Integer categoryId,
-                                                    @RequestParam(name = "province",required = false, defaultValue = "") String province,
-                                                    @RequestParam(name = "district",required = false, defaultValue = "") String district,
-                                                    @RequestParam(name = "ward",required = false, defaultValue = "") String ward,
-                                                    @RequestParam(name = "address",required = false, defaultValue = "") String address,
-                                                    @RequestParam(name = "order",required = false, defaultValue = "null") String order) {
+                                          @RequestParam(name = "priceMax", required = false, defaultValue = "50000000000") BigDecimal priceMax,
+                                          @RequestParam(name = "areaMin",required = false, defaultValue = "10") float areaMin,
+                                          @RequestParam(name = "areaMax",required = false, defaultValue = "1000000") float areaMax,
+                                          @RequestParam(name = "categoryId",required = false) Integer categoryId,
+                                          @RequestParam(name = "province",required = false, defaultValue = "") String province,
+                                          @RequestParam(name = "district",required = false, defaultValue = "") String district,
+                                          @RequestParam(name = "ward",required = false, defaultValue = "") String ward,
+                                          @RequestParam(name = "address",required = false, defaultValue = "") String address,
+                                          @RequestParam(name = "order",required = false, defaultValue = "null") String order) {
         List<Space> spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
         if (order.toString().equals("null")){
             spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
@@ -87,7 +87,7 @@ public class SpaceController {
     // Update đối tượng
     @PutMapping(value = "")
     public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "spaceId") Integer id,
-                                                           @RequestBody Space space){
+                                                 @RequestBody Space space){
         Space spaceTemp = spaceService.findById(id); //.orElse(null)
 
         if(spaceTemp == null){
@@ -138,8 +138,8 @@ public class SpaceController {
 
     @PutMapping(value = "/user/profile")
     public ResponseEntity<User> updateUserInformation(@RequestParam(name = "id") Integer id,
-                                                @RequestBody User user){
-        User userTemp = userService.findById(id); //.orElse(null)
+                                                      @RequestBody User user){
+        User userTemp = userService.findByUserId(id); //.orElse(null)
 
         if(userTemp == null){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -161,5 +161,4 @@ public class SpaceController {
     public List<CategorySpace> getCategorySpaces(){
         return (List<CategorySpace>) categorySpaceService.findAll();
     }
-
 }

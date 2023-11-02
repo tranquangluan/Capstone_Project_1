@@ -5,9 +5,24 @@ import javax.persistence.*;
 @Entity
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "roleCode")
+    @Column(name = "roleCode" , length = 10)
     private String roleCode;
-    @Column(name = "roleValue")
+    @Column(name = "roleValue" , length = 10)
     private String roleValue;
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
+
+    public String getRoleValue() {
+        return roleValue;
+    }
+
+    public void setRoleValue(String roleValue) {
+        this.roleValue = roleValue;
+    }
 }

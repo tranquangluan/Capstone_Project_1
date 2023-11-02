@@ -15,17 +15,27 @@ repositories {
     mavenCentral()
 }
 
+
+
 dependencies {
     implementation group: 'mysql', name: 'mysql-connector-java'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-//    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.4.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.7.5'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    ext['spring-security.version']='6.1.5'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
+    implementation 'com.cloudinary:cloudinary-http44:1.28.1'
+    implementation 'com.cloudinary:cloudinary:1.0.12'
+
+
+
 }
 
 tasks.named('test') {
