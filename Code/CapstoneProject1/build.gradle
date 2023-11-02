@@ -31,6 +31,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-security"
     ext['spring-security.version']='6.1.5'
     implementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
+    implementation 'com.cloudinary:cloudinary-http44:1.28.1'
+    implementation 'com.cloudinary:cloudinary:1.0.12'
+
+
 
 }
 

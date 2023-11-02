@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -54,10 +55,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Override
-    public User findById(Integer id) {
-        return  userRepository.findById(id).orElse(null);
-    }
+//    @Override
+//    public User findById(Integer id) {
+//        return  userRepository.findById(id).orElse(null);
+//    }
 
     @Override
     public void delete(Integer id) {
@@ -82,5 +83,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByRefreshToken(String refreshToken) {
         return userRepository.findByRefreshToken(refreshToken);
+    }
+
+    @Override
+    public Optional<User> findById(Integer userId) {
+        return userRepository.findById(userId);
     }
 }

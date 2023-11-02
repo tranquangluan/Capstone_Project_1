@@ -65,6 +65,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     @PostMapping(value = "/register", produces = "application/json")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpForm signUpForm) {
@@ -95,7 +96,6 @@ public class AuthController {
             authService.saveRefreshToken(signInForm.getEmail(), refreshToken);
 
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-
         return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken, "Bearer", userPrinciple.getAuthorities()));
     }
 
@@ -132,11 +132,9 @@ public class AuthController {
     public ResponseEntity<?> logOut(HttpServletRequest request, HttpServletResponse response) {
         // Get authenticated user information
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication);
         if (authentication != null) {
             // Cancel the user's session
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-            System.out.println(authentication);
+            logoutHandler.logout(request, response, authentication);
             return ResponseEntity.ok(new ResponseMessage("Logout Successful"));
         }
         return ResponseEntity.ok(new ResponseMessage("No user is logged in"));
