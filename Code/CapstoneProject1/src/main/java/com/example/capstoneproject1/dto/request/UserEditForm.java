@@ -1,16 +1,17 @@
 package com.example.capstoneproject1.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 
 public class UserEditForm {
+    @Value("${rest.client.url}")
     private String fullName;
-    private String gender;
+    private Boolean gender;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd/MM/yyyy")
     private Date dateOfBirth;
     private String phone;
-    private String avatar;
     private String province;
     private String district;
     private String ward;
@@ -21,12 +22,11 @@ public class UserEditForm {
     public UserEditForm() {
     }
 
-    public UserEditForm(String fullName, String gender, Date dateOfBirth, String phone, String avatar, String province, String district, String ward, String address, String oldPassword, String newPassword) {
+    public UserEditForm(String fullName, Boolean gender, Date dateOfBirth, String phone, String avatar, String province, String district, String ward, String address, String oldPassword, String newPassword) {
         this.fullName = fullName;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.phone = phone;
-        this.avatar = avatar;
         this.province = province;
         this.district = district;
         this.ward = ward;
@@ -43,11 +43,11 @@ public class UserEditForm {
         this.fullName = fullName;
     }
 
-    public String getGender() {
+    public Boolean getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Boolean gender) {
         this.gender = gender;
     }
 
@@ -65,14 +65,6 @@ public class UserEditForm {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
     }
 
     public String getProvince() {

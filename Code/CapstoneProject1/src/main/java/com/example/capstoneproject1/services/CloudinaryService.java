@@ -9,21 +9,26 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Service
 public class CloudinaryService {
-    Cloudinary cloudinary;
+    private  Cloudinary cloudinary;
 
-//    public CloudinaryService() {
-//        Map<String, String> valuesMap = new HashMap<>();
-//        valuesMap.put("cloud_name", "dghu2ne82");
-//        valuesMap.put("api_key", "945594823734944");
-//        valuesMap.put("api_secret", "K0_8M1Q3k7Ai1FIPrrYbTgvf-9w");
-//        cloudinary = new Cloudinary(valuesMap);
-//    }
+    private static final String CLOUD_NAME= "shared-space-finder";
 
+    private static final String API_KEY= "698537876736678";
+
+    private static final String API_SECRET= "7GEg5HoGcvHQ8nCRtJzpcPAKFkc";
+    public CloudinaryService() {
+        Map<String, String> valuesMap = new HashMap<>();
+        valuesMap.put("cloud_name", CLOUD_NAME);
+        valuesMap.put("api_key", API_KEY);
+        valuesMap.put("api_secret", API_SECRET);
+        cloudinary = new Cloudinary(valuesMap);
+    }
 
     public Map upload(MultipartFile multipartFile) throws IOException {
         File file = convert(multipartFile);

@@ -6,17 +6,20 @@ import com.example.capstoneproject1.dto.response.UserResponse;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
+import com.example.capstoneproject1.services.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,6 +34,9 @@ public class UserController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     @PreAuthorize("hasAnyAuthority('User')")
     @GetMapping("/current-user")
@@ -48,26 +54,31 @@ public class UserController {
                     User user = userOptional.get();
                     return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(jwtTokenProvider.getMessage()), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 401), HttpStatus.NOT_FOUND);
                 }
             } else
-                return new ResponseEntity<>(new ResponseMessage(jwtTokenProvider.getMessage()), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1,jwtTokenProvider.getMessage(), 401), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage( 1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
         }
     }
 
 
     @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
-    @PutMapping(value = "/edit-profile" , produces = "application/json")
-    public ResponseEntity<?> editUser(@Valid @RequestBody UserEditForm userEditForm ,@RequestParam String userId) {
+    @PutMapping(value = "/edit-profile" , consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE
+    } , produces = {
+                    MediaType.APPLICATION_JSON_VALUE
+            })
+    public @ResponseBody ResponseEntity<?> editUser(UserEditForm userEditForm , @RequestParam(name = "userId") Integer userId, @RequestParam(required=false, value="avartar") MultipartFile avartar) {
+
 
         try {
-
-            Optional<User> user = userRepository.findById(Integer. parseInt(userId));
+            Optional<User> user = userRepository.findById(userId);
 
             if( !user.isPresent()) {
-                return new ResponseEntity<>("User Not Found!", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new ResponseMessage(1 ,"User Not Found!", 404), HttpStatus.NOT_FOUND);
             }
 
             if (userEditForm.getFullName() != null) {
@@ -80,10 +91,10 @@ public class UserController {
                 user.get().setWard(userEditForm.getWard());
                 user.get().setAddress(userEditForm.getAddress());
             }
+            if(userEditForm.getGender() != null)
+                user.get().setGender(userEditForm.getGender());
 
             if(userEditForm.getDateOfBirth() != null) {
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-//                Date date = dateFormat.parse(userEditForm.getDateOfBirth());
                 java.sql.Date sqlDate = new java.sql.Date(userEditForm.getDateOfBirth().getTime());
                 user.get().setDateOfBirth(sqlDate);
             }
@@ -98,19 +109,36 @@ public class UserController {
                 if (passwordEncoder.matches(oldPassword,storedPassword)) {
                         user.get().setPassword(passwordEncoder.encode(userEditForm.getNewPassword()));
                 }else {
-                    return new ResponseEntity<>(new ResponseMessage("Old Password Was Incorrect!"), HttpStatus.ACCEPTED);
+                    return new ResponseEntity<>(new ResponseMessage(1,"Old Password Was Incorrect!", 401), HttpStatus.ACCEPTED);
                 }
             }
 
-            if (userEditForm.getAvatar() != null) {
-                user.get().setAvatar(userEditForm.getAvatar());
-            }
 
+            if(avartar != null) {
+                if (!avartar.isEmpty()) {
+                    // delete in cloudinary before updating
+                    if (user.get().getAvatarId() != null) {
+                        cloudinaryService.delete( user.get().getAvatarId() );
+                    }
+                    Map result = cloudinaryService.upload(avartar);
+                    System.out.println(result);
+                    String imageUrl = (String) result.get("secure_url");
+                    String imageId = (String) result.get("public_id");
+                    user.get().setAvatar(imageUrl);
+                    user.get().setAvatarId(imageId);
+                } else {
+                    // delete image in stored when user not sent image when request url
+                    if (user.get().getAvatarId() != null) {
+                        cloudinaryService.delete( user.get().getAvatarId() );
+                    }
+                }
+
+            }
             userRepository.save(user.get());
-            return new ResponseEntity<>(new ResponseMessage("Update Profile Successfully!"), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!",201), HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 }

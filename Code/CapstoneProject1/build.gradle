@@ -34,8 +34,6 @@ dependencies {
     implementation 'com.cloudinary:cloudinary-http44:1.28.1'
     implementation 'com.cloudinary:cloudinary:1.0.12'
 
-
-
 }
 
 tasks.named('test') {

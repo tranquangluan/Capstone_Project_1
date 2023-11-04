@@ -13,8 +13,8 @@ public class User {
     private Integer id;
     @Column(name = "userName", length = 50)
     private String name;
-    @Column(name = "gender", length = 10)
-    private String gender;
+    @Column(name = "gender")
+    private Boolean gender;
     @Column(name = "dateOfBirth")
     private Date dateOfBirth;
     @Column(name = "phone", length = 11)
@@ -23,6 +23,8 @@ public class User {
     private String email;
     @Column(name = "password",nullable = false)
     private String password;
+    @Column(name = "avatarId")
+    private String avatarId;
     @Column(name = "avatar")
     private String avatar;
     @Column(name = "province")
@@ -45,7 +47,7 @@ public class User {
     }
 
 
-    public User(Integer id, String name, String gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Set<Role> roles) {
+    public User(Integer id, String name, Boolean gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -88,11 +90,11 @@ public class User {
         this.name = name;
     }
 
-    public String getGender() {
+    public Boolean getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Boolean gender) {
         this.gender = gender;
     }
 
@@ -126,6 +128,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
     }
 
     public String getAvatar() {

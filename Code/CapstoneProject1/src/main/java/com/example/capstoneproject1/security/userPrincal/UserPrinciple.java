@@ -15,7 +15,7 @@ public class UserPrinciple implements UserDetails {
 
     private Integer id;
     private String name;
-    private String gender;
+    private Boolean gender;
     private Date dateOfBirth ;
     private String email;
     private String phone;
@@ -33,7 +33,7 @@ public class UserPrinciple implements UserDetails {
         return role;
     }
 
-    public UserPrinciple(Integer id, String name, String gender, Date dateOfBirth, String email, String phone, String password, String avatar, String province, String district, String ward, String address, Collection<? extends GrantedAuthority> role) {
+    public UserPrinciple(Integer id, String name, Boolean gender, Date dateOfBirth, String email, String phone, String password, String avatar, String province, String district, String ward, String address, Collection<? extends GrantedAuthority> role) {
         this.id = id;
         this.name = name;
         this.gender = gender;

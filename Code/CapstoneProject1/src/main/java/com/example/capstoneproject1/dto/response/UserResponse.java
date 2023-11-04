@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class UserResponse {
     private Integer id;
     private String name;
-    private String gender;
+    private Boolean gender;
     private Date dateOfBirth;
     private String email;
     private String phone;
@@ -65,11 +65,11 @@ public class UserResponse {
         this.name = name;
     }
 
-    public String getGender() {
+    public Boolean getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Boolean gender) {
         this.gender = gender;
     }
 

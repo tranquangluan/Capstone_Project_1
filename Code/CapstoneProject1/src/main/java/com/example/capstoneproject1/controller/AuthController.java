@@ -18,6 +18,7 @@ import com.example.capstoneproject1.services.UserServiceImpl;
 import com.example.capstoneproject1.services.impl.RoleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,13 +28,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,11 +67,16 @@ public class AuthController {
 
     SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
-    @PostMapping(value = "/register", produces = "application/json")
-    public ResponseEntity<?> register(@Valid @RequestBody SignUpForm signUpForm) {
+    @PostMapping(value = "/register", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    } , produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public @ResponseBody ResponseEntity<?> register(SignUpForm signUpForm) {
         System.out.printf(signUpForm.getEmail());
         if (userServiceImpl.existsByEmail(signUpForm.getEmail())) {
-            return new ResponseEntity<>(new ResponseMessage("Email is existed"), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseMessage(1,"Email Already Exists!",409), HttpStatus.CONFLICT);
         }
         User user = new User(signUpForm.getName(), signUpForm.getEmail(), passwordEncoder.encode(signUpForm.getPassword()), signUpForm.getProvince(), signUpForm.getDistrict(), signUpForm.getWard(), signUpForm.getAddress());
         Set<Role> roles = new HashSet<>();
@@ -79,14 +84,19 @@ public class AuthController {
         roles.add(roleUser);
         user.setRoles(roles);
         userServiceImpl.save(user);
-        return new ResponseEntity<>(new ResponseMessage("Created account successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage(0,"Created Account Successfully!", 200), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/login", produces = "application/json")
-    public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm) {
+    @PostMapping(value = "/login", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    } , produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public @ResponseBody ResponseEntity<?> login(SignInForm signInForm) {
         Boolean user = authService.findUserByEmail(signInForm.getEmail());
         if (!user)
-            return new ResponseEntity<>(new ResponseMessage("Email hasn't been registered"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage(1,"Email Hasn't Been Registered!", 401), HttpStatus.NOT_FOUND);
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -99,11 +109,16 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken, "Bearer", userPrinciple.getAuthorities()));
     }
 
-    @PostMapping(value = "/refresh-token", produces = "application/json")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenForm refreshTokenForm) {
+    @PostMapping(value = "/refresh-token", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    } , produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public @ResponseBody ResponseEntity<?> refreshToken(RefreshTokenForm refreshTokenForm) {
         try {
             if ( refreshTokenForm.getRefreshToken() == null || refreshTokenForm.getRefreshToken().isEmpty()) {
-                return new ResponseEntity<>(new ResponseMessage("Required refresh token"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, "Required Refresh Token!",400 ), HttpStatus.BAD_REQUEST);
             }
 
             // validate the refresh token
@@ -115,16 +130,16 @@ public class AuthController {
                 String newToken = jwtTokenProvider.generateTokenByUserPrinciple(userPrinciple);
 
                 if(newToken.isEmpty()) {
-                    return new ResponseEntity<>(new ResponseMessage("Fail to generate new access token. Let's try more time"), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new ResponseMessage(1,"Fail to generate new access token. Let's try more time!", 400), HttpStatus.BAD_REQUEST);
                 }else {
                     return new ResponseEntity<>(new RefreshTokenResponse("Generate access token successfully!", newToken), HttpStatus.OK);
                 }
 
             } else {
-                return new ResponseEntity<>(new ResponseMessage(jwtTokenProvider.getMessage()), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1,jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage("Refresh token is missing"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1,"Refresh token is missing", 400), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -135,8 +150,8 @@ public class AuthController {
         if (authentication != null) {
             // Cancel the user's session
             logoutHandler.logout(request, response, authentication);
-            return ResponseEntity.ok(new ResponseMessage("Logout Successful"));
+            return ResponseEntity.ok(new ResponseMessage(0,"Logout Successful", 200));
         }
-        return ResponseEntity.ok(new ResponseMessage("No user is logged in"));
+        return ResponseEntity.ok(new ResponseMessage(1, "No user is logged in", 409));
     }
 }
