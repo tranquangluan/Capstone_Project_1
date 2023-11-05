@@ -1,14 +1,13 @@
 package com.example.capstoneproject1.services;
 
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.SpaceRepository;
-import com.example.capstoneproject1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SpaceServiceImpl implements SpaceService{
@@ -21,7 +20,7 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
-    public Space findById(Integer id) {
+    public Space findSpaceById(Integer id) {
         return  spaceRepository.findById(id).orElse(null);
     }
 
@@ -62,4 +61,14 @@ public class SpaceServiceImpl implements SpaceService{
     public Iterable<Space> findAll() {
         return (List<Space>) spaceRepository.findAll();
     }
+
+    @Override
+    public Optional<Space> findById(Integer spaceId) {
+        return spaceRepository.findById(spaceId);
+    }
+
+//    @Override
+//    public Boolean existsBySpace(Integer spaceId) {
+//        return spaceRepository.existsBySpace(spaceId);
+//    }
 }

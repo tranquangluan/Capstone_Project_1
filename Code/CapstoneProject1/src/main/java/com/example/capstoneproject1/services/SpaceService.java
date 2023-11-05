@@ -1,15 +1,14 @@
 package com.example.capstoneproject1.services;
 
-import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.User;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface SpaceService {
     void update(Space space);
-    Space findById(Integer id);
+    Space findSpaceById(Integer id);
     void delete(Integer id);
     List<Space> search(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
     List<Space> sortAsc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
@@ -17,4 +16,8 @@ public interface SpaceService {
     Space detailSpace(Integer id);
     List<Space> getList();
     Iterable<Space> findAll();
+
+
+    Optional<Space> findById(Integer spaceId);
+//    Boolean existsBySpace(Integer spaceId);
 }

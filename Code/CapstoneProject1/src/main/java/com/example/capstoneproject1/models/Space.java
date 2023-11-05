@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Entity
 public class Space {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "spaceId")
     private Integer id;
     @Column(name = "title")

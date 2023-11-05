@@ -34,10 +34,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         try {
             String token = getJwtFromRequest(request);
-
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
                 UserDetails userDetails = userDetailService.loadUserByUsername(userEmail);

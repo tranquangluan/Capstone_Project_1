@@ -80,7 +80,7 @@ public class AuthController {
         }
         User user = new User(signUpForm.getName(), signUpForm.getEmail(), passwordEncoder.encode(signUpForm.getPassword()), signUpForm.getProvince(), signUpForm.getDistrict(), signUpForm.getWard(), signUpForm.getAddress());
         Set<Role> roles = new HashSet<>();
-        Role roleUser = roleServiceImpl.findByRoleCode("R3").orElseThrow(() -> new RuntimeException("Role not found"));
+        Role roleUser = roleServiceImpl.findByRoleCode("R3").orElseThrow(() -> new RuntimeException("Role not found!"));
         roles.add(roleUser);
         user.setRoles(roles);
         userServiceImpl.save(user);

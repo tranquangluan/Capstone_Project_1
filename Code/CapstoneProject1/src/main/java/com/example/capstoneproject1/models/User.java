@@ -1,5 +1,7 @@
 package com.example.capstoneproject1.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.HashSet;
@@ -21,8 +23,6 @@ public class User {
     private String phone;
     @Column(name = "email",unique = true,nullable = false)
     private String email;
-    @Column(name = "password",nullable = false)
-    private String password;
     @Column(name = "avatarId")
     private String avatarId;
     @Column(name = "avatar")
@@ -35,8 +35,11 @@ public class User {
     private String ward;
     @Column(name = "address")
     private String address;
-
+    @Column(name = "password",nullable = false)
+    @JsonIgnore
+    private String password;
     @Column(name = "refreshToken")
+    @JsonIgnore
     private String refreshToken;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -47,7 +50,7 @@ public class User {
     }
 
 
-    public User(Integer id, String name, Boolean gender, Date dateOfBirth, String phone, String email, String password, String avatar, String province, String district, String ward, String address, Set<Role> roles) {
+    public User(Integer id, String name, Boolean gender) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -63,7 +66,21 @@ public class User {
         this.roles = roles;
     }
 
-    public User( String name,  String email, String password, String province, String district, String ward, String address) {
+    public User(Integer id, String name, Boolean gender, String phone, String email, String password, String province, String district, String ward, String address, Set<Role> roles) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+        this.roles = roles;
+    }
+
+    public User(String name, String email, String password, String province, String district, String ward, String address) {
         this.name = name;
         this.email = email;
         this.password = password;

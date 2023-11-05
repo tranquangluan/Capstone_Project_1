@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/space")
@@ -88,7 +87,7 @@ public class SpaceController {
     @PutMapping(value = "")
     public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "spaceId") Integer id,
                                                  @RequestBody Space space){
-        Space spaceTemp = spaceService.findById(id); //.orElse(null)
+        Space spaceTemp = spaceService.findSpaceById(id); //.orElse(null)
 
         if(spaceTemp == null){
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -116,7 +115,7 @@ public class SpaceController {
     // Delete đối tượng
     @DeleteMapping("")
     public ResponseEntity<String> deleteSpaceByID(@RequestParam(name = "spaceId") Integer id){
-        Space spaceTemp = spaceService.findById(id); //.orElse(null)
+        Space spaceTemp = spaceService.findSpaceById(id); //.orElse(null)
 
         if(spaceTemp == null){
             return new ResponseEntity<>("Not found object", HttpStatus.NOT_FOUND);

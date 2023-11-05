@@ -1,15 +1,16 @@
 package com.example.capstoneproject1.repository;
 
 import com.example.capstoneproject1.models.Space;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface SpaceRepository extends CrudRepository<Space, Integer> {
+public interface SpaceRepository extends JpaRepository<Space, Integer> {
     @Query(value= "Select address from space",nativeQuery = true)
     List<Space> getAddress();
     @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id",nativeQuery = true)
@@ -22,4 +23,8 @@ public interface SpaceRepository extends CrudRepository<Space, Integer> {
     List<Space> sortDesc(BigDecimal priceMin,BigDecimal priceMax, float areaMin,float areaMax, Integer categoryId, String province, String district, String ward, String address);
     @Query(value= "Select * from space s join user u on s.user_id = u.userid join category_space cs on s.category_id=cs.category_id where space_id = :id",nativeQuery = true)
     Space detailSpace(Integer id);
+
+
+    Optional<Space> findById(Integer spaceId);
+//    Boolean existsBySpace(Integer spaceId);
 }

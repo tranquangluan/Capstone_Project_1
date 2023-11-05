@@ -11,18 +11,18 @@ public interface UserService {
     void delete(Integer id);
     User findByUsername(String name);
     Iterable<User> findAll();
-    Role saveRole(Role role);
     User findByRefreshToken(String refreshToken);
-
     Optional<User> findById(Integer userId);
     Optional<User> findByEmail(String email);
+    User saveUser(User user);
+    Role saveRole(Role role);
+    void addToUser(String userEmail, String roleName);
     Boolean existsByEmail(String email);
-
     User save(User user);
-
     Boolean existPassword(String password);
     Boolean existsByRefreshToken(String refreshToken);
     String getPasswordByEmail(String email);
+    Boolean existsById(Integer userId);
 
     
 }
