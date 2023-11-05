@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,23 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     public Boolean existsBySpaceIdAndUserId(Integer spaceId, Integer userId) {
         return favoriteRepository.existsBySpaceIdAndUserId(spaceId, userId);
+    }
+
+    @Override
+    public Boolean existsByFavouriteIdAndUserId(Integer favouriteId, Integer userId) {
+        return favoriteRepository.existsByIdAndUserId(favouriteId, userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFavourite(Integer favouriteId) {
+        favoriteRepository.deleteById(favouriteId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId) {
+        favoriteRepository.deleteBySpaceIdAndUserId(spaceId ,userId);
     }
 
 }

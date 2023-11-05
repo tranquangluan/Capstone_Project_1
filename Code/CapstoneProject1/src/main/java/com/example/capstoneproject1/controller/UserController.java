@@ -5,6 +5,7 @@ import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.dto.response.UserResponse;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;
+import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class UserController {
 
     @Autowired
     CloudinaryService cloudinaryService;
+
+    @Autowired
+    JwtTokenFilter jwtTokenFilter;
 
     @PreAuthorize("hasAnyAuthority('User')")
     @GetMapping("/current-user")
@@ -71,43 +75,44 @@ public class UserController {
     } , produces = {
                     MediaType.APPLICATION_JSON_VALUE
             })
-    public @ResponseBody ResponseEntity<?> editUser(UserEditForm userEditForm , @RequestParam(name = "userId") Integer userId, @RequestParam(required=false, value="avartar") MultipartFile avartar) {
-
+    public @ResponseBody ResponseEntity<?> editUser(UserEditForm userEditForm , @RequestParam(required=false, value="avartar") MultipartFile avartar, HttpServletRequest request) {
 
         try {
-            Optional<User> user = userRepository.findById(userId);
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
-            if( !user.isPresent()) {
+            if( !userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1 ,"User Not Found!", 404), HttpStatus.NOT_FOUND);
             }
 
             if (userEditForm.getFullName() != null) {
-                user.get().setName(userEditForm.getFullName());
+                userOptional.get().setName(userEditForm.getFullName());
             }
 
             if(userEditForm.getAddress() != null) {
-                user.get().setProvince(userEditForm.getProvince());
-                user.get().setDistrict(userEditForm.getDistrict());
-                user.get().setWard(userEditForm.getWard());
-                user.get().setAddress(userEditForm.getAddress());
+                userOptional.get().setProvince(userEditForm.getProvince());
+                userOptional.get().setDistrict(userEditForm.getDistrict());
+                userOptional.get().setWard(userEditForm.getWard());
+                userOptional.get().setAddress(userEditForm.getAddress());
             }
             if(userEditForm.getGender() != null)
-                user.get().setGender(userEditForm.getGender());
+                userOptional.get().setGender(userEditForm.getGender());
 
             if(userEditForm.getDateOfBirth() != null) {
                 java.sql.Date sqlDate = new java.sql.Date(userEditForm.getDateOfBirth().getTime());
-                user.get().setDateOfBirth(sqlDate);
+                userOptional.get().setDateOfBirth(sqlDate);
             }
 
             if(userEditForm.getPhone() != null) {
-                user.get().setPhone(userEditForm.getPhone());
+                userOptional.get().setPhone(userEditForm.getPhone());
             }
 
             if (userEditForm.getOldPassword() != null && userEditForm.getNewPassword() != null) {
                 String oldPassword = userEditForm.getOldPassword();
-                String storedPassword =  user.get().getPassword();
+                String storedPassword =  userOptional.get().getPassword();
                 if (passwordEncoder.matches(oldPassword,storedPassword)) {
-                        user.get().setPassword(passwordEncoder.encode(userEditForm.getNewPassword()));
+                        userOptional.get().setPassword(passwordEncoder.encode(userEditForm.getNewPassword()));
                 }else {
                     return new ResponseEntity<>(new ResponseMessage(1,"Old Password Was Incorrect!", 401), HttpStatus.ACCEPTED);
                 }
@@ -117,24 +122,24 @@ public class UserController {
             if(avartar != null) {
                 if (!avartar.isEmpty()) {
                     // delete in cloudinary before updating
-                    if (user.get().getAvatarId() != null) {
-                        cloudinaryService.delete( user.get().getAvatarId() );
+                    if (userOptional.get().getAvatarId() != null) {
+                        cloudinaryService.delete( userOptional.get().getAvatarId() );
                     }
                     Map result = cloudinaryService.upload(avartar);
                     System.out.println(result);
                     String imageUrl = (String) result.get("secure_url");
                     String imageId = (String) result.get("public_id");
-                    user.get().setAvatar(imageUrl);
-                    user.get().setAvatarId(imageId);
+                    userOptional.get().setAvatar(imageUrl);
+                    userOptional.get().setAvatarId(imageId);
                 } else {
-                    // delete image in stored when user not sent image when request url
-                    if (user.get().getAvatarId() != null) {
-                        cloudinaryService.delete( user.get().getAvatarId() );
+                    // delete image in stored when userOptional not sent image when request url
+                    if (userOptional.get().getAvatarId() != null) {
+                        cloudinaryService.delete( userOptional.get().getAvatarId() );
                     }
                 }
 
             }
-            userRepository.save(user.get());
+            userRepository.save(userOptional.get());
             return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!",201), HttpStatus.OK);
 
         } catch (Exception e) {

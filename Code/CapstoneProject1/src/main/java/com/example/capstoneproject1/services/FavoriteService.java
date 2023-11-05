@@ -15,4 +15,7 @@ public interface FavoriteService {
     Favourite saveFavourite(Space space, User user);
 
     Boolean existsBySpaceIdAndUserId(Integer spaceId, Integer userId);
+    Boolean existsByFavouriteIdAndUserId(Integer favouriteId, Integer userId);
+    void deleteFavourite(Integer favouriteId);
+    void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId);
 }

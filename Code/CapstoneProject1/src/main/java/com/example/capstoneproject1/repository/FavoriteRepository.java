@@ -14,6 +14,7 @@ public interface FavoriteRepository extends JpaRepository<Favourite,Integer> {
 
     Boolean existsByUserId(Integer userId);
     Boolean existsBySpaceId(Integer spaceId);
+    Boolean existsByIdAndUserId(Integer favoriteId, Integer userId);
     Boolean existsBySpaceIdAndUserId(Integer spaceId, Integer userId);
-
+    void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId);
 }

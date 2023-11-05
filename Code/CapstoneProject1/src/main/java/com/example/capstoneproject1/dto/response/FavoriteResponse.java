@@ -6,17 +6,35 @@ public class FavoriteResponse {
 
     private Integer error;
     private String message;
+    private Boolean isSaved;
     private Favourite favorite;
     private Integer status;
 
     public FavoriteResponse() {
     }
 
-    public FavoriteResponse(Integer error, String message, Favourite favorite, Integer statusCode) {
+    public FavoriteResponse(Integer error, String message,Boolean isSaved, Favourite favorite, Integer statusCode) {
         this.error = error;
         this.message = message;
+        this.isSaved = isSaved;
         this.favorite = favorite;
         this.status = statusCode;
+    }
+
+    public FavoriteResponse(Integer error, String message,Boolean isSaved,  Integer statusCode) {
+        this.error = error;
+        this.message = message;
+        this.isSaved = isSaved;
+        this.status = statusCode;
+    }
+
+
+    public Boolean getSaved() {
+        return isSaved;
+    }
+
+    public void setSaved(Boolean saved) {
+        isSaved = saved;
     }
 
     public Integer getError() {
