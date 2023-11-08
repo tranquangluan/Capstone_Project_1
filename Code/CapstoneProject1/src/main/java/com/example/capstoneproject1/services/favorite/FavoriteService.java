@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.favorite;
 
 import com.example.capstoneproject1.models.Favourite;
 import com.example.capstoneproject1.models.Space;

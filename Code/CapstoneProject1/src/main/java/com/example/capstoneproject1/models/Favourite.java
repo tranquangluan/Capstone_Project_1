@@ -8,12 +8,10 @@ public class Favourite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "favouriteId")
     private Integer id;
-
-    @ManyToOne
+    @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "spaceId")
     private Space space;
-
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private User user;
 

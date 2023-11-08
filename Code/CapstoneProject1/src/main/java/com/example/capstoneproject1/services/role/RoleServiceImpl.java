@@ -1,9 +1,8 @@
-package com.example.capstoneproject1.services.impl;
+package com.example.capstoneproject1.services.role;
 
 
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.repository.RoleRepository;
-import com.example.capstoneproject1.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

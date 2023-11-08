@@ -42,13 +42,12 @@ public class User {
     @JsonIgnore
     private String refreshToken;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER )
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
-
 
     public User(Integer id, String name, Boolean gender) {
         this.id = id;

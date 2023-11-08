@@ -1,10 +1,9 @@
-package com.example.capstoneproject1.services.impl;
+package com.example.capstoneproject1.services.favorite;
 
 import com.example.capstoneproject1.models.Favourite;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.FavoriteRepository;
-import com.example.capstoneproject1.services.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

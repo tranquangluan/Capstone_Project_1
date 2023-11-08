@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+
 
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favourite,Integer> {
@@ -17,4 +19,8 @@ public interface FavoriteRepository extends JpaRepository<Favourite,Integer> {
     Boolean existsByIdAndUserId(Integer favoriteId, Integer userId);
     Boolean existsBySpaceIdAndUserId(Integer spaceId, Integer userId);
     void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId);
+    @Transactional
+    void deleteByUserId(Integer userId);
+    @Transactional
+    void deleteAllByUserId(Integer userId);
 }

@@ -7,10 +7,10 @@ public class Feedback {
     @Id
     @Column(name = "feedBackId")
     private Integer id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "userSendFeedBackId")
     private User userSendFeedBackId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "userReceiveFeedBackId")
     private User userReceiveFeedBackId;
     @Column(name = "rate")

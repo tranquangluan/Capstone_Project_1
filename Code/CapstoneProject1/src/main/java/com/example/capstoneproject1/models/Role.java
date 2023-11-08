@@ -1,21 +1,19 @@
 package com.example.capstoneproject1.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class Role {
     @Id
     @Column(name = "roleCode" , length = 10)
-    @JsonIgnore
     private String roleCode;
     @Column(name = "roleValue" , length = 10)
     private String roleValue;
 
     public Role() {
     }
-
     public Role(String roleCode, String roleValue) {
         this.roleCode = roleCode;
         this.roleValue = roleValue;

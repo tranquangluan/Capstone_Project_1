@@ -43,7 +43,7 @@ public class Space {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategorySpace categoryId ;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "ownerId")
     private User ownerId ;
 

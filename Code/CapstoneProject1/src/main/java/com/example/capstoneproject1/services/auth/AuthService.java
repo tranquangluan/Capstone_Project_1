@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.auth;
 
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;

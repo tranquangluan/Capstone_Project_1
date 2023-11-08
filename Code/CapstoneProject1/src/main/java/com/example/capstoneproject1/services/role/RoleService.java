@@ -1,5 +1,5 @@
 
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.role;
 
 
 import com.example.capstoneproject1.models.Role;

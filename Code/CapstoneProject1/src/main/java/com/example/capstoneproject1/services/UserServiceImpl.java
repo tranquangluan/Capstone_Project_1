@@ -2,16 +2,20 @@ package com.example.capstoneproject1.services;
 
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
+import com.example.capstoneproject1.repository.FavoriteRepository;
 import com.example.capstoneproject1.repository.RoleRepository;
+import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import javax.transaction.Transactional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,6 +28,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    FavoriteRepository favoriteRepository;
+
+    @Autowired
+    SpaceRepository spaceRepository;
 
 
     @Override
@@ -65,6 +75,60 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existsById(Integer userId) {
         return userRepository.existsById(userId);
+    }
+
+    @Override
+    public List<User> getAllUsers(Integer userId, String email, String name , Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+       try {
+           // Create Sorted instance
+           Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                   : Sort.by(sortBy).descending();
+           // create Pageable instance
+           Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+           // Get users by email and id
+           if( !email.isEmpty() ) {
+               if(userId != null) {
+                   Page<User> listUsersByEmail = userRepository.findByIdAndEmailContaining(userId, email, pageable);
+                   return listUsersByEmail.getContent();
+               }
+               System.out.println(email);
+               Page<User> listUsersByEmail = userRepository.findByEmailContaining(email, pageable);
+               return listUsersByEmail.getContent();
+           }
+           // Get users by full name and id
+           if(!name.isEmpty()) {
+               if(userId != null) {
+                   Page<User> listUsersByEmail = userRepository.findByIdAndNameContaining(userId, name, pageable);
+                   return listUsersByEmail.getContent();
+               }
+               System.out.println(name);
+               Page<User> listUsersByFullName= userRepository.findByNameContaining(name ,pageable);
+               return listUsersByFullName.getContent();
+           }
+           //get user by id
+           if (userId != null) {
+               Optional<User> userById= userRepository.findById(userId);
+               List<User> users = new ArrayList<User>();
+               userById.ifPresent(users::add);
+               return users;
+           }
+           // get all users
+           Page<User> listUsers = userRepository.findAll(pageable);
+           return listUsers.getContent();
+       }catch (Exception e) {
+           System.out.println(e.getMessage());
+           return new ArrayList<>();
+       }
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserByUserId(Integer userId) {
+//        favoriteRepository.deleteAllByUserId(userId);
+        userRepository.deleteFavoriteByUserId(userId);
+        spaceRepository.deleteAllByOwnerId_Id(userId);
+        userRepository.deleteUsersRoleByUserId(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override

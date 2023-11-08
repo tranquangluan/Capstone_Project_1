@@ -31,7 +31,7 @@ public class CapstoneProject1Application {
             userService.saveUser(new User(3, "Lê Xuân Hoàng", true, "09235234324","lexuanhoang@gmail.com", "111111", "Đà Nẵng", "Quận Liên Chiểu", "Phường Hòa Minh", "12 Tô Hieu", new HashSet<>()));
 
             //
-            userService.addToUser("lexuantan@gmail.com" , "R3");
+            userService.addToUser("lexuantan@gmail.com" , "R1");
             userService.addToUser("tranquangluan@gmail.com" , "R3");
             userService.addToUser("lexuanhoang@gmail.com" , "R3");
         };

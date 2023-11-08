@@ -10,9 +10,7 @@ public class Image {
     private Integer id;
     @Column(name = "image")
     private String image;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "spaceId")
     private Space spaceId;
-
-
 }
