@@ -45,7 +45,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     void deleteFeedbackByUserId(@Param("userId") Integer userId);
 
     @Modifying
-    @Transactional
     @Query(value = "DELETE FROM users_role WHERE users_id = :userId",nativeQuery = true)
     void deleteUsersRoleByUserId(@Param("userId") Integer userId);
 

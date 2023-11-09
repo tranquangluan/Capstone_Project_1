@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.dto.response;
+package com.example.capstoneproject1.dto.response.favoutite;
 
 import com.example.capstoneproject1.models.Favourite;
 

@@ -8,11 +8,11 @@ public class Favourite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "favouriteId")
     private Integer id;
-    @ManyToOne( cascade = CascadeType.ALL)
-    @JoinColumn(name = "spaceId")
+    @ManyToOne
+    @JoinColumn(name = "spaceId", referencedColumnName = "spaceId",foreignKey = @ForeignKey(name = "fk_favourite_space"))
     private Space space;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId")
+    @ManyToOne
+    @JoinColumn(name = "userId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_favourite_user"))
     private User user;
 
     public Favourite() {

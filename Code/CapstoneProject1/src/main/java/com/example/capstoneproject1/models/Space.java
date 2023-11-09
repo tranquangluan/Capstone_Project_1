@@ -2,8 +2,12 @@ package com.example.capstoneproject1.models;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -15,7 +19,7 @@ public class Space {
     @Column(name = "title")
     private String title;
     @ManyToOne
-    @JoinColumn(name = "status")
+    @JoinColumn(name = "statusId")
     private SpaceStatus status;
     @Column(name = "price")
     private BigDecimal price;
@@ -42,10 +46,14 @@ public class Space {
     private String address;
     @ManyToOne
     @JoinColumn(name = "categoryId")
-    private CategorySpace categoryId ;
+    private CategorySpace categoryId;
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "ownerId")
+    @JoinColumn(name = "ownerId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_space_user"))
     private User ownerId ;
+
+    @OneToMany(mappedBy = "space", orphanRemoval = true)
+    @JsonIgnore
+    private List<Favourite> favourites = new ArrayList<>();
 
     public Space() {
     }

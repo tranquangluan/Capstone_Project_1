@@ -17,7 +17,7 @@ public interface SpaceService {
     List<Space> getList();
     Iterable<Space> findAll();
 
+    Integer countSpaceByCategoryId(Integer categoryId);
 
     Optional<Space> findById(Integer spaceId);
-//    Boolean existsBySpace(Integer spaceId);
 }

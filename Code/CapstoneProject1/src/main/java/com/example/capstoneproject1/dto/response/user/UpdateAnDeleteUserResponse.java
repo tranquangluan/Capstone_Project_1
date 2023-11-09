@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.dto.response;
+package com.example.capstoneproject1.dto.response.user;
 
 import com.example.capstoneproject1.models.User;
 
@@ -15,6 +15,12 @@ public class UpdateAnDeleteUserResponse {
         this.error = error;
         this.message = message;
         this.user = user;
+        this.status = status;
+    }
+
+    public UpdateAnDeleteUserResponse(Integer error, String message, Integer status) {
+        this.error = error;
+        this.message = message;
         this.status = status;
     }
 

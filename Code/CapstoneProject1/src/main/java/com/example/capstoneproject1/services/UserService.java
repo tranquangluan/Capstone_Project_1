@@ -27,5 +27,5 @@ public interface UserService {
 
     List<User> getAllUsers(Integer userId,String email, String name ,Integer pageNo, Integer pageSize , String sortBy, String sortDir);
 
-    void deleteUserByUserId(Integer userId);
+    Boolean deleteUserByUserId(Integer userId);
 }

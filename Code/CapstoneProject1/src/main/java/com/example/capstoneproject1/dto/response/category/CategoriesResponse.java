@@ -1,25 +1,25 @@
-package com.example.capstoneproject1.dto.response;
-
-import com.example.capstoneproject1.models.User;
+package com.example.capstoneproject1.dto.response.category;
 
 import java.util.List;
 
-public class ListUsersResponse {
-
+public class CategoriesResponse {
     private Integer error;
     private String message;
-    private List<User> listUsers;
+    private List<CategoryItem> listCategories;
     private Integer status;
 
-    public ListUsersResponse() {
+
+    public CategoriesResponse() {
     }
 
-    public ListUsersResponse(Integer error, String message, List<User> listUsers, Integer status) {
+    public CategoriesResponse(Integer error, String message, List<CategoryItem> listCategories, Integer status) {
         this.error = error;
         this.message = message;
-        this.listUsers = listUsers;
+        this.listCategories = listCategories;
         this.status = status;
     }
+
+
 
     public Integer getError() {
         return error;
@@ -37,12 +37,12 @@ public class ListUsersResponse {
         this.message = message;
     }
 
-    public List<User> getListUsers() {
-        return listUsers;
+    public List<CategoryItem> getListCategories() {
+        return listCategories;
     }
 
-    public void setListUsers(List<User> listUsers) {
-        this.listUsers = listUsers;
+    public void setListCategories(List<CategoryItem> listCategories) {
+        this.listCategories = listCategories;
     }
 
     public Integer getStatus() {

@@ -1,7 +1,7 @@
 package com.example.capstoneproject1.controller;
 
-import com.example.capstoneproject1.dto.response.FavoriteResponse;
-import com.example.capstoneproject1.dto.response.ListFavoriteResponse;
+import com.example.capstoneproject1.dto.response.favoutite.FavoriteResponse;
+import com.example.capstoneproject1.dto.response.favoutite.ListFavoriteResponse;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.models.Favourite;
 import com.example.capstoneproject1.models.Space;

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -45,6 +47,14 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER )
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @JsonIgnore
+    private List<Favourite> favourites = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ownerId", orphanRemoval = true)
+    @JsonIgnore
+    private List<Space> spaces = new ArrayList<>();
 
     public User() {
     }
@@ -89,6 +99,22 @@ public class User {
         this.address = address;
     }
 
+
+    public List<Space> getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(List<Space> spaces) {
+        this.spaces = spaces;
+    }
+
+    public List<Favourite> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(List<Favourite> favourites) {
+        this.favourites = favourites;
+    }
 
     public Integer getId() {
         return id;

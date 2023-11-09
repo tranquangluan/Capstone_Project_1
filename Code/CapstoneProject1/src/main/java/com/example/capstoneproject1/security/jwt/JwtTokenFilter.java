@@ -30,7 +30,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/auth")) {
+        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,21 +48,24 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     Map<String, String> errorMessage = new HashMap<>();
-                    errorMessage.put("error", "User not found");
+                    errorMessage.put("error", String.valueOf(1));
+                    errorMessage.put("message","User not found");
                     response.setContentType("application/json");
                     new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 Map<String, String> errorMessage = new HashMap<>();
-                errorMessage.put("Error", jwtTokenProvider.getMessage());
+                errorMessage.put("error", String.valueOf(1));
+                errorMessage.put("message", jwtTokenProvider.getMessage());
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION);
             Map<String, String> errorMessage = new HashMap<>();
-            errorMessage.put("Error", e.getMessage());
+            errorMessage.put("error", String.valueOf(1));
+            errorMessage.put("message", e.getMessage());
             response.setContentType("application/json");
             new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
         }

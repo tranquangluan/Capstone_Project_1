@@ -63,6 +63,11 @@ public class SpaceServiceImpl implements SpaceService{
     }
 
     @Override
+    public Integer countSpaceByCategoryId(Integer categoryId) {
+        return spaceRepository.countByCategoryId_Id(categoryId);
+    }
+
+    @Override
     public Optional<Space> findById(Integer spaceId) {
         return spaceRepository.findById(spaceId);
     }

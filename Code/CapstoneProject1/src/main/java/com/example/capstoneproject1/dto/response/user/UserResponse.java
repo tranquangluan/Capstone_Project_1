@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.dto.response;
+package com.example.capstoneproject1.dto.response.user;
 
 import com.example.capstoneproject1.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;

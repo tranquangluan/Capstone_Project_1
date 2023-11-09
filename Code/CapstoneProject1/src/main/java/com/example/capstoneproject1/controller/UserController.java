@@ -1,10 +1,10 @@
 package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.dto.request.UserEditForm;
-import com.example.capstoneproject1.dto.response.ListUsersResponse;
+import com.example.capstoneproject1.dto.response.user.ListUsersResponse;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
-import com.example.capstoneproject1.dto.response.UpdateAnDeleteUserResponse;
-import com.example.capstoneproject1.dto.response.UserResponse;
+import com.example.capstoneproject1.dto.response.user.UpdateAnDeleteUserResponse;
+import com.example.capstoneproject1.dto.response.user.UserResponse;
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;
@@ -207,16 +207,24 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @DeleteMapping("/delete-user")
-    public ResponseEntity<?> getAllUsers(@RequestParam( required = true, name = "userId") Integer userId) {
+    public ResponseEntity<?> getAllUsers(@RequestParam( required = true, name = "userId") Integer userId, HttpServletRequest request) {
         try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findById(userId);
+            // user not found
             if( !userOptional.isPresent() )
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-            //delete user
-//            userOptional.get().getRoles().clear();
+            // check can not delete yourself
+            if(Objects.equals(userOptional.get().getEmail(), userEmail))
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 401), HttpStatus.BAD_REQUEST);
 
-            userService.deleteUserByUserId(userId);
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!", userOptional.get() ,200), HttpStatus.NOT_FOUND);
+            User userDeleted = userOptional.get();
+            // delete user by user id
+            if(userService.deleteUserByUserId(userId))
+                return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!",userDeleted ,200), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete User Fail!",400), HttpStatus.BAD_REQUEST);
+
 
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);

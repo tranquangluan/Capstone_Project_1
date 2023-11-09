@@ -78,57 +78,58 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers(Integer userId, String email, String name , Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
-       try {
-           // Create Sorted instance
-           Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                   : Sort.by(sortBy).descending();
-           // create Pageable instance
-           Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-           // Get users by email and id
-           if( !email.isEmpty() ) {
-               if(userId != null) {
-                   Page<User> listUsersByEmail = userRepository.findByIdAndEmailContaining(userId, email, pageable);
-                   return listUsersByEmail.getContent();
-               }
-               System.out.println(email);
-               Page<User> listUsersByEmail = userRepository.findByEmailContaining(email, pageable);
-               return listUsersByEmail.getContent();
-           }
-           // Get users by full name and id
-           if(!name.isEmpty()) {
-               if(userId != null) {
-                   Page<User> listUsersByEmail = userRepository.findByIdAndNameContaining(userId, name, pageable);
-                   return listUsersByEmail.getContent();
-               }
-               System.out.println(name);
-               Page<User> listUsersByFullName= userRepository.findByNameContaining(name ,pageable);
-               return listUsersByFullName.getContent();
-           }
-           //get user by id
-           if (userId != null) {
-               Optional<User> userById= userRepository.findById(userId);
-               List<User> users = new ArrayList<User>();
-               userById.ifPresent(users::add);
-               return users;
-           }
-           // get all users
-           Page<User> listUsers = userRepository.findAll(pageable);
-           return listUsers.getContent();
-       }catch (Exception e) {
-           System.out.println(e.getMessage());
-           return new ArrayList<>();
-       }
+    public List<User> getAllUsers(Integer userId, String email, String name, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+        try {
+            // Create Sorted instance
+            Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                    : Sort.by(sortBy).descending();
+            // create Pageable instance
+            Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+            // Get users by email and id
+            if (!email.isEmpty()) {
+                if (userId != null) {
+                    Page<User> listUsersByEmail = userRepository.findByIdAndEmailContaining(userId, email, pageable);
+                    return listUsersByEmail.getContent();
+                }
+                Page<User> listUsersByEmail = userRepository.findByEmailContaining(email, pageable);
+                return listUsersByEmail.getContent();
+            }
+            // Get users by full name and id
+            if (!name.isEmpty()) {
+                if (userId != null) {
+                    Page<User> listUsersByEmail = userRepository.findByIdAndNameContaining(userId, name, pageable);
+                    return listUsersByEmail.getContent();
+                }
+                Page<User> listUsersByFullName = userRepository.findByNameContaining(name, pageable);
+                return listUsersByFullName.getContent();
+            }
+            //get user by id
+            if (userId != null) {
+                Optional<User> userById = userRepository.findById(userId);
+                List<User> users = new ArrayList<User>();
+                userById.ifPresent(users::add);
+                return users;
+            }
+            // get all users
+            Page<User> listUsers = userRepository.findAll(pageable);
+            return listUsers.getContent();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @Override
     @Transactional
-    public void deleteUserByUserId(Integer userId) {
-//        favoriteRepository.deleteAllByUserId(userId);
-        userRepository.deleteFavoriteByUserId(userId);
-        spaceRepository.deleteAllByOwnerId_Id(userId);
-        userRepository.deleteUsersRoleByUserId(userId);
-        userRepository.deleteById(userId);
+    public Boolean deleteUserByUserId(Integer userId) {
+        try {
+            favoriteRepository.deleteByUserId_Id(userId);
+            spaceRepository.deleteAllByOwnerId_Id(userId);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUserId(Integer id) {
-        return  userRepository.findById(id).orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -166,9 +167,9 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findByEmail(userEmail);
         Optional<Role> role = roleRepository.findByRoleCode(roleCode);
         Set<Role> roles = new HashSet<>();
-        // add role to Set Roles
+        // add role to Set Role
         role.ifPresent(roles::add);
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             user.get().setRoles(roles);
             userRepository.save(user.get());
         }
