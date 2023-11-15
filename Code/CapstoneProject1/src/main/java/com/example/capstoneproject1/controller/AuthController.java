@@ -27,18 +27,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -73,8 +72,7 @@ public class AuthController {
     } , produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public @ResponseBody ResponseEntity<?> register(SignUpForm signUpForm) {
-        System.out.printf(signUpForm.getEmail());
+    public @ResponseBody ResponseEntity<?> register(@Valid SignUpForm signUpForm) {
         if (userServiceImpl.existsByEmail(signUpForm.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage(1,"Email Already Exists!",409), HttpStatus.CONFLICT);
         }

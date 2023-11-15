@@ -1,163 +1,214 @@
 package com.example.capstoneproject1.controller;
 
-import com.example.capstoneproject1.models.CategorySpace;
-import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.services.BookingService;
-import com.example.capstoneproject1.services.CategorySpaceService;
-import com.example.capstoneproject1.services.SpaceService;
+import com.example.capstoneproject1.dto.request.SpaceForm;
+import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
+import com.example.capstoneproject1.dto.response.ResponseMessage;
+import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
+import com.example.capstoneproject1.dto.response.space.SpaceResponse;
+import com.example.capstoneproject1.models.*;
+import com.example.capstoneproject1.repository.*;
+import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
+import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
+import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.UserService;
+import com.example.capstoneproject1.services.space.SpaceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/space")
+@RequestMapping("/api/spaces")
+@CrossOrigin(origins = "http://localhost:3000")
 public class SpaceController {
 
     @Autowired
-    SpaceService spaceService;
+    SpaceServiceImpl spaceServiceImpl;
     @Autowired
     UserService userService;
     @Autowired
-    BookingService bookingService;
+    CloudinaryService cloudinaryService;
+
     @Autowired
-    CategorySpaceService categorySpaceService;
+    SpaceRepository spaceRepository;
 
-    @GetMapping(value = "")
-    public List<Space> getSpaces(){
-        return spaceService.getList();
-    }
+    @Autowired
+    ImageRepository imageRepository;
 
-    // Lấy đối tượng khi truyền ID
-    @GetMapping(value = "", produces = "application/json")
-    public ResponseEntity<Space> getSpaceById(@RequestParam(name = "spaceId") Integer id) {
-        Space space = spaceService.detailSpace(id);
-        if(space == null){
-//            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    StatusRepository statusRepository;
+
+    @Autowired
+    CategorySpaceRepository categorySpaceRepository;
+
+    @Autowired
+    JwtTokenFilter jwtTokenFilter;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
+    @GetMapping(value = "/list-spaces")
+    public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "0", required = false, name = "page") Integer page,
+                                       @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
+                                       @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
+                                       @RequestParam(defaultValue = "ASC", required = false, name = "sortDir") String sortDir,
+                                       @RequestParam(defaultValue = "1", required = false, name = "status") Integer status,
+                                       @RequestParam(required = false, name = "categoryId") Integer categoryId,
+                                       @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
+                                       @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
+                                       @RequestParam(required = false, name = "searchByWard") String searchByWard,
+                                       @RequestParam(required = false, name = "priceFrom") BigDecimal priceFrom,
+                                       @RequestParam(required = false, name = "priceTo") BigDecimal priceTo,
+                                       @RequestParam(required = false, name = "areaFrom") Float areaFrom,
+                                       @RequestParam(required = false, name = "areaTo") Float areaTo,
+                                       @RequestParam(required = false, name = "spaceId") Integer spaceId,
+                                       @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+        try {
+            List<Space> listSpaces = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            if (!listSpaces.isEmpty())
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(space, HttpStatus.OK);
     }
-    @GetMapping(value = "/detailOwner", produces = "application/json")      //có vấn đề chỗ owner
-    public ResponseEntity<User> getOwnerById(@RequestParam(name = "id") Integer id) {
-        User user = userService.findByUserId(id);
-        if(user == null){
-//            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
+
+
+    @PreAuthorize("hasAnyAuthority('Admin','Owner')")
+    @PostMapping(value = "/create-space", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE
+    }, produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public @ResponseBody ResponseEntity<?> createSpace(@Valid SpaceForm spaceForm, @RequestParam(value = "images") List<MultipartFile> images, HttpServletRequest request) throws IOException {
+
+        try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userRepository.findByEmail(userEmail);
+            if (!userOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceForm.getCategoryId());
+            if (!categorySpaceOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            // find default status pending
+            Optional<SpaceStatus> statusOptional = statusRepository.findById(3);
+            if (!statusOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            // Set properties from spaceForm
+            Space space = new Space(spaceForm.getTitle(), statusOptional.get(), spaceForm.getPrice(), spaceForm.getDescription(), spaceForm.getBathroomsNumber(), spaceForm.getBedroomsNumber(), spaceForm.getPeopleNumber(), spaceForm.getArea(), spaceForm.getProvince(), spaceForm.getDistrict(), spaceForm.getWard(), spaceForm.getAddress(), categorySpaceOptional.get(), userOptional.get());
+            // Save the space entity to get the ID
+            Space savedSpace = spaceServiceImpl.saveSpace(space);
+            // handle upload image on cloudinary server
+            List<Map> results = cloudinaryService.uploadMultiple(images);
+            if (results.size() > 0) {
+                // loop and save info in image Object
+                for (Map result : results) {
+                    Image image = new Image();
+                    String imageUrl = (String) result.get("secure_url");
+                    String imageId = (String) result.get("public_id");
+                    // save the imageId and imageUrl into db
+                    image.setImageId(imageId);
+                    image.setImageUrl(imageUrl);
+                    // connect relationship Image and Space
+                    image.setSpaceId(savedSpace);
+                    // save the image in the database
+                    imageRepository.save(image);
+                }
+            } else {
+                return new ResponseEntity<>(new ResponseMessage(1, "Required image in space!", 401), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(new SpaceResponse(0, "Create Space Successful!", space, 201), HttpStatus.CREATED);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
     }
-    @GetMapping(value = "/", produces = "application/json")
-    public List<Space> searchAndSortSpace(@RequestParam(name = "priceMin", required = false, defaultValue = "0") BigDecimal priceMin ,
-                                          @RequestParam(name = "priceMax", required = false, defaultValue = "50000000000") BigDecimal priceMax,
-                                          @RequestParam(name = "areaMin",required = false, defaultValue = "10") float areaMin,
-                                          @RequestParam(name = "areaMax",required = false, defaultValue = "1000000") float areaMax,
-                                          @RequestParam(name = "categoryId",required = false) Integer categoryId,
-                                          @RequestParam(name = "province",required = false, defaultValue = "") String province,
-                                          @RequestParam(name = "district",required = false, defaultValue = "") String district,
-                                          @RequestParam(name = "ward",required = false, defaultValue = "") String ward,
-                                          @RequestParam(name = "address",required = false, defaultValue = "") String address,
-                                          @RequestParam(name = "order",required = false, defaultValue = "null") String order) {
-        List<Space> spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
-        if (order.toString().equals("null")){
-            spaceList = spaceService.search(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
 
-        }else if(order.toString().equals("asc")){
-            spaceList = spaceService.sortAsc(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
+    @PreAuthorize("hasAnyAuthority('Admin','Owner')")
+    @PutMapping(value = "/update-space", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE
+    }, produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public @ResponseBody ResponseEntity<?> updateSpace(@Valid SpaceUpdateForm spaceUpdateForm, @RequestParam(required = false, value = "images") List<MultipartFile> images, @RequestParam(value = "spaceId") Integer spaceId, HttpServletRequest request) throws IOException {
+        try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userRepository.findByEmail(userEmail);
+            if (!userOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
-        }else if (order.toString().equals("desc")){
-            spaceList = spaceService.sortDesc(priceMin,priceMax,areaMin,areaMax,categoryId,province,district,ward,address);
+            if (spaceUpdateForm.getCategoryId() != null) {
+                Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceUpdateForm.getCategoryId());
+                if (!categorySpaceOptional.isPresent())
+                    return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            }
+
+            Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
+            if (!spaceOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            // handle feild
+           spaceServiceImpl.updateSpace(spaceUpdateForm, spaceId);
+           // handle image
+            if(images != null) {
+                List<Map> results = cloudinaryService.uploadMultiple(images);
+                if (!results.isEmpty()) {
+                    // loop and save info in image Object
+                    for (Map result : results) {
+                        Image image = new Image();
+                        String imageUrl = (String) result.get("secure_url");
+                        String imageId = (String) result.get("public_id");
+                        // save the imageId and imageUrl into db
+                        image.setImageId(imageId);
+                        image.setImageUrl(imageUrl);
+                        // connect relationship Image and Space
+                        image.setSpaceId(spaceOptional.get());
+                        // save the image in the database
+                        imageRepository.save(image);
+                    }
+                    spaceServiceImpl.saveSpace(spaceOptional.get());
+                } else {
+                    return new ResponseEntity<>(new ResponseMessage(1, "Requires at least 1 image!", 401), HttpStatus.BAD_REQUEST);
+                }
+
+                List<Image> listImages = spaceOptional.get().getImages();
+                if(!listImages.isEmpty()) {
+                    for (Image image : listImages) {
+                        imageRepository.deleteById(image.getImageId());
+                        cloudinaryService.delete(image.getImageId());
+                    }
+                }
+            }
+
+            return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!",spaceOptional.get(), 200), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
-        System.out.println(order);
-        return spaceList;
     }
 
-
-    // Thêm một đối tượng
-    @PostMapping(path = "/add", consumes = "application/json")
-    public ResponseEntity<Space> addSpace(@RequestBody Space space){
-        spaceService.update(space);
-        return new ResponseEntity<>(space, HttpStatus.OK);
-    }
-
-    // Update đối tượng
-    @PutMapping(value = "")
-    public ResponseEntity<Space> updateSpaceByID(@RequestParam(name = "spaceId") Integer id,
-                                                 @RequestBody Space space){
-        Space spaceTemp = spaceService.findSpaceById(id); //.orElse(null)
-
-        if(spaceTemp == null){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        Space spa = new Space();
-        spa.setId(id);
-        spa.setTitle(space.getTitle());
-        spa.setStatus(space.getStatus());
-        spa.setPrice(space.getPrice());
-        spa.setDistrict(space.getDistrict());
-        spa.setProvince(space.getProvince());
-        spa.setWard(space.getWard());
-        spa.setPeopleNumbers(space.getPeopleNumbers());
-//        spa.setImage(space.getImage());
-        spa.setDescription(space.getDescription());
-        spa.setBathroomNumbers(space.getBathroomNumbers());
-        spa.setBedroomNumbers(space.getBedroomNumbers());
-        spa.setAddress(space.getAddress());
-        spa.setCategoryId(space.getCategoryId());
-        spa.setArea(space.getArea());
-        spaceService.update(spa);
-        return new ResponseEntity<>(spa, HttpStatus.OK);
-    }
-
-    // Delete đối tượng
-    @DeleteMapping("")
-    public ResponseEntity<String> deleteSpaceByID(@RequestParam(name = "spaceId") Integer id){
-        Space spaceTemp = spaceService.findSpaceById(id); //.orElse(null)
-
-        if(spaceTemp == null){
-            return new ResponseEntity<>("Not found object", HttpStatus.NOT_FOUND);
-        }
-
-        spaceService.delete(id);
-        return new ResponseEntity<>("Delete Success", HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/booking", produces = "application/json") // xung đột user khó hiểu
-    public ResponseEntity<Space> getBooking(@RequestParam(name = "id") Integer id,
-                                            @RequestBody User user) {
-        Space space = spaceService.detailSpace(id); //.orElse(null)
-        if(space == null){
-//            throw  new RestaurantNotFoundException("Restaurant id not found " + id);
-        }
-        return new ResponseEntity<>(space, HttpStatus.OK);
-    }
-
-    @PutMapping(value = "/user/profile")
-    public ResponseEntity<User> updateUserInformation(@RequestParam(name = "id") Integer id,
-                                                      @RequestBody User user){
-        User userTemp = userService.findByUserId(id); //.orElse(null)
-
-        if(userTemp == null){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        User user1 = new User();
-        user1.setId(id);
-        user1.setAvatar(user.getAvatar());
-        user1.setName(user.getName());
-        user1.setGender(user.getGender());
-        user1.setDateOfBirth(user.getDateOfBirth());
-        user1.setPhone(user.getPhone());
-        user1.setEmail(user.getEmail());
-        user1.setAddress(user.getAddress());
-        userService.update(user1);
-        return new ResponseEntity<>(user1, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/category")
-    public List<CategorySpace> getCategorySpaces(){
-        return (List<CategorySpace>) categorySpaceService.findAll();
-    }
 }

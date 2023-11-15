@@ -125,6 +125,7 @@ public class UserServiceImpl implements UserService {
         try {
             favoriteRepository.deleteByUserId_Id(userId);
             spaceRepository.deleteAllByOwnerId_Id(userId);
+            userRepository.deleteById(userId);
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());

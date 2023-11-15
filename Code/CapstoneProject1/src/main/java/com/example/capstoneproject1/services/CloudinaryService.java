@@ -9,9 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class CloudinaryService {
@@ -37,6 +35,23 @@ public class CloudinaryService {
             throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
         }
         return result;
+    }
+
+    public List<Map> uploadMultiple(List<MultipartFile> multipartFiles) throws IOException {
+        List<Map> uploadResults = new ArrayList<>();
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            File file = convert(multipartFile);
+            Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+            uploadResults.add(result);
+
+            // Delete the temporary file
+            if (!Files.deleteIfExists(file.toPath())) {
+                throw new IOException("Failed to delete temporary file: " + file.getAbsolutePath());
+            }
+        }
+
+        return uploadResults;
     }
 
     public Map delete(String id) throws IOException {

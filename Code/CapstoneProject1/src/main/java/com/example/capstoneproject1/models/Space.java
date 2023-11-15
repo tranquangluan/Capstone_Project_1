@@ -23,9 +23,8 @@ public class Space {
     private SpaceStatus status;
     @Column(name = "price")
     private BigDecimal price;
-    @ManyToOne
-    @JoinColumn(name = "imageId")
-    private Image imageId;
+    @OneToMany(mappedBy = "spaceId", cascade = CascadeType.ALL)
+    private List<Image> images;
     @Column(name = "description")
     private String description;
     @Column(name = "bathroomNumbers")
@@ -58,12 +57,29 @@ public class Space {
     public Space() {
     }
 
-    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, Image imageId, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
+    public Space( String title, SpaceStatus status, BigDecimal price, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
+        this.title = title;
+        this.status = status;
+        this.price = price;
+        this.description = description;
+        this.bathroomNumbers = bathroomNumbers;
+        this.bedroomNumbers = bedroomNumbers;
+        this.peopleNumbers = peopleNumbers;
+        this.area = area;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+        this.categoryId = categoryId;
+        this.ownerId = ownerId;
+    }
+
+    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, List<Image> images, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
         this.id = id;
         this.title = title;
         this.status = status;
         this.price = price;
-        this.imageId = imageId;
+        this.images = images;
         this.description = description;
         this.bathroomNumbers = bathroomNumbers;
         this.bedroomNumbers = bedroomNumbers;
@@ -109,12 +125,12 @@ public class Space {
         this.price = price;
     }
 
-    public Image getImageId() {
-        return imageId;
+    public List<Image> getImages() {
+        return images;
     }
 
-    public void setImageId(Image imageId) {
-        this.imageId = imageId;
+    public void setImages(List<Image> images) {
+        this.images = images;
     }
 
     public String getDescription() {

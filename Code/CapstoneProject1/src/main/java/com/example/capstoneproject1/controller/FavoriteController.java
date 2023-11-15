@@ -10,7 +10,7 @@ import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.favorite.FavoriteService;
-import com.example.capstoneproject1.services.SpaceService;
+import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/favorites")
+@CrossOrigin(origins = "http://localhost:3000")
 public class FavoriteController {
 
     @Autowired

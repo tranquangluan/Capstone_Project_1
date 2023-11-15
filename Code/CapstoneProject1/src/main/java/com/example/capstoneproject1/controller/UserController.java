@@ -29,6 +29,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -147,8 +148,8 @@ public class UserController {
                         cloudinaryService.delete(userOptional.get().getAvatarId());
                     }
                 }
-
             }
+
             userRepository.save(userOptional.get());
             return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 201), HttpStatus.OK);
 
@@ -222,7 +223,7 @@ public class UserController {
             User userDeleted = userOptional.get();
             // delete user by user id
             if(userService.deleteUserByUserId(userId))
-                return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!",userDeleted ,200), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!",userDeleted ,200), HttpStatus.OK);
             return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete User Fail!",400), HttpStatus.BAD_REQUEST);
 
 

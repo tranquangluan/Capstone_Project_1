@@ -4,21 +4,19 @@ import com.example.capstoneproject1.dto.response.category.CategoriesResponse;
 import com.example.capstoneproject1.dto.response.category.CategoryItem;
 import com.example.capstoneproject1.dto.response.category.CategoryMessage;
 import com.example.capstoneproject1.models.CategorySpace;
-import com.example.capstoneproject1.services.SpaceService;
+import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.category.CategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CategoryController {
 
     @Autowired

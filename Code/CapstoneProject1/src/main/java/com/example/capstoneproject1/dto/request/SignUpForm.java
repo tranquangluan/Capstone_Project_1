@@ -31,7 +31,6 @@ public class SignUpForm {
     }
 
 
-
     public String getName() {
         return name;
     }
