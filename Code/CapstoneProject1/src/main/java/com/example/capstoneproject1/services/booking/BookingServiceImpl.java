@@ -1,16 +1,14 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.booking;
 
 import com.example.capstoneproject1.models.Booking;
-import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.repository.BookingRepository;
-import com.example.capstoneproject1.repository.CategorySpaceRepository;
+import com.example.capstoneproject1.services.booking.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 @Service
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 

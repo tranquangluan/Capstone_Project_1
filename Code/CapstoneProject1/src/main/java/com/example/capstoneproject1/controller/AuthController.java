@@ -14,7 +14,7 @@ import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.security.userPrincal.UserDetailService;
 import com.example.capstoneproject1.security.userPrincal.UserPrinciple;
 import com.example.capstoneproject1.services.auth.AuthService;
-import com.example.capstoneproject1.services.UserServiceImpl;
+import com.example.capstoneproject1.services.user.UserServiceImpl;
 import com.example.capstoneproject1.services.role.RoleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

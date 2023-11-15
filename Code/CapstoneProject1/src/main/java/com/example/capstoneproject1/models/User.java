@@ -52,7 +52,7 @@ public class User {
     @JsonIgnore
     private List<Favourite> favourites = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ownerId", orphanRemoval = true)
+    @OneToMany(mappedBy = "ownerId", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Space> spaces = new ArrayList<>();
 

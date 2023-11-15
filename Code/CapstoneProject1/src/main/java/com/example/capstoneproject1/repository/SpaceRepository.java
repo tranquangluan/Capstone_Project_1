@@ -2,6 +2,7 @@ package com.example.capstoneproject1.repository;
 
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -79,4 +80,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("categoryId") CategorySpace categorySpace,
             @Param("spaceId") Integer spaceId
     );
+
+
+    Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
 }

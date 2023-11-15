@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.user;
 
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;

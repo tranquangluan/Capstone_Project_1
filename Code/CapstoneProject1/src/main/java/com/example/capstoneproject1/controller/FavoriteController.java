@@ -11,7 +11,7 @@ import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.favorite.FavoriteService;
 import com.example.capstoneproject1.services.space.SpaceService;
-import com.example.capstoneproject1.services.UserService;
+import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

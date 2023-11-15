@@ -3,10 +3,12 @@ package com.example.capstoneproject1.services.space;
 import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.CategorySpaceRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.repository.StatusRepository;
 import com.example.capstoneproject1.repository.UserRepository;
+import com.example.capstoneproject1.services.image.ImageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,9 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Autowired
     CategorySpaceRepository categorySpaceRepository;
+
+    @Autowired
+    ImageServiceImpl imageServiceImpl;
 
 
     @Override
@@ -102,6 +108,21 @@ public class SpaceServiceImpl implements SpaceService {
 
         spaceRepository.updateSpace(title, price, description, bathroomNumbers, bedroomNumbers, peopleNumbers, area, province, district, ward, address, categorySpace, spaceId);
 
+    }
+
+    @Override
+    public Boolean deleteSpace(Space space) throws IOException {
+        if (space != null) {
+            imageServiceImpl.deleteImageBySpaceId(space);
+            spaceRepository.deleteById(space.getId());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner) {
+        return spaceRepository.findSpaceByIdAndOwnerId(spaceId, owner);
     }
 
 

@@ -23,7 +23,7 @@ public class Space {
     private SpaceStatus status;
     @Column(name = "price")
     private BigDecimal price;
-    @OneToMany(mappedBy = "spaceId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "spaceId")
     private List<Image> images;
     @Column(name = "description")
     private String description;
@@ -46,7 +46,7 @@ public class Space {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategorySpace categoryId;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "ownerId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_space_user"))
     private User ownerId ;
 

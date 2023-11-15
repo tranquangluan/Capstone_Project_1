@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.booking;
 
 import com.example.capstoneproject1.models.Booking;
 
