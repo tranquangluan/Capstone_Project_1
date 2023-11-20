@@ -27,4 +27,6 @@ public interface UserService {
     List<User> getAllUsers(Integer userId,String email, String name ,Integer pageNo, Integer pageSize , String sortBy, String sortDir);
 
     Boolean deleteUserByUserId(Integer userId);
+
+    void deleteRoleByUserId(Integer userId);
 }

@@ -129,6 +129,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteRoleByUserId(Integer userId) {
+        userRepository.deleteRole(userId);
+    }
+
+    @Override
     public void update(User user) {
         userRepository.save(user);
     }

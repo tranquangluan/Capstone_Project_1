@@ -183,17 +183,30 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('Admin')")
     @PutMapping("/update-user")
     public ResponseEntity<?> getAllUsers(@RequestParam(required = true, name = "userId") Integer userId,
-                                         @RequestParam(required = true, name = "role") String role) {
+                                         @RequestParam(required = true, name = "role") String role, HttpServletRequest request) {
         try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> adminOptional = userRepository.findByEmail(userEmail);
             Optional<User> userOptional = userRepository.findById(userId);
-            if( !userOptional.isPresent() )
+            // user not found
+            if( !userOptional.isPresent() || !adminOptional.isPresent() )
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-            Set<Role> roles = userOptional.get().getRoles();
+
+            System.out.println(userOptional.get().getId() + ">>>>" + userId);
+            // can not update yourself
+            if(Objects.equals(adminOptional.get().getId(), userOptional.get().getId()))
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot update yourself!", 400), HttpStatus.BAD_REQUEST);
+
 
             Optional<Role> roleUser = roleService.findByRoleCode(role);
             if(!roleUser.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Role Not Found!", 404), HttpStatus.NOT_FOUND);
             }
+            //  delete old role
+            userService.deleteRoleByUserId(userId);
+
+            Set<Role> roles = userOptional.get().getRoles();
             // Set role
             roles.add(roleUser.get());
             userOptional.get().setRoles(roles);

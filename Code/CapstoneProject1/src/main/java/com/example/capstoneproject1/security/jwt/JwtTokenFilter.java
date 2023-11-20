@@ -30,11 +30,21 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category")|| request.getServletPath().contains("/api/contact")  || request.getServletPath().contains("/api/spaces/list-spaces")) {
+        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category") || request.getServletPath().contains("/api/spaces/list-spaces")) {
             filterChain.doFilter(request, response);
             return;
         }
         try {
+            // handle check have token
+            if(request.getHeader("Authorization") == null || request.getHeader("Authorization").isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, String> errorMessage = new HashMap<>();
+                errorMessage.put("error", String.valueOf(1));
+                errorMessage.put("message","Required authentication or authorization");
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
+            }
+            // handle validation token
             String token = getJwtFromRequest(request);
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
