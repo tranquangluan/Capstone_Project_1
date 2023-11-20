@@ -10,7 +10,6 @@ public interface UserService {
     void update(User user);
     User findByUserId(Integer id);
     void delete(Integer id);
-    User findByUsername(String name);
     Iterable<User> findAll();
     User findByRefreshToken(String refreshToken);
     Optional<User> findById(Integer userId);

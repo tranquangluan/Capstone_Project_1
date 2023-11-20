@@ -69,12 +69,12 @@ public class UserController {
                     User user = userOptional.get();
                     return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 401), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 404), HttpStatus.NOT_FOUND);
                 }
             } else
-                return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 401), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -125,7 +125,7 @@ public class UserController {
                 if (passwordEncoder.matches(oldPassword, storedPassword)) {
                     userOptional.get().setPassword(passwordEncoder.encode(userEditForm.getNewPassword()));
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(1, "Old Password Was Incorrect!", 401), HttpStatus.ACCEPTED);
+                    return new ResponseEntity<>(new ResponseMessage(1, "Old Password Was Incorrect!", 400), HttpStatus.BAD_REQUEST);
                 }
             }
 
@@ -151,7 +151,7 @@ public class UserController {
             }
 
             userRepository.save(userOptional.get());
-            return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 201), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 200), HttpStatus.OK);
 
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
@@ -174,7 +174,6 @@ public class UserController {
                 return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!", listUsers, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-
 
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
@@ -200,7 +199,7 @@ public class UserController {
             userOptional.get().setRoles(roles);
             // Update User
             userService.save(userOptional.get());
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get() ,200), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get() ,200), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -218,7 +217,7 @@ public class UserController {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             // check can not delete yourself
             if(Objects.equals(userOptional.get().getEmail(), userEmail))
-                return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 401), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 400), HttpStatus.BAD_REQUEST);
 
             User userDeleted = userOptional.get();
             // delete user by user id

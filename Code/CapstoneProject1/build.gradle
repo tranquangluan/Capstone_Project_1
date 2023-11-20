@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.cloudinary:cloudinary-http44:1.28.1'
     implementation 'com.cloudinary:cloudinary:1.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.1'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.3'
 
 }
 

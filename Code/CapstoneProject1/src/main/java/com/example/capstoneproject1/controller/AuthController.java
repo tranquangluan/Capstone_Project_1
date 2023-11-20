@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -82,7 +83,7 @@ public class AuthController {
         roles.add(roleUser);
         user.setRoles(roles);
         userServiceImpl.save(user);
-        return new ResponseEntity<>(new ResponseMessage(0,"Created Account Successfully!", 200), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage(0,"Created Account Successfully!", 201), HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/login", consumes = {
@@ -91,10 +92,12 @@ public class AuthController {
     } , produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public @ResponseBody ResponseEntity<?> login(SignInForm signInForm) {
-        Boolean user = authService.findUserByEmail(signInForm.getEmail());
-        if (!user)
-            return new ResponseEntity<>(new ResponseMessage(1,"Email Hasn't Been Registered!", 401), HttpStatus.NOT_FOUND);
+    public @ResponseBody ResponseEntity<?> login(@Valid SignInForm signInForm) {
+        System.out.println(signInForm.getEmail());
+        System.out.println(signInForm.getPassword());
+       Optional<User> userOptional = userServiceImpl.findByEmail(signInForm.getEmail());
+        if (!userOptional.isPresent())
+            return new ResponseEntity<>(new ResponseMessage(1,"Email Hasn't Been Registered!", 404), HttpStatus.NOT_FOUND);
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -132,9 +135,8 @@ public class AuthController {
                 }else {
                     return new ResponseEntity<>(new RefreshTokenResponse("Generate access token successfully!", newToken), HttpStatus.OK);
                 }
-
             } else {
-                return new ResponseEntity<>(new ResponseMessage(1,jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1,jwtTokenProvider.getMessage(), 401), HttpStatus.UNAUTHORIZED);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1,"Refresh token is missing", 400), HttpStatus.BAD_REQUEST);

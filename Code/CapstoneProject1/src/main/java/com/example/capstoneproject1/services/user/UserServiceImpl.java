@@ -37,11 +37,6 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    @Override
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -149,8 +144,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String name) {
-        return userRepository.findByUsername(name);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override

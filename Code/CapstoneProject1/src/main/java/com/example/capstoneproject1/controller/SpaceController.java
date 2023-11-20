@@ -63,10 +63,10 @@ public class SpaceController {
     JwtTokenProvider jwtTokenProvider;
 
     @GetMapping(value = "/list-spaces")
-    public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "0", required = false, name = "page") Integer page,
+    public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
                                        @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
                                        @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
-                                       @RequestParam(defaultValue = "ASC", required = false, name = "sortDir") String sortDir,
+                                       @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
                                        @RequestParam(defaultValue = "1", required = false, name = "status") Integer status,
                                        @RequestParam(required = false, name = "categoryId") Integer categoryId,
                                        @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
@@ -79,14 +79,14 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "spaceId") Integer spaceId,
                                        @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
-            List<Space> listSpaces = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            List<Space> listSpaces = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
             if (!listSpaces.isEmpty())
                 return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -139,7 +139,7 @@ public class SpaceController {
                 }
                 spaceServiceImpl.saveSpace(savedSpace);
             } else {
-                return new ResponseEntity<>(new ResponseMessage(1, "Required image in space!", 401), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, "Required image in space!", 400), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Create Space Successful!", savedSpace, 201), HttpStatus.CREATED);
         } catch (Exception e) {

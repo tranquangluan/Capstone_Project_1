@@ -2,10 +2,13 @@ package com.example.capstoneproject1.services.thymeleaf;
 
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
+
+import java.util.Map;
 
 public class ThymeleafServiceImpl implements  ThymeleafService{
     private static final String MAIL_TEMPLATE_BASE_NAME = "mail/MailMessages";
@@ -47,11 +50,11 @@ public class ThymeleafServiceImpl implements  ThymeleafService{
         return messageSource;
     }
 
-//    @Override
-//    public String createContent(String template, Map<String, Object> variables) {
-//        final Context context = new Context();
-//        context.setVariables(variables);
-//
-//        return templateEngine.process(template, context);
-//    }
+    @Override
+    public String createContent(String template, Map<String, Object> variables) {
+        final Context context = new Context();
+        context.setVariables(variables);
+        return templateEngine.process(template, context);
+    }
+
 }
