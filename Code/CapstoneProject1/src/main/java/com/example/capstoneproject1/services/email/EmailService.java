@@ -4,4 +4,5 @@ import com.example.capstoneproject1.dto.request.ContactForm;
 
 public interface EmailService {
     void sendMailCreateCustomer(ContactForm contactForm);
+    void sendMailOTP(String OTP, String email, String subject);
 }

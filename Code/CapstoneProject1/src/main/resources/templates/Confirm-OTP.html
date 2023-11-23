@@ -280,7 +280,7 @@
                                                         <td><![endif]-->
                                                 <h1 class="v-font-size"
                                                     style="margin: 0px; color: #ffffff; line-height: 120%; text-align: left; word-wrap: break-word; font-family: Bitter; font-size: 35px; font-weight: 400;">
-                                                    Contact!</h1>
+                                                    Confirm OTP!</h1>
                                                 <!--[if mso]></td></tr></table><![endif]-->
 
                                             </td>
@@ -298,12 +298,8 @@
 
                                                 <div class="v-font-size"
                                                      style="font-size: 14px; color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word;">
-                                                    <p style="line-height: 140%;"><strong>Họ Và Tên:</strong> <span
-                                                            th:text="${first_name + last_name}"></span><br/><strong>Email:</strong>
-                                                        <a rel="noopener" href="mailto:ngsadf@gmail.com"
-                                                           target="_blank"> <span th:text="${email}"></span></a></p>
-                                                    <p style="line-height: 140%;"><strong>Ngày Gửi:</strong> <span
-                                                            th:text="${date}"></span></p>
+                                                    <p style="line-height: 140%; font-size: 22px;"><strong>OTP:</strong> <span style="font-weight: 600;" th:text="${otp}"></span>
+                                                    <p style="line-height: 140%;"><strong>Chú Ý:</strong><span> OTP chỉ có hiệu lực trong vòng 5 phút, vui lòng xác nhận OTP đúng thời gian!</span></p>
                                                 </div>
 
                                             </td>
@@ -321,10 +317,7 @@
 
                                                 <div class="v-font-size"
                                                      style="font-size: 20px; color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word;">
-                                                    <p style="line-height: 140%;"><span
-                                                            data-metadata="&lt;!--(figmeta)eyJmaWxlS2V5IjoiNzJlVVB4M2M2UHAxam05Q1BEeWIyMSIsInBhc3RlSUQiOjI4MDI4NzA4NiwiZGF0YVR5cGUiOiJzY2VuZSJ9Cg==(/figmeta)--&gt;"
-                                                            style="line-height: 28px;"></span><strong
-                                                            th:text="${title + ':'}"></strong></p>
+                                                    <p style="line-height: 140%;"></p>
                                                 </div>
 
                                             </td>

@@ -168,7 +168,6 @@ public class UserController {
                                          @RequestParam(defaultValue = "", required = false, name = "searchByName") String searchByName,
                                          @RequestParam(required = false, name = "searchById") Integer searchById) {
         try {
-
             List<User> listUsers = userService.getAllUsers(searchById, searchByEmail, searchByName, page, limit, sortBy, sortDir);
             if (!listUsers.isEmpty())
                 return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!", listUsers, 200), HttpStatus.OK);

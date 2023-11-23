@@ -63,4 +63,29 @@ public class EmailServiceImpl implements EmailService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void sendMailOTP(String OTP, String email, String subject) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()
+            );
+
+            helper.setTo(email);
+            helper.setSubject(subject);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("otp", OTP);
+            // use thymeleaf to make template email
+            String emailContent = thymeleafService.createContent("Confirm-OTP.html", variables);
+
+            helper.setText(emailContent, true);
+            mailSender.send(message);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
