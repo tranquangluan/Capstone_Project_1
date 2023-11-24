@@ -1,5 +1,6 @@
 package com.example.capstoneproject1.repository;
 
+import com.example.capstoneproject1.models.Booking;
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.User;
@@ -80,7 +81,8 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("categoryId") CategorySpace categorySpace,
             @Param("spaceId") Integer spaceId
     );
-
+    @Query(value = "SELECT * FROM Space s join User u on s.user_id= u.userid WHERE s.space_id = :id ", nativeQuery = true)
+    Space findSpaceById(Integer id);
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
 }

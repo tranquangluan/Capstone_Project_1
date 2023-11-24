@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteRoleByUserId(Integer userId) {
-        userRepository.deleteRole(userId);
+        userRepository.deleteUsersRoleByUserId(userId);
     }
 
     @Override

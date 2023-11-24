@@ -19,6 +19,7 @@ public class SpaceUpdateForm {
     private String ward;
     private String address;
     private Integer categoryId;
+    private String status;
 
     private String[] imagesId;
 
@@ -142,5 +143,29 @@ public class SpaceUpdateForm {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public SpaceUpdateForm(String title, String description, BigDecimal price, Float area, Integer bedroomsNumber, Integer bathroomsNumber, Integer peopleNumber, String province, String district, String ward, String address, Integer categoryId, String status) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.area = area;
+        this.bedroomsNumber = bedroomsNumber;
+        this.bathroomsNumber = bathroomsNumber;
+        this.peopleNumber = peopleNumber;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+        this.categoryId = categoryId;
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -13,6 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+    @Query(value= "Select * from user where user_name = :name ",nativeQuery = true)
+    User findByUsername(String name);
     User findByRefreshToken(String refreshToken);
     String getPasswordByEmail(String email);
     Optional<User> findByEmail(String email);
@@ -25,9 +28,33 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Page<User> findByIdAndNameContaining(Integer userId, String name, Pageable pageable);
     Page<User> findByNameContaining(String name, Pageable pageable);
 
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM favourite WHERE user_id = :userId", nativeQuery = true)
+    void deleteFavoriteByUserId(@Param("userId") Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM space WHERE owner_id = :userId",nativeQuery = true)
+    void deleteSpaceByUserId(@Param("userId") Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM feedback WHERE user_receive_feed_back_id = :userId or user_send_feed_back_id = :userId",nativeQuery = true)
+    void deleteFeedbackByUserId(@Param("userId") Integer userId);
     @Modifying
     @Query(value = "DELETE FROM users_role WHERE users_id = :userId", nativeQuery = true)
     @Transactional
     void deleteRole(Integer userId);
+    @Modifying
+    @Query(value = "DELETE FROM users_role WHERE users_id = :userId",nativeQuery = true)
+    void deleteUsersRoleByUserId(@Param("userId") Integer userId);
 
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R1'",nativeQuery = true)
+    Integer countUsersRoleAdmin();
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R2'",nativeQuery = true)
+    Integer countUsersRoleOwner();
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R3'",nativeQuery = true)
+    Integer countUsersRoleUser();
 }
