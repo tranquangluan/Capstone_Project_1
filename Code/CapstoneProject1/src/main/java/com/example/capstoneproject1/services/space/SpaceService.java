@@ -2,7 +2,9 @@ package com.example.capstoneproject1.services.space;
 
 import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.User;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,10 @@ public interface SpaceService {
     Space saveSpace(Space space);
 
     void updateSpace(SpaceUpdateForm spaceUpdateForm, Integer spaceId);
+
+    Boolean deleteSpace(Space space) throws IOException;
+
+    Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
 
 }

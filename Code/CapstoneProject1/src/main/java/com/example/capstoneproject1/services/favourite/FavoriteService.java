@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services.favorite;
+package com.example.capstoneproject1.services.favourite;
 
 import com.example.capstoneproject1.models.Favourite;
 import com.example.capstoneproject1.models.Space;
@@ -18,4 +18,7 @@ public interface FavoriteService {
     Boolean existsByFavouriteIdAndUserId(Integer favouriteId, Integer userId);
     void deleteFavourite(Integer favouriteId);
     void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId);
+
+    Favourite findBySpaceId(Integer spaceId);
+
 }

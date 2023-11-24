@@ -11,7 +11,7 @@ import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
-import com.example.capstoneproject1.services.UserService;
+import com.example.capstoneproject1.services.user.UserService;
 import com.example.capstoneproject1.services.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,12 +69,12 @@ public class UserController {
                     User user = userOptional.get();
                     return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 401), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 404), HttpStatus.NOT_FOUND);
                 }
             } else
-                return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 401), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -125,7 +125,7 @@ public class UserController {
                 if (passwordEncoder.matches(oldPassword, storedPassword)) {
                     userOptional.get().setPassword(passwordEncoder.encode(userEditForm.getNewPassword()));
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(1, "Old Password Was Incorrect!", 401), HttpStatus.ACCEPTED);
+                    return new ResponseEntity<>(new ResponseMessage(1, "Old Password Was Incorrect!", 400), HttpStatus.BAD_REQUEST);
                 }
             }
 
@@ -151,7 +151,7 @@ public class UserController {
             }
 
             userRepository.save(userOptional.get());
-            return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 201), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 200), HttpStatus.OK);
 
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
@@ -175,7 +175,6 @@ public class UserController {
             else
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
-
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -184,23 +183,36 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('Admin')")
     @PutMapping("/update-user")
     public ResponseEntity<?> getAllUsers(@RequestParam(required = true, name = "userId") Integer userId,
-                                         @RequestParam(required = true, name = "role") String role) {
+                                         @RequestParam(required = true, name = "role") String role, HttpServletRequest request) {
         try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> adminOptional = userRepository.findByEmail(userEmail);
             Optional<User> userOptional = userRepository.findById(userId);
-            if( !userOptional.isPresent() )
+            // user not found
+            if( !userOptional.isPresent() || !adminOptional.isPresent() )
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-            Set<Role> roles = userOptional.get().getRoles();
+
+            System.out.println(userOptional.get().getId() + ">>>>" + userId);
+            // can not update yourself
+            if(Objects.equals(adminOptional.get().getId(), userOptional.get().getId()))
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot update yourself!", 400), HttpStatus.BAD_REQUEST);
+
 
             Optional<Role> roleUser = roleService.findByRoleCode(role);
             if(!roleUser.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Role Not Found!", 404), HttpStatus.NOT_FOUND);
             }
+            //  delete old role
+            userService.deleteRoleByUserId(userId);
+
+            Set<Role> roles = userOptional.get().getRoles();
             // Set role
             roles.add(roleUser.get());
             userOptional.get().setRoles(roles);
             // Update User
             userService.save(userOptional.get());
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get() ,200), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get() ,200), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -218,7 +230,7 @@ public class UserController {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             // check can not delete yourself
             if(Objects.equals(userOptional.get().getEmail(), userEmail))
-                return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 401), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 400), HttpStatus.BAD_REQUEST);
 
             User userDeleted = userOptional.get();
             // delete user by user id

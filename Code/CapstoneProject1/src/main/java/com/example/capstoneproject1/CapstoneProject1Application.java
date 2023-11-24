@@ -1,6 +1,6 @@
 package com.example.capstoneproject1;
 
-import com.example.capstoneproject1.services.UserService;
+import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

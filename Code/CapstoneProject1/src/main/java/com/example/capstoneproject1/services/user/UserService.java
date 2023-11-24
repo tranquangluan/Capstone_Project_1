@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.user;
 
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
@@ -10,7 +10,6 @@ public interface UserService {
     void update(User user);
     User findByUserId(Integer id);
     void delete(Integer id);
-    User findByUsername(String name);
     Iterable<User> findAll();
     User findByRefreshToken(String refreshToken);
     Optional<User> findById(Integer userId);
@@ -28,4 +27,6 @@ public interface UserService {
     List<User> getAllUsers(Integer userId,String email, String name ,Integer pageNo, Integer pageSize , String sortBy, String sortDir);
 
     Boolean deleteUserByUserId(Integer userId);
+
+    void deleteRoleByUserId(Integer userId);
 }

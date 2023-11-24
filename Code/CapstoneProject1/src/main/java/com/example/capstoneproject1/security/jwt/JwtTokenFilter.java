@@ -30,11 +30,21 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category")) {
+        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category") || request.getServletPath().contains("/api/spaces/list-spaces")) {
             filterChain.doFilter(request, response);
             return;
         }
         try {
+            // handle check have token
+            if(request.getHeader("Authorization") == null || request.getHeader("Authorization").isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, String> errorMessage = new HashMap<>();
+                errorMessage.put("error", String.valueOf(1));
+                errorMessage.put("message","Required authentication or authorization");
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
+            }
+            // handle validation token
             String token = getJwtFromRequest(request);
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -54,7 +64,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 Map<String, String> errorMessage = new HashMap<>();
                 errorMessage.put("error", String.valueOf(1));
                 errorMessage.put("message", jwtTokenProvider.getMessage());
@@ -62,12 +72,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
             }
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION);
-            Map<String, String> errorMessage = new HashMap<>();
-            errorMessage.put("error", String.valueOf(1));
-            errorMessage.put("message", e.getMessage());
-            response.setContentType("application/json");
-            new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                Map<String, String> errorMessage = new HashMap<>();
+                errorMessage.put("error", String.valueOf(1));
+                errorMessage.put("message", e.getMessage());
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), errorMessage);
         }
     }
 

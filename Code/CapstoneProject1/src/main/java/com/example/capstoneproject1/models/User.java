@@ -44,7 +44,7 @@ public class User {
     @JsonIgnore
     private String refreshToken;
 
-    @ManyToMany(fetch = FetchType.EAGER )
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
@@ -52,7 +52,7 @@ public class User {
     @JsonIgnore
     private List<Favourite> favourites = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ownerId", orphanRemoval = true)
+    @OneToMany(mappedBy = "ownerId", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Space> spaces = new ArrayList<>();
 

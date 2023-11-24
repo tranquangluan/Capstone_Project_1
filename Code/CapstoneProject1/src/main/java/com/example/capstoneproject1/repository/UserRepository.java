@@ -43,7 +43,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Query(value = "DELETE FROM feedback WHERE user_receive_feed_back_id = :userId or user_send_feed_back_id = :userId",nativeQuery = true)
     void deleteFeedbackByUserId(@Param("userId") Integer userId);
-
+    @Modifying
+    @Query(value = "DELETE FROM users_role WHERE users_id = :userId", nativeQuery = true)
+    @Transactional
+    void deleteRole(Integer userId);
     @Modifying
     @Query(value = "DELETE FROM users_role WHERE users_id = :userId",nativeQuery = true)
     void deleteUsersRoleByUserId(@Param("userId") Integer userId);

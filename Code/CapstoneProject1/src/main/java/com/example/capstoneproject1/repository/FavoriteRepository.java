@@ -31,4 +31,6 @@ public interface FavoriteRepository extends JpaRepository<Favourite,Integer> {
     List<Favourite> findByUserId(Integer userId);
 
     List<Favourite> findByUser(User userToDelete);
+
+    Favourite findBySpaceId(Integer spaceId);
 }

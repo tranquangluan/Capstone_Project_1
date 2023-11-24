@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services.favorite;
+package com.example.capstoneproject1.services.favourite;
 
 import com.example.capstoneproject1.models.Favourite;
 import com.example.capstoneproject1.models.Space;
@@ -71,6 +71,11 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     public void deleteBySpaceIdAndUserId(Integer spaceId, Integer userId) {
         favoriteRepository.deleteBySpaceIdAndUserId(spaceId ,userId);
+    }
+
+    @Override
+    public Favourite findBySpaceId(Integer spaceId) {
+        return favoriteRepository.findBySpaceId(spaceId);
     }
 
 }

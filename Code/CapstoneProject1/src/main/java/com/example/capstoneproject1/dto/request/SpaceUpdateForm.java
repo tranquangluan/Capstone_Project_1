@@ -21,6 +21,8 @@ public class SpaceUpdateForm {
     private Integer categoryId;
     private String status;
 
+    private String[] imagesId;
+
     public SpaceUpdateForm() {
     }
 
@@ -37,6 +39,14 @@ public class SpaceUpdateForm {
         this.ward = ward;
         this.address = address;
         this.categoryId = categoryId;
+    }
+
+    public String[] getImagesId() {
+        return imagesId;
+    }
+
+    public void setImagesId(String[] imagesId) {
+        this.imagesId = imagesId;
     }
 
     public String getTitle() {

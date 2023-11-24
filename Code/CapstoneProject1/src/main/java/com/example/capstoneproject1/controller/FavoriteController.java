@@ -9,9 +9,9 @@ import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
-import com.example.capstoneproject1.services.favorite.FavoriteService;
+import com.example.capstoneproject1.services.favourite.FavoriteService;
 import com.example.capstoneproject1.services.space.SpaceService;
-import com.example.capstoneproject1.services.UserService;
+import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,40 +59,53 @@ public class FavoriteController {
                 if (userOptional.isPresent()) {
                     // check has been created space in my favorite
                     if (favoriteService.existsBySpaceIdAndUserId(spaceId, userOptional.get().getId()))
-                        return new ResponseEntity<>(new ResponseMessage(1, "This Space Has Been In Your Favorite!", 401), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>(new ResponseMessage(1, "This Space Has Been In Your Favorite!", 400), HttpStatus.BAD_REQUEST);
 
                     Favourite favorite = favoriteService.saveFavourite(space.get(), userOptional.get());
-                    return new ResponseEntity<>(new FavoriteResponse(0, "Create Favorite Successful!", true,favorite, 201), HttpStatus.OK);
+                    return new ResponseEntity<>(new FavoriteResponse(0, "Create Favorite Successful!", true, favorite, 201), HttpStatus.CREATED);
                 } else
                     return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             } else
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("hasAnyAuthority('User', 'Owner')")
     @GetMapping(value = "/list-favorite")
-    public ResponseEntity<?> createFavorite(@RequestParam(required = true, name = "userId") Integer userId,
+    public ResponseEntity<?> createFavorite(@RequestParam(required = false, name = "spaceId") Integer spaceId,
                                             @RequestParam(defaultValue = "4", required = false, name = "limit") Integer limit,
-                                            @RequestParam(defaultValue = "0", required = false, name = "page") Integer page) {
+                                            @RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
+                                            HttpServletRequest request) {
 
         try {
-            if (!favoriteService.existsByUserId(userId))
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userRepository.findByEmail(userEmail);
+            // check user existence
+            if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-
-            List<Favourite> listFavorites = favoriteService.favoritesByUserId(userId, page, limit);
+            Integer userId = userOptional.get().getId();
+            // return when find by spaceId
+            if(spaceId != null) {
+                if(favoriteService.existsBySpaceIdAndUserId(spaceId, userId)) {
+                    return new ResponseEntity<>(new FavoriteResponse(0,"Have space in your favourite!",true, 200 ), HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new FavoriteResponse(0,"Have not space in your favourite!!",false, 200 ), HttpStatus.OK);
+            }
+            // return list of favorites when not param spaceId
+            List<Favourite> listFavorites = favoriteService.favoritesByUserId(userId, page - 1, limit);
             return new ResponseEntity<>(new ListFavoriteResponse(0, "Get List Favorite Successful!", listFavorites.size(), listFavorites, 200), HttpStatus.OK);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("hasAnyAuthority('User', 'Owner')")
-    @DeleteMapping (value = "/delete-favorite")
+    @DeleteMapping(value = "/delete-favorite")
     public ResponseEntity<?> deleteFavorite(@RequestParam(required = true, name = "favoriteId") Integer favoriteId, HttpServletRequest request) {
 
         try {
@@ -101,17 +114,17 @@ public class FavoriteController {
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
             if (userOptional.isPresent()) {
-               if(favoriteService.existsByFavouriteIdAndUserId(favoriteId, userOptional.get().getId() )) {
-                   favoriteService.deleteFavourite(favoriteId);
-                   return new ResponseEntity<>(new ResponseMessage(0, "Delete Favorite Successful!", 200), HttpStatus.OK);
-               }else
-                   return new ResponseEntity<>(new ResponseMessage(1, "This favorite does not exist in your favorite!", 401), HttpStatus.BAD_REQUEST);
+                if (favoriteService.existsByFavouriteIdAndUserId(favoriteId, userOptional.get().getId())) {
+                    favoriteService.deleteFavourite(favoriteId);
+                    return new ResponseEntity<>(new ResponseMessage(0, "Delete Favorite Successful!", 200), HttpStatus.OK);
+                } else
+                    return new ResponseEntity<>(new ResponseMessage(1, "This favorite does not exist in your favorite!", 400), HttpStatus.BAD_REQUEST);
             } else
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -128,19 +141,18 @@ public class FavoriteController {
             if (favoriteService.existsBySpaceId(spaceId)) {
                 if (userOptional.isPresent()) {
                     // if has been saved then delete it
-                    if (favoriteService.existsBySpaceIdAndUserId(spaceId, userOptional.get().getId()))
-                    {
+                    if (favoriteService.existsBySpaceIdAndUserId(spaceId, userOptional.get().getId())) {
                         favoriteService.deleteBySpaceIdAndUserId(spaceId, userOptional.get().getId());
-                        return new ResponseEntity<>(new FavoriteResponse(0, "Update Favorite Successful!",false, 201), HttpStatus.OK);
-                    }else
-                        return new ResponseEntity<>(new ResponseMessage(1, "Update Favorite Fail Or Does Saved!", 401), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>(new FavoriteResponse(0, "Update Favorite Successful!", false, 200), HttpStatus.OK);
+                    } else
+                        return new ResponseEntity<>(new ResponseMessage(1, "Update Favorite Fail Or Does Saved!", 400), HttpStatus.BAD_REQUEST);
                 } else
                     return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             } else
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found Or Not Saved!", 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 401), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 

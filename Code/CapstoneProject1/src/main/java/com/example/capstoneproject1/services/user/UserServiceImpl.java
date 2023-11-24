@@ -1,4 +1,4 @@
-package com.example.capstoneproject1.services;
+package com.example.capstoneproject1.services.user;
 
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
@@ -35,11 +35,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     SpaceRepository spaceRepository;
 
-
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 
     @Override
     public User saveUser(User user) {
@@ -134,6 +129,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteRoleByUserId(Integer userId) {
+        userRepository.deleteUsersRoleByUserId(userId);
+    }
+
+    @Override
     public void update(User user) {
         userRepository.save(user);
     }
@@ -149,8 +149,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String name) {
-        return userRepository.findByUsername(name);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override

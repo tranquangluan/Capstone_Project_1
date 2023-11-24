@@ -7,10 +7,11 @@ import com.example.capstoneproject1.dto.response.booking.ListBookingResponse;
 import com.example.capstoneproject1.models.Booking;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.services.BookingService;
-import com.example.capstoneproject1.services.UserService;
+
 import com.example.capstoneproject1.services.ZaloPayService;
+import com.example.capstoneproject1.services.booking.BookingService;
 import com.example.capstoneproject1.services.space.SpaceService;
+import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
