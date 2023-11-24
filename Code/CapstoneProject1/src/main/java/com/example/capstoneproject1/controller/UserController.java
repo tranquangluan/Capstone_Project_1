@@ -231,4 +231,16 @@ public class UserController {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> viewDashBoard() {
+        List<Integer> countRoles = new ArrayList<>();
+        Integer countAdmin = userRepository.countUsersRoleAdmin();
+        Integer countOwner = userRepository.countUsersRoleOwner();
+        Integer countUser = userRepository.countUsersRoleUser();
+        countRoles.add(countAdmin);
+        countRoles.add(countOwner);
+        countRoles.add(countUser);
+        return new ResponseEntity<>("",HttpStatus.OK);
+    }
 }

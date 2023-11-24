@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -83,6 +85,19 @@ public class SpaceController {
                 return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping(value = "/list-spaces/")
+    public ResponseEntity<?> getSpaces(@RequestParam(required = false, name = "spaceId") Integer spaceId) {
+        try {
+            Space space = spaceServiceImpl.findSpaceById(spaceId);
+            if (!space.equals("Null"))
+                return new ResponseEntity<>(new SpaceResponse(0, "Get Spaces Successfully", space, 200), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new SpaceResponse(1, "Space Not Found", 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
@@ -210,5 +225,5 @@ public class SpaceController {
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
-
+    
 }

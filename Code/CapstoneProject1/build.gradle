@@ -32,6 +32,11 @@ dependencies {
     implementation 'com.cloudinary:cloudinary-http44:1.28.1'
     implementation 'com.cloudinary:cloudinary:1.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.1'
+// https://mvnrepository.com/artifact/org.json/json
+    implementation group: 'org.json', name: 'json', version: '20231013'
+
+// https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
 }
 

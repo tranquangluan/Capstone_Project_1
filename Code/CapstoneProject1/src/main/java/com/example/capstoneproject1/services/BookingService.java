@@ -2,9 +2,11 @@ package com.example.capstoneproject1.services;
 
 import com.example.capstoneproject1.models.Booking;
 
+import java.util.List;
+
 public interface BookingService {
     void update(Booking booking);
-    Booking findById(Integer id);
-    void delete(Integer id);
-    Iterable<Booking> findAll();
+    Booking findBookingById(Integer id);
+    void deleteBookingById(Integer id);
+    List<Booking> getAllBookings(Integer status,Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 }
