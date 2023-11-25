@@ -12,6 +12,7 @@ import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.space.SpaceServiceImpl;
+import com.example.capstoneproject1.services.status.StatusServiceImpl;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,6 +63,9 @@ public class SpaceController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    StatusServiceImpl statusService;
+
     @GetMapping(value = "/list-spaces")
     public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
                                        @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
@@ -89,7 +93,6 @@ public class SpaceController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
 
     @PreAuthorize("hasAnyAuthority('Admin','Owner')")
@@ -175,18 +178,18 @@ public class SpaceController {
 
             // delete Image in repository
             String[] imageIds = spaceUpdateForm.getImagesId();
-            if(imageIds!=null) {
+            if (imageIds != null) {
                 for (String imageId : imageIds) {
-                    if(imageRepository.existsById(imageId)) {
+                    if (imageRepository.existsById(imageId)) {
                         imageRepository.deleteById(imageId);
                         cloudinaryService.delete(imageId);
                     }
                 }
             }
             // handle fields
-           spaceServiceImpl.updateSpace(spaceUpdateForm, spaceId);
-           // handle image
-            if(images != null) {
+            spaceServiceImpl.updateSpace(spaceUpdateForm, spaceId);
+            // handle image
+            if (images != null) {
                 List<Map> results = cloudinaryService.uploadMultiple(images);
                 if (!results.isEmpty()) {
                     // loop and save info in image Object
@@ -207,7 +210,7 @@ public class SpaceController {
                     return new ResponseEntity<>(new ResponseMessage(1, "Requires at least 1 image!", 401), HttpStatus.BAD_REQUEST);
                 }
             }
-            return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!",spaceOptional.get(), 200), HttpStatus.OK);
+            return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!", spaceOptional.get(), 200), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
@@ -222,7 +225,7 @@ public class SpaceController {
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
             // user not found
-            if( !userOptional.isPresent() )
+            if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
             // space notfound
@@ -236,9 +239,9 @@ public class SpaceController {
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete space that is not yours!", 400), HttpStatus.CONFLICT);
 
 
-            if(spaceServiceImpl.deleteSpace(spaceOptional.get()))
-                return new ResponseEntity<>(new ResponseMessage(0, "Delete Space Successful!",200), HttpStatus.OK);
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete Space Fail!",400), HttpStatus.BAD_REQUEST);
+            if (spaceServiceImpl.deleteSpace(spaceOptional.get()))
+                return new ResponseEntity<>(new ResponseMessage(0, "Delete Space Successful!", 200), HttpStatus.OK);
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete Space Fail!", 400), HttpStatus.BAD_REQUEST);
 
 
         } catch (Exception e) {
@@ -246,5 +249,56 @@ public class SpaceController {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
+    public ResponseEntity<?> updateStatusController(Integer statusCode, Integer spaceId, HttpServletRequest request) {
+        String token = jwtTokenFilter.getJwtFromRequest(request);
+        String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        // user not found
+        if (!userOptional.isPresent())
+            return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+        // space not found
+        Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
+        if (!spaceOptional.isPresent())
+            return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
+
+        // space not found
+        Optional<SpaceStatus> statusOptional = statusService.findBySpaceStatusId(statusCode);
+        if (!statusOptional.isPresent())
+            return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
+
+        Integer spaceStatusId = spaceOptional.get().getStatus().getId();
+        if (spaceStatusId != 3)
+            return new ResponseEntity<>(new ResponseMessage(1, "Space has updated!", 404), HttpStatus.NOT_FOUND);
+
+        SpaceStatus status = statusOptional.get();
+
+        if (spaceServiceImpl.updateStatus(spaceId, status)) {
+            return new ResponseEntity<>(new ResponseMessage(0, "Update space successfully!", 200), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ResponseMessage(1, "Update space fail!", 400), HttpStatus.BAD_REQUEST);
+    }
+
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PutMapping("/denied-space")
+    public ResponseEntity<?> deniedSpace(@RequestParam(name = "spaceId") Integer spaceId, HttpServletRequest request) {
+        try {
+            return updateStatusController(5, spaceId, request);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PutMapping("/accept-space")
+    public ResponseEntity<?> acceptSpace(@RequestParam(name = "spaceId") Integer spaceId, HttpServletRequest request) {
+        try {
+            return updateStatusController(0, spaceId, request);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 }

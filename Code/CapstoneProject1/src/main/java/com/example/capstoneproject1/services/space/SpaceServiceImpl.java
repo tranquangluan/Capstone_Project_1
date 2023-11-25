@@ -3,6 +3,7 @@ package com.example.capstoneproject1.services.space;
 import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.SpaceStatus;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.CategorySpaceRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
@@ -128,6 +129,17 @@ public class SpaceServiceImpl implements SpaceService {
             public Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner) {
                 return spaceRepository.findSpaceByIdAndOwnerId(spaceId, owner);
             }
+
+    @Override
+    public Boolean updateStatus(Integer spaceId, SpaceStatus spaceStatus) {
+       try {
+               spaceRepository.updateStatus(spaceId, spaceStatus);
+           return true;
+       }catch (Exception e) {
+           System.out.println("Lỗi Đây: >>>>" + e.getMessage());
+           return false;
+       }
+    }
 
 
 }

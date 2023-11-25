@@ -2,6 +2,7 @@ package com.example.capstoneproject1.services.space;
 
 import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.SpaceStatus;
 import com.example.capstoneproject1.models.User;
 
 import java.io.IOException;
@@ -27,5 +28,6 @@ public interface SpaceService {
 
     Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
+    Boolean updateStatus(Integer spaceId, SpaceStatus spaceStatus);
 
 }
