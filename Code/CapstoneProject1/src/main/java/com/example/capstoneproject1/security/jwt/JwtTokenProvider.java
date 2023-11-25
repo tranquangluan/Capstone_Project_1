@@ -17,7 +17,7 @@ public class JwtTokenProvider {
     private String message;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private static final String JWT_SECRET = "F2C583391C63F2D39E3EE2955677A";
-    private final long JWT_EXPIRATION = 86400;
+    private final long JWT_EXPIRATION = 864000;
     // generated jwt from information of user
     public String generateToken(Authentication authentication ) {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
@@ -30,7 +30,7 @@ public class JwtTokenProvider {
                 .setSubject(userPrinciple.getUsername())
                 .claim("roles", roles) // add accessControl in claims
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 2000))
+                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 1000))
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                 .compact();
     }
@@ -45,7 +45,7 @@ public class JwtTokenProvider {
                 .setSubject(userPrinciple.getUsername())
                 .claim("roles", roles) // add accessControl in claims
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 2000))
+                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 1000))
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                 .compact();
     }
@@ -57,7 +57,7 @@ public class JwtTokenProvider {
                 .setId(userPrinciple.getId().toString())
                 .setSubject(userPrinciple.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 1000))
+                .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 2000))
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                 .compact();
     }

@@ -6,15 +6,15 @@ public class ResponseMessage {
 
     private  Integer error;
     private  String message;
-    private  Integer statusCode;
+    private  Integer status;
 
     public ResponseMessage(String s, HttpStatus badRequest) {
     }
 
-    public ResponseMessage(Integer error, String message, Integer statusCode) {
+    public ResponseMessage(Integer error, String message, Integer status) {
         this.error = error;
         this.message = message;
-        this.statusCode = statusCode;
+        this.status = status;
     }
 
     public Integer getError() {
@@ -26,11 +26,11 @@ public class ResponseMessage {
     }
 
     public Integer getStatusCode() {
-        return statusCode;
+        return status;
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setStatusCode(Integer status) {
+        this.status = status;
     }
 
     public String getMessage() {

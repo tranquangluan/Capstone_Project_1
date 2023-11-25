@@ -53,10 +53,11 @@ public class UserController {
     @Autowired
     RoleService roleService;
 
-    @PreAuthorize("hasAnyAuthority('User')")
+    @PreAuthorize("hasAnyAuthority('User','Owner')")
     @GetMapping("/current-user")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request, HttpServletResponse response) {
         try {
+
             String bearerToken = request.getHeader("Authorization");
             String token = "";
             if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

@@ -15,8 +15,8 @@ import com.example.capstoneproject1.security.userPrincal.UserDetailService;
 import com.example.capstoneproject1.security.userPrincal.UserPrinciple;
 import com.example.capstoneproject1.services.auth.AuthService;
 import com.example.capstoneproject1.services.email.EmailServiceImpl;
-import com.example.capstoneproject1.services.user.UserServiceImpl;
 import com.example.capstoneproject1.services.role.RoleServiceImpl;
+import com.example.capstoneproject1.services.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,7 +35,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -68,6 +71,7 @@ public class AuthController {
     @Autowired
     EmailServiceImpl emailServiceImpl;
 
+
     SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     @PostMapping(value = "/register", consumes = {
@@ -89,7 +93,7 @@ public class AuthController {
         session.setMaxInactiveInterval(300);
         // send OTP for email
         emailServiceImpl.sendMailOTP(otp, signUpForm.getEmail(),"Verify Email");
-        return new ResponseEntity<>(new ResponseMessage(0, "You Need Verify OTP!", 201), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ResponseMessage(0, "You Need Verify OTP!", 200), HttpStatus.OK);
     }
 
     @PostMapping(value = "/verify-email", consumes = {
@@ -98,10 +102,9 @@ public class AuthController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public @ResponseBody ResponseEntity<?> verifyEmail(HttpServletRequest request, @Valid SignUpForm signUpForm, @NotNull String otp) {
+    public @ResponseBody ResponseEntity<?> verifyEmail(@Valid SignUpForm signUpForm,@Valid @NotNull String otp , HttpServletRequest request , HttpServletResponse response) {
 
         try {
-
             HttpSession session = request.getSession(false);
             if (session != null) {
                 //Get OTP from session
@@ -114,7 +117,8 @@ public class AuthController {
                     roles.add(roleUser);
                     user.setRoles(roles);
                     userServiceImpl.save(user);
-                    return new ResponseEntity<>(new ResponseMessage(0, "Create Account Successful!", 200), HttpStatus.OK);
+                    session.removeAttribute("otpEmail");
+                    return new ResponseEntity<>(new ResponseMessage(0, "Create Account Successful!", 201), HttpStatus.CREATED);
                 }else {
                     return new ResponseEntity<>(new ResponseMessage(1, "Invalid OTP. Please check your entered code.", 400), HttpStatus.BAD_REQUEST);
                 }
@@ -223,6 +227,7 @@ public class AuthController {
             session.setAttribute("otp", otp);
             // set time for OTP 5p
             session.setMaxInactiveInterval(300);
+            System.out.println(session.getId());
 
             // send OTP for email
             emailServiceImpl.sendMailOTP(otp, email,"Forgot Password");
@@ -242,6 +247,7 @@ public class AuthController {
     public @ResponseBody ResponseEntity<?> resetPassword(HttpServletRequest request, @NotNull String password, @NotNull String otp, @NotNull String email) {
 
         try {
+            System.out.println(email);
             Optional<User> userOptional = userServiceImpl.findByEmail(email);
             if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Email not existed!", 404), HttpStatus.NOT_FOUND);
