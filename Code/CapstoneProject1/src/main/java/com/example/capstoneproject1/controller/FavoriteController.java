@@ -45,7 +45,7 @@ public class FavoriteController {
     @Autowired
     UserRepository userRepository;
 
-    @PreAuthorize("hasAnyAuthority('User', 'Owner')")
+    @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
     @PostMapping(value = "/create-favorite")
     public ResponseEntity<?> createFavorite(@RequestParam(required = true, name = "spaceId") Integer spaceId, HttpServletRequest request) {
 
@@ -73,7 +73,7 @@ public class FavoriteController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('User', 'Owner')")
+    @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
     @GetMapping(value = "/list-favorite")
     public ResponseEntity<?> createFavorite(@RequestParam(required = false, name = "spaceId") Integer spaceId,
                                             @RequestParam(defaultValue = "4", required = false, name = "limit") Integer limit,
@@ -104,7 +104,7 @@ public class FavoriteController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('User', 'Owner')")
+    @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
     @DeleteMapping(value = "/delete-favorite")
     public ResponseEntity<?> deleteFavorite(@RequestParam(required = true, name = "favoriteId") Integer favoriteId, HttpServletRequest request) {
 
@@ -128,7 +128,7 @@ public class FavoriteController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('User', 'Owner')")
+    @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
     @PutMapping(value = "/update-favorite")
     public ResponseEntity<?> updateFavorite(@RequestParam(required = true, name = "spaceId") Integer spaceId, HttpServletRequest request) {
 

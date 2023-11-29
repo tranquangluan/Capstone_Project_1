@@ -53,7 +53,7 @@ public class UserController {
     @Autowired
     RoleService roleService;
 
-    @PreAuthorize("hasAnyAuthority('User','Owner')")
+    @PreAuthorize("hasAnyAuthority('User' , 'Admin', 'Owner')")
     @GetMapping("/current-user")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -70,7 +70,7 @@ public class UserController {
                     User user = userOptional.get();
                     return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 404), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(new ResponseMessage(1, "User not found!", 404), HttpStatus.NOT_FOUND);
                 }
             } else
                 return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);

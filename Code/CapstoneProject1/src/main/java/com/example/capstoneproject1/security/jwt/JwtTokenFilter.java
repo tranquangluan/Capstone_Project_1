@@ -30,7 +30,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category") || request.getServletPath().contains("/api/spaces/list-spaces")) {
+        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/api/category") || request.getServletPath().contains("/api/spaces/list-spaces") || request.getServletPath().contains("/api/spaces/list-sharing")) {
             filterChain.doFilter(request, response);
             return;
         }
