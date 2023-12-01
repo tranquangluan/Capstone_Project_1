@@ -53,8 +53,8 @@ public class SpaceServiceImpl implements SpaceService {
             }
 
             @Override
-            public List<Space> getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo) {
-
+            public Page<Space> getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo) {
+                System.out.println();
                 try {
                     if (sortDir != "None") {
                         // Create Sorted instance
@@ -63,19 +63,18 @@ public class SpaceServiceImpl implements SpaceService {
                         // create Pageable instance
                         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
                         Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                        return pageSpace.getContent();
+                        return pageSpace;
                     }else {
                         Pageable pageable = PageRequest.of(pageNo, pageSize);
                         Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                        return pageSpace.getContent();
+                        return pageSpace;
                     }
 
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
-                    return new ArrayList<>();
+                    return Page.empty();
                 }
-
             }
 
             @Override

@@ -63,7 +63,7 @@ public class JwtTokenProvider {
     }
 
     // get information from jwt secret
-    public String getUserEmailFromToken(String token) {
+    public String getUserEmailFromToken(String token) { // mã hóa ngước để lấy email
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)

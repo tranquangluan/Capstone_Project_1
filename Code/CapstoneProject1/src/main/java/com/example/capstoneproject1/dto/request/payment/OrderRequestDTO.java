@@ -5,45 +5,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequestDTO {
-    private String appUser;
-    private Long amount;
-    private Long orderId;
+    private Integer userId;
+    private Integer id;
 
-    public String getAppUser() {
-        return appUser;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setAppUser(String appUser) {
-        this.appUser = appUser;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public Long getAmount() {
-        return amount;
+    public Integer getId() {
+        return id;
     }
 
-    public void setAmount(Long amount) {
-        this.amount = amount;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    private Space space;
-
-    public Space getSpace() {
-        return space;
-    }
-
-    public void setSpace(Space space) {
-        this.space = space;
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

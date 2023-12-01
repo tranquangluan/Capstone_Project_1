@@ -14,6 +14,7 @@ import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.space.SpaceServiceImpl;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -81,9 +82,11 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "spaceId") Integer spaceId,
                                        @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
-            List<Space> listSpaces = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            Page<Space> listSpaces = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            System.out.println(listSpaces.getSize());
             if (!listSpaces.isEmpty())
-                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", (int)listSpaces.getTotalElements(), listSpaces.getContent(), 200), HttpStatus.OK);
+
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
@@ -91,21 +94,6 @@ public class SpaceController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping(value = "/list-spaces/")
-    public ResponseEntity<?> getSpaces(@RequestParam(required = false, name = "spaceId") Integer spaceId) {
-        try {
-            Space space = spaceServiceImpl.findSpaceById(spaceId);
-            if (!space.equals("Null"))
-                return new ResponseEntity<>(new SpaceResponse(0, "Get Spaces Successfully", space, 200), HttpStatus.OK);
-            else
-                return new ResponseEntity<>(new SpaceResponse(1, "Space Not Found", 404), HttpStatus.NOT_FOUND);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
 
     @PreAuthorize("hasAnyAuthority('Admin','Owner')")
     @PostMapping(value = "/create-space", consumes = {

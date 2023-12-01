@@ -50,7 +50,7 @@ public class FavoriteController {
     public ResponseEntity<?> createFavorite(@RequestParam(required = true, name = "spaceId") Integer spaceId, HttpServletRequest request) {
 
         try {
-            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String token = jwtTokenFilter.getJwtFromRequest(request); // trả về token từ request
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
             Optional<Space> space = spaceService.findById(spaceId);
