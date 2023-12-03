@@ -9,6 +9,7 @@ public class ListSpaceResponse {
     private Integer error;
     private String message;
     private Integer spaceQuantity;
+    private Integer totalPages;
 
     private List<Space> listSpaces;
 
@@ -22,6 +23,21 @@ public class ListSpaceResponse {
         this.error = error;
         this.message = message;
         this.spaceQuantity = spaceQuantity;
+        this.status = status;
+    }
+
+    public ListSpaceResponse(Integer error, String message, Integer spaceQuantity, Integer totalPages, List<Space> listSpaces, Integer status) {
+        this.error = error;
+        this.message = message;
+        this.spaceQuantity = spaceQuantity;
+        this.totalPages = totalPages;
+        this.listSpaces = listSpaces;
+        this.status = status;
+    }
+
+    public ListSpaceResponse(Integer error, String message, Integer status) {
+        this.error = error;
+        this.message = message;
         this.status = status;
     }
 
@@ -71,5 +87,13 @@ public class ListSpaceResponse {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getTotalPages() {
+        return totalPages;
+    }
+
+    public void setTotalPages(Integer totalPages) {
+        this.totalPages = totalPages;
     }
 }

@@ -6,7 +6,7 @@ import com.example.capstoneproject1.dto.response.sharing.SharingResponse;
 import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
 import com.example.capstoneproject1.models.Sharing;
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.SpaceStatus;
+import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.CategorySpaceRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
@@ -94,8 +94,6 @@ public class SharingController {
         return userService.findByEmail(userEmail);
     }
 
-
-
     @PostMapping(value = "/create-sharing", consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_FORM_URLENCODED_VALUE
@@ -114,7 +112,7 @@ public class SharingController {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space not found!", 404), HttpStatus.NOT_FOUND);
             // handle check status
             Integer statusCode = 2;
-            Optional<SpaceStatus> statusOptional = statusService.findBySpaceStatusId(statusCode);
+            Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status not found!", 404), HttpStatus.NOT_FOUND);
 
@@ -157,7 +155,7 @@ public class SharingController {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space not found!", 404), HttpStatus.NOT_FOUND);
             // handle check status
             Integer statusCode = 2;
-            Optional<SpaceStatus> statusOptional = statusService.findBySpaceStatusId(statusCode);
+            Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status not found!", 404), HttpStatus.NOT_FOUND);
 
@@ -195,7 +193,7 @@ public class SharingController {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space not found!", 404), HttpStatus.NOT_FOUND);
             // handle check status
             Integer statusCode = 2;
-            Optional<SpaceStatus> statusOptional = statusService.findBySpaceStatusId(statusCode);
+            Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status not found!", 404), HttpStatus.NOT_FOUND);
 

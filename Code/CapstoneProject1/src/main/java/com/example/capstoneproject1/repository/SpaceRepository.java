@@ -2,7 +2,7 @@ package com.example.capstoneproject1.repository;
 
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.SpaceStatus;
+import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,7 +89,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "WHERE s.id = :spaceId")
     void updateStatus(
             @Param("spaceId") Integer spaceId,
-            @Param("statusId") SpaceStatus spaceStatus
+            @Param("statusId") Status status
     );
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);

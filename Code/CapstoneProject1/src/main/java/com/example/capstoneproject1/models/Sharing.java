@@ -18,12 +18,12 @@ public class Sharing {
     private String infoSharing;
     @ManyToOne
     @JoinColumn(name = "statusId")
-    private SpaceStatus status;
+    private Status status;
 
     public Sharing() {
     }
 
-    public Sharing(Integer id, Space spaceId, User userId, String infoSharing, SpaceStatus status) {
+    public Sharing(Integer id, Space spaceId, User userId, String infoSharing, Status status) {
         this.id = id;
         this.spaceId = spaceId;
         this.userId = userId;
@@ -31,7 +31,7 @@ public class Sharing {
         this.status = status;
     }
 
-    public Sharing(Space spaceId, User userId, String infoSharing, SpaceStatus status) {
+    public Sharing(Space spaceId, User userId, String infoSharing, Status status) {
         this.spaceId = spaceId;
         this.userId = userId;
         this.infoSharing = infoSharing;
@@ -70,11 +70,11 @@ public class Sharing {
         this.infoSharing = infoSharing;
     }
 
-    public SpaceStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(SpaceStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 }

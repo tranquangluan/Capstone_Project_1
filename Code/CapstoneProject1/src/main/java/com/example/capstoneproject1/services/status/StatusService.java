@@ -1,9 +1,9 @@
 package com.example.capstoneproject1.services.status;
 
-import com.example.capstoneproject1.models.SpaceStatus;
+import com.example.capstoneproject1.models.Status;
 
 import java.util.Optional;
 
 public interface StatusService {
-    Optional<SpaceStatus> findBySpaceStatusId(Integer spaceStatusId);
+    Optional<Status> findBySpaceStatusId(Integer spaceStatusId);
 }

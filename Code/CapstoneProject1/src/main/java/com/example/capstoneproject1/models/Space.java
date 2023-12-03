@@ -20,7 +20,7 @@ public class Space {
     private String title;
     @ManyToOne
     @JoinColumn(name = "statusId")
-    private SpaceStatus status;
+    private Status status;
     @Column(name = "price")
     private BigDecimal price;
     @OneToMany(mappedBy = "spaceId")
@@ -57,7 +57,7 @@ public class Space {
     public Space() {
     }
 
-    public Space( String title, SpaceStatus status, BigDecimal price, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
+    public Space(String title, Status status, BigDecimal price, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
         this.title = title;
         this.status = status;
         this.price = price;
@@ -74,7 +74,7 @@ public class Space {
         this.ownerId = ownerId;
     }
 
-    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, List<Image> images, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
+    public Space(Integer id, String title, Status status, BigDecimal price, List<Image> images, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
         this.id = id;
         this.title = title;
         this.status = status;
@@ -109,11 +109,11 @@ public class Space {
         this.title = title;
     }
 
-    public SpaceStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(SpaceStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

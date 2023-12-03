@@ -1,9 +1,10 @@
 package com.example.capstoneproject1.services.space;
 
 import com.example.capstoneproject1.dto.request.SpaceUpdateForm;
+import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
-import com.example.capstoneproject1.models.SpaceStatus;
+import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.CategorySpaceRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ public class SpaceServiceImpl implements SpaceService {
             }
 
             @Override
-            public List<Space> getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo) {
+            public PageSpace getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo) {
 
                 try {
                     if (sortDir != "None") {
@@ -64,17 +64,21 @@ public class SpaceServiceImpl implements SpaceService {
                         // create Pageable instance
                         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
                         Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                        return pageSpace.getContent();
+                        Integer totalPages = pageSpace.getTotalPages();
+                        List<Space> listSpaces = pageSpace.getContent();
+                        return new PageSpace(totalPages, listSpaces);
                     }else {
                         Pageable pageable = PageRequest.of(pageNo, pageSize);
                         Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                        return pageSpace.getContent();
+                        Integer totalPages = pageSpace.getTotalPages();
+                        List<Space> listSpaces = pageSpace.getContent();
+                        return new PageSpace(totalPages, listSpaces);
                     }
 
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
-                    return new ArrayList<>();
+                    return new PageSpace();
                 }
 
             }
@@ -131,9 +135,9 @@ public class SpaceServiceImpl implements SpaceService {
             }
 
     @Override
-    public Boolean updateStatus(Integer spaceId, SpaceStatus spaceStatus) {
+    public Boolean updateStatus(Integer spaceId, Status status) {
        try {
-               spaceRepository.updateStatus(spaceId, spaceStatus);
+               spaceRepository.updateStatus(spaceId, status);
            return true;
        }catch (Exception e) {
            System.out.println("Lỗi Đây: >>>>" + e.getMessage());

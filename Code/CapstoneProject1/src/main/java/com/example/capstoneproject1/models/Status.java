@@ -3,7 +3,7 @@ package com.example.capstoneproject1.models;
 import javax.persistence.*;
 
 @Entity
-public class SpaceStatus {
+public class Status {
     @Id
     @Column(name="statusId")
     private Integer id;
@@ -11,10 +11,10 @@ public class SpaceStatus {
     private String status;
 
 
-    public SpaceStatus() {
+    public Status() {
     }
 
-    public SpaceStatus(Integer id, String status) {
+    public Status(Integer id, String status) {
         this.id = id;
         this.status = status;
     }
