@@ -1,11 +1,14 @@
 package com.example.capstoneproject1.services.user;
 
+import com.example.capstoneproject1.dto.response.user.PageUser;
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.FavoriteRepository;
 import com.example.capstoneproject1.repository.RoleRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,8 @@ import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -72,45 +77,59 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsById(userId);
     }
 
+    public String getRoleCode(String role) {
+        switch (role) {
+            case "Admin":
+                return "R1";
+            case "Owner":
+                return "R2";
+            case "User":
+                return "R3";
+            default:
+                return "None";
+        }
+    }
+
     @Override
-    public List<User> getAllUsers(Integer userId, String email, String name, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public PageUser getAllUsers(Integer userId, String email, String name, Integer pageNo, Integer pageSize, String sortBy, String sortDir, String role) {
+
         try {
-            // Create Sorted instance
-            Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
-            // create Pageable instance
-            Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-            // Get users by email and id
-            if (!email.isEmpty()) {
-                if (userId != null) {
-                    Page<User> listUsersByEmail = userRepository.findByIdAndEmailContaining(userId, email, pageable);
-                    return listUsersByEmail.getContent();
+            String roleCode = getRoleCode(role);
+            if (!Objects.equals(sortDir, "None")) {
+                // Create Sorted instance
+                Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+                // create Pageable instance
+                Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+                Page<User> pageUsers;
+                if (Objects.equals(roleCode, "None")) {
+                    pageUsers = userRepository.findByRoleCodeAndConditions(userId, email, name, null, pageable);
+                } else {
+                    pageUsers = userRepository.findByRoleCodeAndConditions(userId, email, name, roleCode, pageable);
                 }
-                Page<User> listUsersByEmail = userRepository.findByEmailContaining(email, pageable);
-                return listUsersByEmail.getContent();
-            }
-            // Get users by full name and id
-            if (!name.isEmpty()) {
-                if (userId != null) {
-                    Page<User> listUsersByEmail = userRepository.findByIdAndNameContaining(userId, name, pageable);
-                    return listUsersByEmail.getContent();
+                System.out.println(2);
+                Integer totalPages = pageUsers.getTotalPages();
+                List<User> listUsers = pageUsers.getContent();
+                return new PageUser(totalPages, listUsers);
+            } else {
+                System.out.println("Đây");
+                Pageable pageable = PageRequest.of(pageNo, pageSize);
+                System.out.println(1);
+                Page<User> pageUsers;
+                if (Objects.equals(roleCode, "None")) {
+                    pageUsers = userRepository.findByRoleCodeAndConditions(userId, email, name, null, pageable);
+                } else {
+                    pageUsers = userRepository.findByRoleCodeAndConditions(userId, email, name, roleCode, pageable);
                 }
-                Page<User> listUsersByFullName = userRepository.findByNameContaining(name, pageable);
-                return listUsersByFullName.getContent();
+                System.out.println(2);
+                Integer totalPages = pageUsers.getTotalPages();
+                List<User> listUsers = pageUsers.getContent();
+                return new PageUser(totalPages, listUsers);
             }
-            //get user by id
-            if (userId != null) {
-                Optional<User> userById = userRepository.findById(userId);
-                List<User> users = new ArrayList<User>();
-                userById.ifPresent(users::add);
-                return users;
-            }
-            // get all users
-            Page<User> listUsers = userRepository.findAll(pageable);
-            return listUsers.getContent();
+
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ArrayList<>();
+            logger.error(e.getMessage());
+            return new PageUser();
         }
     }
 
@@ -123,7 +142,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(userId);
             return true;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             return false;
         }
     }

@@ -44,13 +44,6 @@ public class User {
     @JsonIgnore
     private String refreshToken;
 
-    @Column(name = "resetExpires")
-    @JsonIgnore
-    private Integer resetExpires;
-
-    @Column(name = "otpCode", length = 10)
-    @JsonIgnore
-    private String otpCode;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

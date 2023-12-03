@@ -3,6 +3,7 @@ package com.example.capstoneproject1.controller;
 import com.example.capstoneproject1.dto.request.UserEditForm;
 import com.example.capstoneproject1.dto.response.user.ListUsersResponse;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
+import com.example.capstoneproject1.dto.response.user.PageUser;
 import com.example.capstoneproject1.dto.response.user.UpdateAnDeleteUserResponse;
 import com.example.capstoneproject1.dto.response.user.UserResponse;
 import com.example.capstoneproject1.models.Role;
@@ -161,17 +162,20 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(@RequestParam(defaultValue = "0", required = false, name = "page") Integer page,
+    public ResponseEntity<?> getAllUsers(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
                                          @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
                                          @RequestParam(defaultValue = "email", required = false, name = "sortBy") String sortBy,
-                                         @RequestParam(defaultValue = "ASC", required = false, name = "sortDir") String sortDir,
-                                         @RequestParam(defaultValue = "", required = false, name = "searchByEmail") String searchByEmail,
-                                         @RequestParam(defaultValue = "", required = false, name = "searchByName") String searchByName,
-                                         @RequestParam(required = false, name = "searchById") Integer searchById) {
+                                         @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
+                                         @RequestParam(required = false, name = "searchByEmail") String searchByEmail,
+                                         @RequestParam(required = false, name = "searchByName") String searchByName,
+                                         @RequestParam(required = false, name = "searchById") Integer searchById,
+                                         @RequestParam( defaultValue = "None",required = false, name = "searchByRole") String searchByRole) {
         try {
-            List<User> listUsers = userService.getAllUsers(searchById, searchByEmail, searchByName, page, limit, sortBy, sortDir);
+            PageUser pageUser = userService.getAllUsers(searchById, searchByEmail, searchByName, page - 1, limit, sortBy, sortDir,searchByRole);
+            Integer totalPages = pageUser.getTotalPages();
+            List<User> listUsers = pageUser.getListUsers();
             if (!listUsers.isEmpty())
-                return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!", listUsers, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!",listUsers.size() ,totalPages, listUsers, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 

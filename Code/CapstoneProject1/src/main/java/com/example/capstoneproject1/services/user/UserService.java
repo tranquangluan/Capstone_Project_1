@@ -1,9 +1,9 @@
 package com.example.capstoneproject1.services.user;
 
+import com.example.capstoneproject1.dto.response.user.PageUser;
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -24,7 +24,7 @@ public interface UserService {
     String getPasswordByEmail(String email);
     Boolean existsById(Integer userId);
 
-    List<User> getAllUsers(Integer userId,String email, String name ,Integer pageNo, Integer pageSize , String sortBy, String sortDir);
+    PageUser getAllUsers(Integer userId, String email, String name , Integer pageNo, Integer pageSize , String sortBy, String sortDir , String role);
 
     Boolean deleteUserByUserId(Integer userId);
 

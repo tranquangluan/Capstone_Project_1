@@ -39,4 +39,22 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             + "WHERE r.role_code = :roleCode", nativeQuery = true)
     List<User> findByRoleCode(@Param("roleCode") String roleCode);
 
+
+    @Query(value = "SELECT u FROM User u " +
+            "JOIN u.roles r " +
+            "WHERE (:userId IS NULL OR u.id = :userId) " +
+            "AND (:email IS NULL OR u.email LIKE CONCAT('%', :email, '%')) " +
+            "AND (:name IS NULL OR u.name LIKE CONCAT('%', :name, '%')) " +
+            "AND (:roleCode IS NULL OR r.roleCode = :roleCode)", nativeQuery = false)
+    Page<User> findByRoleCodeAndConditions(
+            @Param("userId") Integer userId,
+            @Param("email") String email,
+            @Param("name") String name,
+            @Param("roleCode") String roleCode,
+            Pageable pageable
+    );
+
+
+
+
 }

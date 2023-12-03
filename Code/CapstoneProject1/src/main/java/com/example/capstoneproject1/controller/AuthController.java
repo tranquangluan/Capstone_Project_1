@@ -207,7 +207,7 @@ public class AuthController {
         return String.valueOf(otpValue);
     }
 
-    @PostMapping(value = "/forgot-password", consumes = {
+        @PostMapping(value = "/forgot-password", consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_FORM_URLENCODED_VALUE
     }, produces = {
