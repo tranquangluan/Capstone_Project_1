@@ -128,5 +128,10 @@ public class SpaceServiceImpl implements SpaceService {
                 return spaceRepository.findSpaceByIdAndOwnerId(spaceId, owner);
             }
 
+    @Override
+    public Integer countPostSpace() {
+        return spaceRepository.countPostSpace();
+    }
+
 
 }

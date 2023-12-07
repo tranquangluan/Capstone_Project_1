@@ -25,36 +25,41 @@ public class PaymentController {
     @Autowired
     private ZaloPayService zaloPayService;
 
-//    @PostMapping(value = "/api/v1/create-order", consumes = {
-//            MediaType.APPLICATION_JSON_VALUE,
-//            MediaType.APPLICATION_FORM_URLENCODED_VALUE
-//    }, produces = {
-//            MediaType.APPLICATION_JSON_VALUE
-//    })
-//    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequestDTO request) throws JSONException, IOException {
-//
-//        Map<String, Object> resultOrder = zaloPayService.createOrder(request);
-//        return new ResponseEntity<>(resultOrder, HttpStatus.OK);
-//    }
-@PostMapping(value = "/api/v1/create-order", produces = {
-        MediaType.APPLICATION_JSON_VALUE
-})
-public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequestDTO orderRequestDTO)
-        throws JSONException, IOException {
-    Map<String, Object> resultOrder = zaloPayService.createOrder(orderRequestDTO);
-    return new ResponseEntity<>(resultOrder, HttpStatus.OK);
-}
-    @PostMapping("/api/v1/callback")
-    public ResponseEntity<String> callback(@RequestBody CallBackPaymentDTO paymentDTO)
+
+    @PostMapping("/api/v1/create-order")
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) throws JSONException, IOException {
+
+        Map<String, Object> resultOrder = zaloPayService.createOrder(orderRequestDTO);
+        return new ResponseEntity<>(resultOrder, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/api/v1/callback", produces = {
+            MediaType.APPLICATION_JSON_VALUE
+    })
+    public ResponseEntity<String> callback(@RequestBody String string)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         JSONObject result = new JSONObject();
-        return new ResponseEntity<>(zaloPayService.doCallBack(result, paymentDTO.getJsonString()).toString(), HttpStatus.OK);
+        if (string != null) {
+            return new ResponseEntity<>(zaloPayService.doCallBack(result, string).toString(), HttpStatus.OK);
+        } else {
+            result.put("return_code", 0);
+            result.put("return_message", "Json string is null");
+            return new ResponseEntity<>(result.toString(), HttpStatus.BAD_REQUEST);
+        }
     }
-//    @PostMapping("/api/v1/order-status")
-//    public Map<String, Object> getStatusOrder(@RequestBody StatusRequestDTO statusRequestDTO)
-//            throws JSONException, URISyntaxException, IOException {
-//        return zaloPayService.statusOrder(statusRequestDTO);
+//    @PostMapping(value = "/api/v1/callback")
+//    public ResponseEntity<String> callback(@RequestParam("string") String string)
+//            throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
+//        JSONObject result = new JSONObject();
+//        if (string != null) {
+//            return new ResponseEntity<>(zaloPayService.doCallBack(result, string).toString(), HttpStatus.OK);
+//        } else {
+//            result.put("return_code", 0);
+//            result.put("return_message", "Json string is null");
+//            return new ResponseEntity<>(result.toString(), HttpStatus.BAD_REQUEST);
+//        }
 //    }
+
     @PostMapping("/api/v1/refund-payment")
     public ResponseEntity<Map<String, Object>> sendRefundRequest(@RequestBody RefundRequestDTO refundRequestDTO)
             throws JSONException, IOException {

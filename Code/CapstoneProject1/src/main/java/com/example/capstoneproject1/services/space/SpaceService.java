@@ -28,5 +28,5 @@ public interface SpaceService {
 
     Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
-
+    Integer countPostSpace();
 }

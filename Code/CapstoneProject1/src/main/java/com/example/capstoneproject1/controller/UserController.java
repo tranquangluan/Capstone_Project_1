@@ -11,6 +11,7 @@ import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
+import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.user.UserService;
 import com.example.capstoneproject1.services.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class UserController {
 
     @Autowired
     RoleService roleService;
+    @Autowired
+    SpaceService spaceService;
 
     @PreAuthorize("hasAnyAuthority('User')")
     @GetMapping("/current-user")
@@ -246,13 +249,15 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/dashboard")
     public ResponseEntity<?> viewDashBoard() {
-        List<Integer> countRoles = new ArrayList<>();
+        Map<String, Integer> countRoles = new HashMap<>();
         Integer countAdmin = userRepository.countUsersRoleAdmin();
         Integer countOwner = userRepository.countUsersRoleOwner();
         Integer countUser = userRepository.countUsersRoleUser();
-        countRoles.add(countAdmin);
-        countRoles.add(countOwner);
-        countRoles.add(countUser);
-        return new ResponseEntity<>("",HttpStatus.OK);
+        Integer countPostSpace = spaceService.countPostSpace();
+        countRoles.put("NumberAdminAccount", countAdmin);
+        countRoles.put("NumberOwnerAccount", countOwner);
+        countRoles.put("NumberUserAccount", countUser);
+        countRoles.put("NumberPostSpace", countPostSpace);
+        return new ResponseEntity<>(countRoles,HttpStatus.OK);
     }
 }

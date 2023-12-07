@@ -3,10 +3,12 @@ package com.example.capstoneproject1.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -43,6 +45,9 @@ public class Space {
     private String ward;
     @Column(name = "address")
     private String address;
+    @Column(name = "createdAt", nullable = true, updatable = false)
+    @CreationTimestamp
+    private Date createdAt;
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategorySpace categoryId;
@@ -57,7 +62,12 @@ public class Space {
     public Space() {
     }
 
-    public Space( String title, SpaceStatus status, BigDecimal price, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
+    public Space(Integer id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
+    public Space(String title, SpaceStatus status, BigDecimal price, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId) {
         this.title = title;
         this.status = status;
         this.price = price;

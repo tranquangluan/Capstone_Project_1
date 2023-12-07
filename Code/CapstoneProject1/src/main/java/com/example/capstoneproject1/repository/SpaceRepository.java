@@ -85,4 +85,6 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
     Space findSpaceById(Integer id);
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
+    @Query(value = "SELECT COUNT(*) AS total_posts FROM space WHERE created_at >= DATE_SUB(NOW(), INTERVAL 3 DAY)",nativeQuery = true)
+    Integer countPostSpace();
 }

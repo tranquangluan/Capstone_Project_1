@@ -1,5 +1,6 @@
 package com.example.capstoneproject1.services;
 
+import com.example.capstoneproject1.config.ZalopayConstant;
 import com.example.capstoneproject1.dto.request.payment.OrderRequestDTO;
 import com.example.capstoneproject1.dto.request.payment.RefundRequestDTO;
 import com.example.capstoneproject1.dto.request.payment.RefundStatusRequestDTO;
@@ -47,22 +48,6 @@ public class ZaloPayService {
     UserService userService;
     @Autowired
     SpaceService spaceService;
-    @Value("${zalopay.appId}")
-    private Integer appId;
-
-    @Value("${zalopay.key1}")
-    private String key1;
-
-    @Value("${zalopay.key2}")
-    private String key2;
-
-    public static final String ORDER_CREATE_ENDPOINT = "https://sandbox.zalopay.com.vn/v001/tpe/createorder";
-
-    public static final String ORDER_STATUS_ENDPOINT = "https://sb-openapi.zalopay.vn/v2/query";
-
-    public static final String REFUND_PAYMENT_ENDPOINT = "https://sb-openapi.zalopay.vn/v2/refund";
-
-    public static final String REFUND_STATUS_PAYMENT_ENDPOINT = "https://sb-openapi.zalopay.vn/v2/query_refund";
 
     private String getCurrentTimeString(String format) {
 
@@ -81,22 +66,23 @@ public class ZaloPayService {
             put("address",space.getAddress());
         }};
         Map<String, Object> order = new HashMap<String, Object>(){{
-            put("app_id", appId);
-            put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime()); // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-            put("app_time", System.currentTimeMillis()); // miliseconds
-            put("app_user", user.getId()+" "+user.getName());
-            put("amount", space.getPrice());
+            put("appid", ZalopayConstant.APP_ID);
+            put("apptransid", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime()); // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
+            put("apptime", System.currentTimeMillis()); // miliseconds
+            put("appuser", user.getName());
+            put("amount", space.getPrice().longValue());
             put("description", "Shared Space Finder - Payment for the booking #" + getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
-            put("item", new JSONObject(spa));
-            put("embed_data", "");
+            put("bankcode", "zalopayapp");
+            put("item", new JSONObject(spa).toString());
+            put("embeddata", "{}");
             put("callback_url", "http://localhost:8080/api/v1/callback");
         }};
-        String data = order.get("app_id") +"|"+ order.get("app_trans_id") +"|"+ order.get("app_user") +"|"+ order.get("amount")
-                +"|"+ order.get("app_time") +"|"+ order.get("embed_data") +"|"+ order.get("item");
-        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, key1, data));
-
+        String data = order.get("appid") +"|"+ order.get("apptransid") +"|"+ order.get("appuser") +"|"+ order.get("amount")
+                +"|"+ order.get("apptime") +"|"+ order.get("embeddata") +"|"+ order.get("item") ;
+        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConstant.KEY1, data));
+        System.out.println(order.get("mac"));
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(ORDER_CREATE_ENDPOINT);
+        HttpPost post = new HttpPost(ZalopayConstant.ORDER_CREATE_ENDPOINT);
 
         List<NameValuePair> params = new ArrayList<>();
         for (Map.Entry<String, Object> e : order.entrySet()) {
@@ -126,131 +112,8 @@ public class ZaloPayService {
 
         return finalResult;
     }
-//    public Map<String, Object> createOrder(Integer userId, Integer id) throws IOException, JSONException {
-//        Map<String, String> config = new HashMap<String, String>(){{
-//            put("app_id", "554");
-//            put("key1", "8NdU5pG5R2spGHGhyO99HN1OhD8IQJBn");
-//            put("key2", "uUfsWgfLkRLzq6W2uNXTCxrfxs51auny");
-//            put("endpoint", "https://sandbox.zalopay.com.vn/v001/tpe/createorder");
-//
-//        }};
-//        Random rand = new Random();
-//        int random_id = rand.nextInt(1000000);
-//        final Map embed_data = new HashMap(){{}};
-//
-//        final Map[] item = {
-//                new HashMap(){{}}
-//        };
-//
-//        Map<String, Object> order = new HashMap<String, Object>(){{
-//            put("app_id", config.get("app_id"));
-//            put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ random_id); // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-//            put("app_time", System.currentTimeMillis()); // miliseconds
-//            put("app_user", "user123");
-//            put("amount", 50000);
-//            put("description", "Lazada - Payment for the order #"+random_id);
-//            put("bank_code", "zalopayapp");
-//            put("item", new JSONObject(item).toString());
-//            put("embed_data", new JSONObject(embed_data).toString());
-//        }};
-//
-//        // app_id +”|”+ app_trans_id +”|”+ appuser +”|”+ amount +"|" + app_time +”|”+ embed_data +"|" +item
-//        String data = order.get("app_id") +"|"+ order.get("app_trans_id") +"|"+ order.get("app_user") +"|"+ order.get("amount")
-//                +"|"+ order.get("app_time") +"|"+ order.get("embed_data") +"|"+ order.get("item");
-//        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, config.get("key1"), data));
-//
-//        CloseableHttpClient client = HttpClients.createDefault();
-//        HttpPost post = new HttpPost(config.get("endpoint"));
-//
-//        List<NameValuePair> params = new ArrayList<>();
-//        for (Map.Entry<String, Object> e : order.entrySet()) {
-//            params.add(new BasicNameValuePair(e.getKey(), e.getValue().toString()));
-//        }
-//
-//        // Content-Type: application/x-www-form-urlencoded
-//        post.setEntity(new UrlEncodedFormEntity(params));
-//
-//        CloseableHttpResponse res = client.execute(post);
-//        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
-//        StringBuilder resultJsonStr = new StringBuilder();
-//        String line;
-//
-//        while ((line = rd.readLine()) != null) {
-//            resultJsonStr.append(line);
-//        }
-//
-//        JSONObject result = new JSONObject(resultJsonStr.toString());
-//        for (String key : result.keySet()) {
-//            System.out.format("%s = %s\n", key, result.get(key));
-//        }
-//        Map<String, Object> finalResult = new HashMap<>();
-//        for (Iterator it = result.keys(); it.hasNext(); ) {
-//
-//            String key = (String) it.next();
-//            finalResult.put(key, result.get(key));
-//        }
-//
-//        return finalResult;
-//    }
-//    public Map<String, Object> createOrder(Integer userId, Integer id) throws IOException {
-//        User user = userService.findByUserId(userId);
-//        Space space = spaceService.findSpaceById(id);
-//        Map<String, Object> spa = new HashMap<String, Object>() {{
-//            put("id", space.getId());
-//            put("price", space.getPrice());
-//            put("address", space.getAddress());
-//        }};
-//        Map<String, Object> order = new HashMap<String, Object>() {{
-//            put("app_id", appId);
-//            put("app_trans_id", getCurrentTimeString("yyMMdd") + "_" + new Date().getTime());
-//            put("app_time", System.currentTimeMillis());
-//            put("app_user", user.getName());
-//            put("amount", space.getPrice().longValue());
-//            put("description", "Shared Space Finder - Payment for the booking #" + getCurrentTimeString("yyMMdd") + "_" + new Date().getTime());
-//            put("item", new Gson().toJson(spa));
-//            put("bank_code", "zalopayapp");
-//            put("embed_data", "");
-//            put("callback_url", "http://localhost:8080/api/v1/callback");
-//        }};
-//        System.out.println(order.get("item"));
-//        String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|" + order.get("amount")
-//                + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|" + order.get("item");
-//        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, key1, data));
-//
-//        CloseableHttpClient client = HttpClients.createDefault();
-//        HttpPost post = new HttpPost(ORDER_CREATE_ENDPOINT);
-//        System.out.println("post" + post);
-//        post.setHeader("Content-Type", "application/json");
-//
-//        // Chuyển đổi order thành chuỗi JSON
-//        String json = new Gson().toJson(order);
-//        System.out.println(json);
-//        StringEntity requestEntity = new StringEntity(json);
-//        post.setEntity(requestEntity);
-//
-//        CloseableHttpResponse res = client.execute(post);
-//        System.out.println(res.getEntity().getContent());
-//
-//        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
-//        System.out.println(rd);
-//        StringBuilder resultJsonStr = new StringBuilder();
-//        String line;
-//
-//        while ((line = rd.readLine()) != null) {
-//            System.out.println(line);
-//
-//            resultJsonStr.append(line);
-//        }
-//        JSONObject jsonResult = new JSONObject(resultJsonStr.toString());
-//        System.out.println(jsonResult);
-//        Map<String, Object> finalResult = new HashMap<>();
-//        for (Iterator<String> it = jsonResult.keys(); it.hasNext(); ) {
-//            String key = it.next();
-//            finalResult.put(key, jsonResult.get(key));
-//        }
-//        System.out.println(finalResult);
-//        return finalResult;
-//    }
+
+
     //--------------------------------------------------------------------------------------------------------------------
     //call back
     private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -258,7 +121,7 @@ public class ZaloPayService {
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
 
         Mac HmacSHA256 = Mac.getInstance("HmacSHA256");
-        HmacSHA256.init(new SecretKeySpec(key2.getBytes(), "HmacSHA256"));
+        HmacSHA256.init(new SecretKeySpec(ZalopayConstant.KEY2.getBytes(), "HmacSHA256"));
 
         try {
             JSONObject cbdata = new JSONObject(jsonStr);
@@ -336,9 +199,9 @@ public class ZaloPayService {
     public Map<String, Object> sendRefund(RefundRequestDTO refundRequestDTO) throws JSONException, IOException {
 
         Map<String, Object> order = new HashMap<String, Object>(){{
-            put("app_id", appId);
+            put("app_id", ZalopayConstant.APP_ID);
             put("zp_trans_id", refundRequestDTO.getZpTransId());
-            put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ appId +"_"+
+            put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ ZalopayConstant.APP_ID +"_"+
                     System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
             put("timestamp", System.currentTimeMillis());
             put("amount", refundRequestDTO.getAmount());
@@ -347,10 +210,10 @@ public class ZaloPayService {
 
         String data = order.get("app_id") +"|"+ order.get("zp_trans_id") +"|"+ order.get("amount")
                 +"|"+ order.get("description") +"|"+ order.get("timestamp");
-        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, key1, data));
+        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConstant.KEY1, data));
 
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(REFUND_PAYMENT_ENDPOINT);
+        HttpPost post = new HttpPost(ZalopayConstant.REFUND_PAYMENT_ENDPOINT);
 
         List<NameValuePair> params = new ArrayList<>();
         for (Map.Entry<String, Object> e : order.entrySet()) {

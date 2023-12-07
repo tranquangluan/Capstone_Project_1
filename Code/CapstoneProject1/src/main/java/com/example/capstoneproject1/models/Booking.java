@@ -20,7 +20,7 @@ public class Booking {
     private BigDecimal totalPrice;
     @Column(name = "status")
     private String status;
-    @Column(name = "bookingDate")
+    @Column(name = "bookingDate", nullable = false)
     private Date date;
 
     public Booking() {
