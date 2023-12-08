@@ -103,6 +103,27 @@ public class Space {
         this.ownerId = ownerId;
     }
 
+    public Space(Integer id, String title, SpaceStatus status, BigDecimal price, List<Image> images, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, Date createdAt, CategorySpace categoryId, User ownerId, List<Favourite> favourites) {
+        this.id = id;
+        this.title = title;
+        this.status = status;
+        this.price = price;
+        this.images = images;
+        this.description = description;
+        this.bathroomNumbers = bathroomNumbers;
+        this.bedroomNumbers = bedroomNumbers;
+        this.peopleNumbers = peopleNumbers;
+        this.area = area;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+        this.createdAt = createdAt;
+        this.categoryId = categoryId;
+        this.ownerId = ownerId;
+        this.favourites = favourites;
+    }
+
     public Integer getId() {
         return id;
     }

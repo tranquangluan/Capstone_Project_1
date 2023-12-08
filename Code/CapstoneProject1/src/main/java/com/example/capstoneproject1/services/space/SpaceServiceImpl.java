@@ -129,8 +129,33 @@ public class SpaceServiceImpl implements SpaceService {
             }
 
     @Override
-    public Integer countPostSpace() {
-        return spaceRepository.countPostSpace();
+    public Integer countSpaceByStatus0() {
+        return spaceRepository.countSpaceByStatus0();
+    }
+    @Override
+    public Integer countSpaceByStatus1() {
+        return spaceRepository.countSpaceByStatus1();
+    }
+    @Override
+    public Integer countSpaceByStatus2() {
+        return spaceRepository.countSpaceByStatus2();
+    }
+    @Override
+    public Integer countSpaceByStatus3() {
+        return spaceRepository.countSpaceByStatus3();
+    }
+    @Override
+    public Integer countSpaceByStatus4() {
+        return spaceRepository.countSpaceByStatus4();
+    }
+    @Override
+    public Integer countSpaceByStatus5() {
+        return spaceRepository.countSpaceByStatus5();
+    }
+
+    @Override
+    public List<Space> getPostSpaceByAmount(Integer number, Integer number1) {
+        return spaceRepository.getPostSpaceByAmount(number, number1);
     }
 
 

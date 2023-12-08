@@ -1,11 +1,13 @@
 package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.dto.request.UserEditForm;
+import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
 import com.example.capstoneproject1.dto.response.user.ListUsersResponse;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.dto.response.user.UpdateAnDeleteUserResponse;
 import com.example.capstoneproject1.dto.response.user.UserResponse;
 import com.example.capstoneproject1.models.Role;
+import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
@@ -171,7 +173,6 @@ public class UserController {
                                          @RequestParam(defaultValue = "", required = false, name = "searchByName") String searchByName,
                                          @RequestParam(required = false, name = "searchById") Integer searchById) {
         try {
-
             List<User> listUsers = userService.getAllUsers(searchById, searchByEmail, searchByName, page, limit, sortBy, sortDir);
             if (!listUsers.isEmpty())
                 return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!", listUsers, 200), HttpStatus.OK);
@@ -253,11 +254,35 @@ public class UserController {
         Integer countAdmin = userRepository.countUsersRoleAdmin();
         Integer countOwner = userRepository.countUsersRoleOwner();
         Integer countUser = userRepository.countUsersRoleUser();
-        Integer countPostSpace = spaceService.countPostSpace();
+        Integer countPostSpaceStatus0 = spaceService.countSpaceByStatus0();
+        Integer countPostSpaceStatus1 = spaceService.countSpaceByStatus1();
+        Integer countPostSpaceStatus2 = spaceService.countSpaceByStatus2();
+        Integer countPostSpaceStatus3 = spaceService.countSpaceByStatus3();
+        Integer countPostSpaceStatus4 = spaceService.countSpaceByStatus4();
+        Integer countPostSpaceStatus5 = spaceService.countSpaceByStatus5();
         countRoles.put("NumberAdminAccount", countAdmin);
         countRoles.put("NumberOwnerAccount", countOwner);
         countRoles.put("NumberUserAccount", countUser);
-        countRoles.put("NumberPostSpace", countPostSpace);
+        countRoles.put("NumberPostSpaceNotRent", countPostSpaceStatus0);
+        countRoles.put("NumberPostSpaceHadRent", countPostSpaceStatus1);
+        countRoles.put("NumberPostSharingSpace", countPostSpaceStatus2);
+        countRoles.put("NumberPostSpaceWaitingApproval", countPostSpaceStatus3);
+        countRoles.put("NumberTopPostSpace", countPostSpaceStatus4);
+        countRoles.put("NumberPostSpaceRejected", countPostSpaceStatus5);
         return new ResponseEntity<>(countRoles,HttpStatus.OK);
+    }
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @GetMapping("/dashboard/")
+    public ResponseEntity<?> viewDashBoard(@RequestParam(name = "numberOfRecentPost", required = false, defaultValue = "5") Integer numberOfRecentPost){
+        try {
+            List<Space> spaceList = spaceService.getPostSpaceByAmount(numberOfRecentPost, numberOfRecentPost-1);
+            if (!spaceList.isEmpty())
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get List Spaces Successfully!", spaceList.size(), spaceList, 200), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+        }
     }
 }

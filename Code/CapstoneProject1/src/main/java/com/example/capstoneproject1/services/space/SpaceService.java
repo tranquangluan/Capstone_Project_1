@@ -28,5 +28,12 @@ public interface SpaceService {
 
     Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
-    Integer countPostSpace();
+    Integer countSpaceByStatus0();
+    Integer countSpaceByStatus1();
+    Integer countSpaceByStatus2();
+    Integer countSpaceByStatus3();
+    Integer countSpaceByStatus4();
+    Integer countSpaceByStatus5();
+    List<Space> getPostSpaceByAmount(Integer number, Integer number1);
+
 }

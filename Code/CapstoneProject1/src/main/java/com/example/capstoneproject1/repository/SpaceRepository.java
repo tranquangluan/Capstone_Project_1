@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -85,6 +86,22 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
     Space findSpaceById(Integer id);
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
-    @Query(value = "SELECT COUNT(*) AS total_posts FROM space WHERE created_at >= DATE_SUB(NOW(), INTERVAL 3 DAY)",nativeQuery = true)
-    Integer countPostSpace();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=0",nativeQuery = true)
+    Integer countSpaceByStatus0();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=1",nativeQuery = true)
+    Integer countSpaceByStatus1();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=2",nativeQuery = true)
+    Integer countSpaceByStatus2();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=3",nativeQuery = true)
+    Integer countSpaceByStatus3();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=4",nativeQuery = true)
+    Integer countSpaceByStatus4();
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=5",nativeQuery = true)
+    Integer countSpaceByStatus5();
+    @Query(value = "(select * from space s join user u on s.owner_id=u.userid order by created_at desc limit :number)\n" +
+            "union \n" +
+            "(select * from space s join user u on s.owner_id=u.userid \n" +
+            "where created_at = (SELECT created_at FROM space ORDER BY created_at DESC LIMIT :number1, 1)\n" +
+            "ORDER BY created_at DESC LIMIT 10)",nativeQuery = true)
+    List<Space> getPostSpaceByAmount(Integer number, Integer number1);
 }

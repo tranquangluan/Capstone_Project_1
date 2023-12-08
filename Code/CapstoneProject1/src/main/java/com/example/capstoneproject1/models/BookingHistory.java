@@ -21,7 +21,5 @@ public class BookingHistory {
     private boolean status;
     @Column(name = "bookingDate")
     private Date date;
-    @ManyToOne
-    @JoinColumn(name = "invoiceId")
-    private Invoice invoiceId;
+
 }
