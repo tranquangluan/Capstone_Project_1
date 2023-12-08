@@ -74,7 +74,7 @@ public class SpaceController {
 
     @GetMapping(value = "/list-spaces")
     public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
-                                       @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
+                                       @RequestParam(defaultValue = "6", required = false, name = "limit") Integer limit,
                                        @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
                                        @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
                                        @RequestParam( required = false, name = "status") Integer status,

@@ -3,7 +3,6 @@ package com.example.capstoneproject1.controller;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.dto.response.sharing.ListSharesResponse;
 import com.example.capstoneproject1.dto.response.sharing.SharingResponse;
-import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
 import com.example.capstoneproject1.models.Sharing;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
@@ -23,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
@@ -73,14 +73,15 @@ public class SharingController {
                                               @RequestParam(required = false, name = "spaceId") Integer spaceId,
                                               @RequestParam(required = false, name = "sharingId") Integer sharingId,
                                               @RequestParam(required = false, name = "userSharingId") Integer userSharingId,
-                                              @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+                                              @RequestParam(required = false, name = "ownerId") Integer ownerId,
+                                              HttpServletRequest request) {
         try {
             Integer statusSharing = 2;
             List<Sharing> listSpaces = sharingServiceImpl.getAllSpaces(ownerId, userSharingId, sharingId, spaceId, statusSharing, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
             if (!listSpaces.isEmpty()) {
                 return new ResponseEntity<>(new ListSharesResponse(0, "Get Spaces Sharing Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
             } else
-                return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new ListSharesResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -143,7 +144,7 @@ public class SharingController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId , @NotNull String content , HttpServletRequest request) {
+    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId , @Valid @NotNull String content , HttpServletRequest request) {
         try {
             // handle check user
             Optional<User> userOptional = getUserFromToken(request);

@@ -25,10 +25,10 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
 
     @Query("SELECT s FROM Space s " +
             "WHERE (:status IS NULL OR s.status.id = :status) " +
-            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId) " +
-            "AND (:searchByProvince IS NULL OR s.province = :searchByProvince) " +
-            "AND (:searchByDistrict IS NULL OR s.district = :searchByDistrict) " +
-            "AND (:searchByWard IS NULL OR s.ward = :searchByWard) " +
+            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId ) " +
+            "AND (:searchByProvince IS NULL OR s.province LIKE CONCAT('%', :searchByProvince, '%')) " +
+            "AND (:searchByDistrict IS NULL OR s.district LIKE CONCAT('%', :searchByDistrict, '%')) " +
+            "AND (:searchByWard IS NULL OR s.ward LIKE CONCAT('%', :searchByWard, '%')) " +
             "AND (:priceFrom IS NULL OR s.price >= :priceFrom) " +
             "AND (:priceTo IS NULL OR s.price <= :priceTo) " +
             "AND (:areaFrom IS NULL OR s.area >= :areaFrom) " +
