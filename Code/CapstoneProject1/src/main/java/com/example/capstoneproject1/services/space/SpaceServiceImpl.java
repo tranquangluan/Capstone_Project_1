@@ -6,7 +6,7 @@ import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.repository.CategorySpaceRepository;
+import com.example.capstoneproject1.repository.CategoryRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.repository.StatusRepository;
 import com.example.capstoneproject1.repository.UserRepository;
@@ -36,7 +36,7 @@ public class SpaceServiceImpl implements SpaceService {
     StatusRepository statusRepository;
 
     @Autowired
-    CategorySpaceRepository categorySpaceRepository;
+    CategoryRepository categoryRepository;
 
     @Autowired
     ImageServiceImpl imageServiceImpl;
@@ -109,7 +109,7 @@ public class SpaceServiceImpl implements SpaceService {
 
         CategorySpace categorySpace = null;
         if (spaceUpdateForm.getCategoryId() != null) {
-            Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceUpdateForm.getCategoryId());
+            Optional<CategorySpace> categorySpaceOptional = categoryRepository.findById(spaceUpdateForm.getCategoryId());
             if (categorySpaceOptional.isPresent()) {
                 categorySpace = categorySpaceOptional.get();
             }

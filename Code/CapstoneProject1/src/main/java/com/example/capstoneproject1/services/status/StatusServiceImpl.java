@@ -17,4 +17,9 @@ public class StatusServiceImpl implements  StatusService {
     public Optional<Status> findBySpaceStatusId(Integer spaceStatusId) {
         return statusRepository.findById(spaceStatusId);
     }
+
+    @Override
+    public Optional<Status> findById(Integer integer) {
+        return statusRepository.findById(integer);
+    }
 }

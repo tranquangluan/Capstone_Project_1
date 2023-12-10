@@ -24,10 +24,11 @@ public class DashboardController {
     SpaceService spaceService;
     @Autowired
     UserService userService;
+
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/dashboard")
     public ResponseEntity<?> viewDashBoard() {
-        try{
+        try {
             Map<String, Integer> countOverview = new HashMap<>();
             Integer countAdmin = userService.countUsersRoleAdmin();
             Integer countOwner = userService.countUsersRoleOwner();
@@ -47,18 +48,18 @@ public class DashboardController {
             countOverview.put("NumberPostSpaceWaitingApproval", countPostSpaceStatus3);
             countOverview.put("NumberTopPostSpace", countPostSpaceStatus4);
             countOverview.put("NumberPostSpaceRejected", countPostSpaceStatus5);
-            if (!countOverview.isEmpty()){
-                return new ResponseEntity<>(new CountByRoleAndCountPostByStatus(0,"Count Successfully!",countOverview,200), HttpStatus.OK);
-            }else {
-                return new ResponseEntity<>(new CountByRoleAndCountPostByStatus(1,"Have problem in count execute!",new HashMap<>(),404), HttpStatus.NOT_FOUND);
+            if (!countOverview.isEmpty()) {
+                return new ResponseEntity<>(new CountByRoleAndCountPostByStatus(0, "Count Successfully!", countOverview, 200), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new CountByRoleAndCountPostByStatus(1, "Have problem in count execute!", new HashMap<>(), 404), HttpStatus.NOT_FOUND);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("hasAnyAuthority('Admin')")
-    @PostMapping ("/recent-post")
+    @PostMapping("/recent-post")
     public ResponseEntity<?> viewDashBoard(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
                                            @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
                                            @RequestParam(defaultValue = "created_at", required = false, name = "sortBy") String sortBy,
@@ -67,16 +68,18 @@ public class DashboardController {
                                            @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
                                            @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
                                            @RequestParam(required = false, name = "searchByWard") String searchByWard,
-                                           @RequestParam(required = false, name = "ownerId") Integer ownerId){
+                                           @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
-            Page<Space> spaceList = spaceService.getPostSpaceByConditions(page-1,limit,sortBy,sortDir,categoryId,searchByProvince,searchByDistrict,searchByWard,ownerId);
-            if (!spaceList.isEmpty())
-                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Recent Post Successfully!", (int)spaceList.getTotalElements(), spaceList.getTotalPages(), spaceList.getContent(), 200), HttpStatus.OK);
-            else
+            Page<Space> spaceList = spaceService.getPostSpaceByConditions(page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, ownerId);
+            if (!spaceList.isEmpty()) {
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Recent Post Successfully!", (int) spaceList.getTotalElements(), spaceList.getTotalPages(), spaceList.getContent(), 200), HttpStatus.OK);
+            } else {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
+
 }

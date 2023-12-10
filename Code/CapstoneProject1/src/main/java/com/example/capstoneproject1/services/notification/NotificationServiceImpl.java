@@ -22,10 +22,8 @@ public class NotificationServiceImpl implements  NotificationService {
 
     @Autowired
     StatusRepository statusRepository;
-
     @Autowired
     NotificationRepository notificationRepository;
-
     @Override
     public void deleteNotification(Long notificationId) {
         notificationRepository.deleteById(notificationId);
@@ -79,6 +77,11 @@ public class NotificationServiceImpl implements  NotificationService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Optional<Notification> findById(Long notificationId) {
+        return notificationRepository.findById(notificationId);
     }
 
 

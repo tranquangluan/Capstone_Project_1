@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface CategorySpaceRepository extends JpaRepository<CategorySpace,Integer> {
+public interface CategoryRepository extends JpaRepository<CategorySpace,Integer> {
     List<CategorySpace> findAll();
-
+    Optional<CategorySpace> findById(Integer categoryId);
 }

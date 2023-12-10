@@ -12,9 +12,11 @@ import com.example.capstoneproject1.repository.*;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
-import com.example.capstoneproject1.services.notification.NotificationServiceImpl;
-import com.example.capstoneproject1.services.space.SpaceServiceImpl;
-import com.example.capstoneproject1.services.status.StatusServiceImpl;
+import com.example.capstoneproject1.services.category.CategoryService;
+import com.example.capstoneproject1.services.image.ImageService;
+import com.example.capstoneproject1.services.notification.NotificationService;
+import com.example.capstoneproject1.services.space.SpaceService;
+import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,38 +40,27 @@ import java.util.Optional;
 public class SpaceController {
 
     @Autowired
-    SpaceServiceImpl spaceServiceImpl;
+    SpaceService spaceService;
     @Autowired
     UserService userService;
     @Autowired
     CloudinaryService cloudinaryService;
-
     @Autowired
-    SpaceRepository spaceRepository;
-
-    @Autowired
-    ImageRepository imageRepository;
-
+    ImageService imageService;
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     StatusRepository statusRepository;
-
     @Autowired
-    CategorySpaceRepository categorySpaceRepository;
-
+    CategoryService categoryService;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
     @Autowired
-    StatusServiceImpl statusService;
-
+    StatusService statusService;
     @Autowired
-    NotificationServiceImpl notificationService;
+    NotificationService notificationService;
 
 
     @GetMapping(value = "/list-spaces")
@@ -89,11 +80,11 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "spaceId") Integer spaceId,
                                        @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
-            PageSpace pageSpace = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            PageSpace pageSpace = spaceService.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
             Integer totalPages = pageSpace.getTotalPages();
             List<Space> listSpaces = pageSpace.getListSpaces();
             if (!listSpaces.isEmpty())
-                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), totalPages,listSpaces, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), totalPages, listSpaces, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
@@ -119,7 +110,7 @@ public class SpaceController {
             if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
-            Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceForm.getCategoryId());
+            Optional<CategorySpace> categorySpaceOptional = categoryService.findById(spaceForm.getCategoryId());
             if (!categorySpaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
 
@@ -131,7 +122,7 @@ public class SpaceController {
             // Set properties from spaceForm
             Space space = new Space(spaceForm.getTitle(), statusOptional.get(), spaceForm.getPrice(), spaceForm.getDescription(), spaceForm.getBathroomsNumber(), spaceForm.getBedroomsNumber(), spaceForm.getPeopleNumber(), spaceForm.getArea(), spaceForm.getProvince(), spaceForm.getDistrict(), spaceForm.getWard(), spaceForm.getAddress(), categorySpaceOptional.get(), userOptional.get());
             // Save the space entity to get the ID
-            Space savedSpace = spaceServiceImpl.saveSpace(space);
+            Space savedSpace = spaceService.saveSpace(space);
             // handle upload image on cloudinary server
             List<Map> results = cloudinaryService.uploadMultiple(images);
             if (results.size() > 0) {
@@ -146,9 +137,9 @@ public class SpaceController {
                     // connect relationship Image and Space
                     image.setSpaceId(savedSpace);
                     // save the image in the database
-                    imageRepository.save(image);
+                    imageService.save(image);
                 }
-                spaceServiceImpl.saveSpace(savedSpace);
+                spaceService.saveSpace(savedSpace);
             } else {
                 return new ResponseEntity<>(new ResponseMessage(1, "Required image in space!", 400), HttpStatus.BAD_REQUEST);
             }
@@ -158,7 +149,7 @@ public class SpaceController {
             // create message
             for (User admin : adminsList) {
                 Boolean isCreated = notificationService.createMessage(userSender, admin, "New Space Created", "A new space has been created.");
-                if(!isCreated)
+                if (!isCreated)
                     return new ResponseEntity<>(new SpaceResponse(0, "Create new space fail!", 400), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Create new space successful!", savedSpace, 201), HttpStatus.CREATED);
@@ -179,31 +170,31 @@ public class SpaceController {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
-            if (!userOptional.isPresent())
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-
-            if (spaceUpdateForm.getCategoryId() != null) {
-                Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceUpdateForm.getCategoryId());
-                if (!categorySpaceOptional.isPresent())
-                    return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
             }
-
-            Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
-            if (!spaceOptional.isPresent())
+            if (spaceUpdateForm.getCategoryId() != null) {
+                Optional<CategorySpace> categorySpaceOptional = categoryService.findById(spaceUpdateForm.getCategoryId());
+                if (!categorySpaceOptional.isPresent()) {
+                    return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
+                }
+            }
+            Optional<Space> spaceOptional = spaceService.findById(spaceId);
+            if (!spaceOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-
+            }
             // delete Image in repository
             String[] imageIds = spaceUpdateForm.getImagesId();
             if (imageIds != null) {
                 for (String imageId : imageIds) {
-                    if (imageRepository.existsById(imageId)) {
-                        imageRepository.deleteById(imageId);
+                    if (imageService.existsById(imageId)) {
+                        imageService.deleteById(imageId);
                         cloudinaryService.delete(imageId);
                     }
                 }
             }
             // handle fields
-            spaceServiceImpl.updateSpace(spaceUpdateForm, spaceId);
+            spaceService.updateSpace(spaceUpdateForm, spaceId);
             // handle image
             if (images != null) {
                 List<Map> results = cloudinaryService.uploadMultiple(images);
@@ -219,9 +210,9 @@ public class SpaceController {
                         // connect relationship Image and Space
                         image.setSpaceId(spaceOptional.get());
                         // save the image in the database
-                        imageRepository.save(image);
+                        imageService.save(image);
                     }
-                    spaceServiceImpl.saveSpace(spaceOptional.get());
+                    spaceService.saveSpace(spaceOptional.get());
                 } else {
                     return new ResponseEntity<>(new ResponseMessage(1, "Requires at least 1 image!", 401), HttpStatus.BAD_REQUEST);
                 }
@@ -240,25 +231,23 @@ public class SpaceController {
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
             // user not found
-            if (!userOptional.isPresent())
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-
+            }
             // space notfound
-            Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
-            if (!spaceOptional.isPresent())
+            Optional<Space> spaceOptional = spaceService.findById(spaceId);
+            if (!spaceOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-
+            }
             // You cannot delete space that is not yours
-            Optional<Space> spaceByOwnerId = spaceServiceImpl.findByIdAndOwnerId(spaceId, userOptional.get());
-            if (!spaceByOwnerId.isPresent())
+            Optional<Space> spaceByOwnerId = spaceService.findByIdAndOwnerId(spaceId, userOptional.get());
+            if (!spaceByOwnerId.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete space that is not yours!", 400), HttpStatus.CONFLICT);
-
-
-            if (spaceServiceImpl.deleteSpace(spaceOptional.get()))
+            }
+            if (spaceService.deleteSpace(spaceOptional.get())) {
                 return new ResponseEntity<>(new ResponseMessage(0, "Delete Space Successful!", 200), HttpStatus.OK);
+            }
             return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete Space Fail!", 400), HttpStatus.BAD_REQUEST);
-
-
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -269,28 +258,27 @@ public class SpaceController {
         String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
         Optional<User> userOptional = userRepository.findByEmail(userEmail);
         // user not found
-        if (!userOptional.isPresent())
+        if (!userOptional.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+        }
         // space not found
-        Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
-        if (!spaceOptional.isPresent())
+        Optional<Space> spaceOptional = spaceService.findById(spaceId);
+        if (!spaceOptional.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-
+        }
         // space not found
         Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
-        if (!statusOptional.isPresent())
+        if (!statusOptional.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
-
+        }
         Integer spaceStatusId = spaceOptional.get().getStatus().getId();
-        if (spaceStatusId != 3)
+        if (spaceStatusId != 3) {
             return new ResponseEntity<>(new ResponseMessage(1, "Space has updated!", 404), HttpStatus.NOT_FOUND);
-
+        }
         Status status = statusOptional.get();
-
-        if (spaceServiceImpl.updateStatus(spaceId, status)) {
+        if (spaceService.updateStatus(spaceId, status)) {
             return new ResponseEntity<>(new ResponseMessage(0, "Update space successfully!", 200), HttpStatus.OK);
         }
-
         return new ResponseEntity<>(new ResponseMessage(1, "Update space fail!", 400), HttpStatus.BAD_REQUEST);
     }
 

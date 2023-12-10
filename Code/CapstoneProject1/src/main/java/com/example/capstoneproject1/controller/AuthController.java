@@ -14,8 +14,11 @@ import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.security.userPrincal.UserDetailService;
 import com.example.capstoneproject1.security.userPrincal.UserPrinciple;
 import com.example.capstoneproject1.services.auth.AuthService;
+import com.example.capstoneproject1.services.email.EmailService;
 import com.example.capstoneproject1.services.email.EmailServiceImpl;
+import com.example.capstoneproject1.services.role.RoleService;
 import com.example.capstoneproject1.services.role.RoleServiceImpl;
+import com.example.capstoneproject1.services.user.UserService;
 import com.example.capstoneproject1.services.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,30 +49,23 @@ import java.util.Set;
 public class AuthController {
 
     @Autowired
-    UserServiceImpl userServiceImpl;
-
+    UserService userService;
     @Autowired
-    RoleServiceImpl roleServiceImpl;
-
+    RoleService roleService;
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
     @Autowired
     JwtTokenFilter jwtTokenFilter;
-
     @Autowired
     private UserDetailService userDetailService;
-
     @Autowired
     private AuthService authService;
     @Autowired
-    EmailServiceImpl emailServiceImpl;
+    EmailService emailService;
 
 
     SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
@@ -81,7 +77,7 @@ public class AuthController {
             MediaType.APPLICATION_JSON_VALUE
     })
     public @ResponseBody ResponseEntity<?> register(@Valid SignUpForm signUpForm, HttpServletRequest request) {
-        if (userServiceImpl.existsByEmail(signUpForm.getEmail())) {
+        if (userService.existsByEmail(signUpForm.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage(1, "Email Already Exists!", 409), HttpStatus.CONFLICT);
         }
         // send OTP
@@ -92,7 +88,7 @@ public class AuthController {
         // set time for OTP 5p
         session.setMaxInactiveInterval(300);
         // send OTP for email
-        emailServiceImpl.sendMailOTP(otp, signUpForm.getEmail(),"Verify Email");
+        emailService.sendMailOTP(otp, signUpForm.getEmail(), "Verify Email");
         return new ResponseEntity<>(new ResponseMessage(0, "You Need Verify OTP!", 200), HttpStatus.OK);
     }
 
@@ -102,7 +98,7 @@ public class AuthController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public @ResponseBody ResponseEntity<?> verifyEmail(@Valid SignUpForm signUpForm,@Valid @NotNull String otp , HttpServletRequest request , HttpServletResponse response) {
+    public @ResponseBody ResponseEntity<?> verifyEmail(@Valid SignUpForm signUpForm, @Valid @NotNull String otp, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             HttpSession session = request.getSession(false);
@@ -113,13 +109,13 @@ public class AuthController {
                 if (storedOTP != null && storedOTP.equals(otp)) {
                     User user = new User(signUpForm.getName(), signUpForm.getEmail(), passwordEncoder.encode(signUpForm.getPassword()), signUpForm.getProvince(), signUpForm.getDistrict(), signUpForm.getWard(), signUpForm.getAddress());
                     Set<Role> roles = new HashSet<>();
-                    Role roleUser = roleServiceImpl.findByRoleCode("R3").orElseThrow(() -> new RuntimeException("Role not found!"));
+                    Role roleUser = roleService.findByRoleCode("R3").orElseThrow(() -> new RuntimeException("Role not found!"));
                     roles.add(roleUser);
                     user.setRoles(roles);
-                    userServiceImpl.save(user);
+                    userService.save(user);
                     session.removeAttribute("otpEmail");
                     return new ResponseEntity<>(new ResponseMessage(0, "Create Account Successful!", 201), HttpStatus.CREATED);
-                }else {
+                } else {
                     return new ResponseEntity<>(new ResponseMessage(1, "Invalid OTP. Please check your entered code.", 400), HttpStatus.BAD_REQUEST);
                 }
             } else {
@@ -140,17 +136,17 @@ public class AuthController {
     public @ResponseBody ResponseEntity<?> login(@Valid SignInForm signInForm) {
         System.out.println(signInForm.getEmail());
         System.out.println(signInForm.getPassword());
-        Optional<User> userOptional = userServiceImpl.findByEmail(signInForm.getEmail());
-        if (!userOptional.isPresent())
+        Optional<User> userOptional = userService.findByEmail(signInForm.getEmail());
+        if (!userOptional.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage(1, "Email Hasn't Been Registered!", 404), HttpStatus.NOT_FOUND);
-
+        }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtTokenProvider.generateToken(authentication);
         String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
-        if (refreshToken != null)
+        if (refreshToken != null) {
             authService.saveRefreshToken(signInForm.getEmail(), refreshToken);
-
+        }
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken, "Bearer", userPrinciple.getAuthorities()));
     }
@@ -166,7 +162,6 @@ public class AuthController {
             if (refreshTokenForm.getRefreshToken() == null || refreshTokenForm.getRefreshToken().isEmpty()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Required Refresh Token!", 400), HttpStatus.BAD_REQUEST);
             }
-
             // validate the refresh token
             if (jwtTokenProvider.validateToken(refreshTokenForm.getRefreshToken())) {
                 String userName = jwtTokenProvider.getUserEmailFromToken(refreshTokenForm.getRefreshToken());
@@ -174,7 +169,6 @@ public class AuthController {
                 UserPrinciple userPrinciple = new UserPrinciple(userDetails.getUsername(), userDetails.getAuthorities());
                 // generate a new token by user principal
                 String newToken = jwtTokenProvider.generateTokenByUserPrinciple(userPrinciple);
-
                 if (newToken.isEmpty()) {
                     return new ResponseEntity<>(new ResponseMessage(1, "Fail to generate new access token. Let's try more time!", 400), HttpStatus.BAD_REQUEST);
                 } else {
@@ -200,14 +194,13 @@ public class AuthController {
         return ResponseEntity.ok(new ResponseMessage(1, "No user is logged in", 409));
     }
 
-
     private String generateOTP() {
         Random random = new Random();
         int otpValue = 100000 + random.nextInt(900000);
         return String.valueOf(otpValue);
     }
 
-        @PostMapping(value = "/forgot-password", consumes = {
+    @PostMapping(value = "/forgot-password", consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_FORM_URLENCODED_VALUE
     }, produces = {
@@ -216,27 +209,24 @@ public class AuthController {
     public @ResponseBody ResponseEntity<?> forgotPassword(HttpServletRequest request, String email) {
 
         try {
-            Optional<User> userOptional = userServiceImpl.findByEmail(email);
-
-            if (!userOptional.isPresent())
+            Optional<User> userOptional = userService.findByEmail(email);
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Email not existed!", 404), HttpStatus.NOT_FOUND);
+            }
             HttpSession session = request.getSession(true);
-
             // save OTP in session
             String otp = generateOTP();
             session.setAttribute("otp", otp);
             // set time for OTP 5p
             session.setMaxInactiveInterval(300);
             System.out.println(session.getId());
-
             // send OTP for email
-            emailServiceImpl.sendMailOTP(otp, email,"Forgot Password");
-            return new ResponseEntity<>(new ResponseMessage(0,"Send OTP Successful!", 200), HttpStatus.OK);
+            emailService.sendMailOTP(otp, email, "Forgot Password");
+            return new ResponseEntity<>(new ResponseMessage(0, "Send OTP Successful!", 200), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @PostMapping(value = "/reset-password", consumes = {
             MediaType.APPLICATION_JSON_VALUE,
@@ -248,9 +238,10 @@ public class AuthController {
 
         try {
             System.out.println(email);
-            Optional<User> userOptional = userServiceImpl.findByEmail(email);
-            if (!userOptional.isPresent())
+            Optional<User> userOptional = userService.findByEmail(email);
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Email not existed!", 404), HttpStatus.NOT_FOUND);
+            }
             User user = userOptional.get();
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -260,15 +251,14 @@ public class AuthController {
                 if (storedOTP != null && storedOTP.equals(otp)) {
                     // Set pass id
                     user.setPassword(passwordEncoder.encode(password));
-                    userServiceImpl.save(user);
+                    userService.save(user);
                     return new ResponseEntity<>(new ResponseMessage(0, "Reset Password Successful!", 200), HttpStatus.OK);
-                }else {
-                        return new ResponseEntity<>(new ResponseMessage(1, "Invalid OTP. Please check your entered code.", 400), HttpStatus.BAD_REQUEST);
+                } else {
+                    return new ResponseEntity<>(new ResponseMessage(1, "Invalid OTP. Please check your entered code.", 400), HttpStatus.BAD_REQUEST);
                 }
             } else {
                 return new ResponseEntity<>(new ResponseMessage(1, "OTP Has Expired. Please request a new OTP.", 400), HttpStatus.BAD_REQUEST);
             }
-
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
