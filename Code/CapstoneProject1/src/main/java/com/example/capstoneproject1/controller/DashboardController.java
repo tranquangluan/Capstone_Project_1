@@ -67,8 +67,7 @@ public class DashboardController {
                                            @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
                                            @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
                                            @RequestParam(required = false, name = "searchByWard") String searchByWard,
-                                           @RequestParam(required = false, name = "ownerId") Integer ownerId,
-                                           @RequestParam(defaultValue = "5", required = false, name = "numberOfRecentPost") Integer numberOfRecentPost){
+                                           @RequestParam(required = false, name = "ownerId") Integer ownerId){
         try {
             Page<Space> spaceList = spaceService.getPostSpaceByConditions(page-1,limit,sortBy,sortDir,categoryId,searchByProvince,searchByDistrict,searchByWard,ownerId);
             if (!spaceList.isEmpty())
