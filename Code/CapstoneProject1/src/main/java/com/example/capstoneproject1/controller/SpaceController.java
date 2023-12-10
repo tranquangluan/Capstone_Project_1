@@ -77,7 +77,7 @@ public class SpaceController {
                                        @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
                                        @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
                                        @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
-                                       @RequestParam( required = false, name = "status") Integer status,
+                                       @RequestParam(required = false, name = "status") Integer status,
                                        @RequestParam(required = false, name = "categoryId") Integer categoryId,
                                        @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
                                        @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
@@ -90,11 +90,10 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
             PageSpace pageSpace = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
-
             Integer totalPages = pageSpace.getTotalPages();
             List<Space> listSpaces = pageSpace.getListSpaces();
             if (!listSpaces.isEmpty())
-                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", totalPages,listSpaces.size(), listSpaces, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), totalPages,listSpaces, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
@@ -164,7 +163,6 @@ public class SpaceController {
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Create new space successful!", savedSpace, 201), HttpStatus.CREATED);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
@@ -230,7 +228,6 @@ public class SpaceController {
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!", spaceOptional.get(), 200), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
@@ -263,7 +260,6 @@ public class SpaceController {
 
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }

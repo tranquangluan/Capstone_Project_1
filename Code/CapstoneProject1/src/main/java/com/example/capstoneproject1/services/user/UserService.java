@@ -29,4 +29,7 @@ public interface UserService {
     Boolean deleteUserByUserId(Integer userId);
 
     void deleteRoleByUserId(Integer userId);
+    Integer countUsersRoleAdmin();
+    Integer countUsersRoleOwner();
+    Integer countUsersRoleUser();
 }

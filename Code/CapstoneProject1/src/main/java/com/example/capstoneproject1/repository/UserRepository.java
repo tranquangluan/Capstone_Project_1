@@ -55,6 +55,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     );
 
 
-
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R1'",nativeQuery = true)
+    Integer countUsersRoleAdmin();
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R2'",nativeQuery = true)
+    Integer countUsersRoleOwner();
+    @Query(value = "SELECT COUNT(*) FROM users_role WHERE role_id = 'R3'",nativeQuery = true)
+    Integer countUsersRoleUser();
 
 }

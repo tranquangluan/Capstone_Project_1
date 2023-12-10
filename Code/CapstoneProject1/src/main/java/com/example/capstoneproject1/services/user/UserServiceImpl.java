@@ -153,6 +153,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Integer countUsersRoleAdmin() {
+        return userRepository.countUsersRoleAdmin();
+    }
+
+    @Override
+    public Integer countUsersRoleOwner() {
+        return userRepository.countUsersRoleOwner();
+    }
+
+    @Override
+    public Integer countUsersRoleUser() {
+        return userRepository.countUsersRoleUser();
+    }
+
+    @Override
     public void update(User user) {
         userRepository.save(user);
     }
