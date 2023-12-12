@@ -8,6 +8,7 @@ public class ListBookingResponse {
     private Integer error;
     private String message;
     private Integer BookingQuantity;
+    private Integer totalPages;
     private List<Booking> listBookings;
     private Integer status;
 
@@ -17,14 +18,23 @@ public class ListBookingResponse {
     public ListBookingResponse(Integer error, String message, Integer bookingQuantity, Integer status) {
         this.error = error;
         this.message = message;
-        BookingQuantity = bookingQuantity;
+        this.BookingQuantity = bookingQuantity;
         this.status = status;
     }
 
     public ListBookingResponse(Integer error, String message, Integer bookingQuantity, List<Booking> listBookings, Integer status) {
         this.error = error;
         this.message = message;
+        this.BookingQuantity = bookingQuantity;
+        this.listBookings = listBookings;
+        this.status = status;
+    }
+
+    public ListBookingResponse(Integer error, String message, Integer bookingQuantity, Integer totalPages, List<Booking> listBookings, Integer status) {
+        this.error = error;
+        this.message = message;
         BookingQuantity = bookingQuantity;
+        this.totalPages = totalPages;
         this.listBookings = listBookings;
         this.status = status;
     }

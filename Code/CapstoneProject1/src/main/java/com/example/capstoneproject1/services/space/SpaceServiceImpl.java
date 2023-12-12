@@ -181,16 +181,16 @@ public class SpaceServiceImpl implements SpaceService {
             if (sortDir.toUpperCase().equals("DESC")) {
                 Sort sort = Sort.by(sortBy).descending();
                 Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageSize, pageable);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
                 return pageSpace;
             } else if (sortDir.toUpperCase().equals("ASC")) {
                 Sort sort = Sort.by(sortBy).ascending();
                 Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageSize, pageable);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
                 return pageSpace;
             } else {
                 Pageable pageable = PageRequest.of(pageNo, pageSize);
-                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageSize, pageable);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
                 return pageSpace;
             }
 

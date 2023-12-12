@@ -61,9 +61,9 @@ public class AuthController {
     @Autowired
     JwtTokenFilter jwtTokenFilter;
     @Autowired
-    private UserDetailService userDetailService;
+    UserDetailService userDetailService;
     @Autowired
-    private AuthService authService;
+    AuthService authService;
     @Autowired
     EmailService emailService;
 

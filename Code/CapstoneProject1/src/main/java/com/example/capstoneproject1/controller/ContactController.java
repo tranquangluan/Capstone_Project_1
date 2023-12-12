@@ -56,6 +56,4 @@ public class ContactController {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
-
-
 }

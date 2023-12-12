@@ -15,7 +15,7 @@ public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     public Boolean findUserByRefreshToken(String refreshToken) {
         return userRepository.existsByRefreshToken(refreshToken);

@@ -23,7 +23,7 @@ public interface UserService {
     Boolean existsByRefreshToken(String refreshToken);
     String getPasswordByEmail(String email);
     Boolean existsById(Integer userId);
-
+    String getRoleCode(String role);
     PageUser getAllUsers(Integer userId, String email, String name , Integer pageNo, Integer pageSize , String sortBy, String sortDir , String role);
 
     Boolean deleteUserByUserId(Integer userId);

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@PreAuthorize("hasAnyAuthority('Admin')")
 @RestController
 @RequestMapping("/api/dashboard")
 public class DashboardController {
@@ -53,6 +53,20 @@ public class DashboardController {
             } else {
                 return new ResponseEntity<>(new CountByRoleAndCountPostByStatus(1, "Have problem in count execute!", new HashMap<>(), 404), HttpStatus.NOT_FOUND);
             }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PostMapping("/static")
+    public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "categoryId") Integer categoryId,
+                                           @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
+                                           @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
+                                           @RequestParam(required = false, name = "searchByWard") String searchByWard,
+                                           @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+        try {
+            return new ResponseEntity<>(new ResponseMessage(1, "", 400), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
