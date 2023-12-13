@@ -26,7 +26,7 @@ public class DashboardController {
     UserService userService;
 
     @PreAuthorize("hasAnyAuthority('Admin')")
-    @GetMapping("/dashboard")
+    @GetMapping("/overview")
     public ResponseEntity<?> viewDashBoard() {
         try {
             Map<String, Integer> countOverview = new HashMap<>();
