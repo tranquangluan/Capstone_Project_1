@@ -115,19 +115,19 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
     @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=5", nativeQuery = true)
     Integer countSpaceByStatus5();
 
-    @Query(value = "SELECT * FROM Space  " +
-            "WHERE status_id = 0 " +
-            "AND (:categoryId IS NULL OR category_id = :categoryId) " +
-            "AND (:searchByProvince IS NULL OR province = :searchByProvince) " +
-            "AND (:searchByDistrict IS NULL OR district = :searchByDistrict) " +
-            "AND (:searchByWard IS NULL OR ward = :searchByWard) " +
-            "AND (:ownerId IS NULL OR owner_id = :ownerId)", nativeQuery = true)
+    @Query("SELECT s FROM Space s " +
+            "WHERE s.status.id = 0 " +
+            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId) " +
+            "AND (:searchByProvince IS NULL OR s.province = :searchByProvince) " +
+            "AND (:searchByDistrict IS NULL OR s.district = :searchByDistrict) " +
+            "AND (:searchByWard IS NULL OR s.ward = :searchByWard) " +
+            "AND (:ownerId IS NULL OR s.ownerId.id = :ownerId)")
     Page<Space> getPostSpaceByConditions(
-            Integer categoryId,
-            String searchByProvince,
-            String searchByDistrict,
-            String searchByWard,
-            Integer ownerId,
+            @Param("categoryId") Integer categoryId,
+            @Param("searchByProvince") String searchByProvince,
+            @Param("searchByDistrict") String searchByDistrict,
+            @Param("searchByWard") String searchByWard,
+            @Param("ownerId") Integer ownerId,
             Pageable pageable
     );
 

@@ -76,7 +76,7 @@ public class DashboardController {
     @PostMapping("/recent-post")
     public ResponseEntity<?> viewDashBoard(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
                                            @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
-                                           @RequestParam(defaultValue = "created_at", required = false, name = "sortBy") String sortBy,
+                                           @RequestParam(defaultValue = "createdAt", required = false, name = "sortBy") String sortBy,
                                            @RequestParam(defaultValue = "DESC", required = false, name = "sortDir") String sortDir,
                                            @RequestParam(required = false, name = "categoryId") Integer categoryId,
                                            @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
