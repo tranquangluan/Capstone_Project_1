@@ -23,9 +23,11 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
     Integer countByCategoryId_Id(Integer category);
     void deleteAllByOwnerId_Id(Integer userId);
 
-    @Query("SELECT s FROM Space s " +
-            "WHERE (:status IS NULL OR s.status.id = :status) " +
-            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId ) " +
+    @Query("SELECT DISTINCT s FROM Space s " +
+            "LEFT JOIN Feedback f ON f.userReceiveFeedBack.id = s.ownerId.id " +
+            "WHERE (:topRate IS NULL OR f IS NOT NULL AND f.rate >= :topRate) " +
+            "AND (:status IS NULL OR s.status.id = :status) " +
+            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId) " +
             "AND (:searchByProvince IS NULL OR s.province LIKE CONCAT('%', :searchByProvince, '%')) " +
             "AND (:searchByDistrict IS NULL OR s.district LIKE CONCAT('%', :searchByDistrict, '%')) " +
             "AND (:searchByWard IS NULL OR s.ward LIKE CONCAT('%', :searchByWard, '%')) " +
@@ -33,7 +35,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "AND (:priceTo IS NULL OR s.price <= :priceTo) " +
             "AND (:areaFrom IS NULL OR s.area >= :areaFrom) " +
             "AND (:areaTo IS NULL OR s.area <= :areaTo) " +
-            "AND (:spaceId IS NULL OR s.id = :spaceId)" +
+            "AND (:spaceId IS NULL OR s.id = :spaceId) " +
             "AND (:ownerId IS NULL OR s.ownerId.id = :ownerId)")
     Page<Space> findSpacesByConditions(
             @Param("status") Integer status,
@@ -47,8 +49,10 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("areaTo") Float areaTo,
             @Param("spaceId") Integer spaceId,
             @Param("ownerId") Integer ownerId,
+            @Param("topRate") Integer topRate,
             Pageable pageable
     );
+
 
     @Transactional
     @Modifying

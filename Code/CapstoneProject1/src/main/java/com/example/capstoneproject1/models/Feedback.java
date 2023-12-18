@@ -5,7 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 public class Feedback {
@@ -28,12 +28,12 @@ public class Feedback {
 
     @Column(name = "createdAt", nullable = false, updatable = false)
     @CreationTimestamp
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public Feedback() {
     }
 
-    public Feedback(Integer id, User userSendFeedBack, User userReceiveFeedBack, Integer rate, String comment, Date createdAt) {
+    public Feedback(Integer id, User userSendFeedBack, User userReceiveFeedBack, Integer rate, String comment, Timestamp createdAt) {
         this.id = id;
         this.userSendFeedBack = userSendFeedBack;
         this.userReceiveFeedBack = userReceiveFeedBack;
@@ -89,11 +89,12 @@ public class Feedback {
         this.comment = comment;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
 }

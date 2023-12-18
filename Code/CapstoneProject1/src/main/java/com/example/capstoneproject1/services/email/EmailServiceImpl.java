@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     ThymeleafService thymeleafService;
-
+ 
     @Value("${spring.mail.username}")
     private String email;
 

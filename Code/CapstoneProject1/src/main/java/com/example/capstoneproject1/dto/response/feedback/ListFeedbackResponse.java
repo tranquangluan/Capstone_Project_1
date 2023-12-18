@@ -10,6 +10,7 @@ public class ListFeedbackResponse {
     private String message;
     private Integer feedbackQuantity;
     private Integer totalPages;
+    private Integer averageRate;
 
     private List<Feedback> listFeedbacks;
 
@@ -18,20 +19,22 @@ public class ListFeedbackResponse {
     public ListFeedbackResponse() {
     }
 
-    public ListFeedbackResponse(Integer error, String message, Integer feedbackQuantity, Integer totalPages, Integer status) {
+
+    public ListFeedbackResponse(Integer error, String message, Integer feedbackQuantity, Integer totalPages, Integer averageRate, List<Feedback> listFeedbacks, Integer status) {
         this.error = error;
         this.message = message;
         this.feedbackQuantity = feedbackQuantity;
         this.totalPages = totalPages;
+        this.averageRate = averageRate;
+        this.listFeedbacks = listFeedbacks;
         this.status = status;
     }
 
-    public ListFeedbackResponse(Integer error, String message, Integer feedbackQuantity, Integer totalPages, List<Feedback> listFeedbacks, Integer status) {
+    public ListFeedbackResponse(Integer error, String message, Integer totalPages, Integer averageRate, Integer status) {
         this.error = error;
         this.message = message;
-        this.feedbackQuantity = feedbackQuantity;
         this.totalPages = totalPages;
-        this.listFeedbacks = listFeedbacks;
+        this.averageRate = averageRate;
         this.status = status;
     }
 
@@ -65,6 +68,14 @@ public class ListFeedbackResponse {
 
     public void setTotalPages(Integer totalPages) {
         this.totalPages = totalPages;
+    }
+
+    public Integer getAverageRate() {
+        return averageRate;
+    }
+
+    public void setAverageRate(Integer averageRate) {
+        this.averageRate = averageRate;
     }
 
     public List<Feedback> getListFeedbacks() {

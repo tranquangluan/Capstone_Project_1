@@ -17,5 +17,7 @@ public interface FeedbackService {
 
     Optional<Feedback> findFeedbackBySenderAnsReceiver(User sender, User receiver);
 
+    Boolean isFeedback (User user, User owner);
+
     PageFeedback getFeedback(Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer rateFrom,  Integer rateTo,Integer receiverId, Integer senderId);
 }

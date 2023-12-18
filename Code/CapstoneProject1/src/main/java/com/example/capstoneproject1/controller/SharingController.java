@@ -7,10 +7,8 @@ import com.example.capstoneproject1.models.Sharing;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.repository.CategorySpaceRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
-import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.sharing.SharingService;
 import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.status.StatusServiceImpl;
@@ -38,12 +36,6 @@ public class SharingController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    CloudinaryService cloudinaryService;
-
-    @Autowired
-    CategorySpaceRepository categorySpaceRepository;
 
     @Autowired
     JwtTokenFilter jwtTokenFilter;

@@ -39,22 +39,18 @@ public class SpaceController {
 
     @Autowired
     SpaceServiceImpl spaceServiceImpl;
-    @Autowired
-    UserService userService;
-    @Autowired
-    CloudinaryService cloudinaryService;
 
     @Autowired
-    SpaceRepository spaceRepository;
+    UserService userService;
+
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     @Autowired
     ImageRepository imageRepository;
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    StatusRepository statusRepository;
 
     @Autowired
     CategorySpaceRepository categorySpaceRepository;
@@ -87,10 +83,10 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "areaFrom") Float areaFrom,
                                        @RequestParam(required = false, name = "areaTo") Float areaTo,
                                        @RequestParam(required = false, name = "spaceId") Integer spaceId,
-                                       @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+                                       @RequestParam(required = false, name = "ownerId") Integer ownerId,
+                                       @RequestParam(required = false, name = "topRate") Integer topRate) {
         try {
-            PageSpace pageSpace = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
-
+            PageSpace pageSpace = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo,topRate);
             Integer totalPages = pageSpace.getTotalPages();
             List<Space> listSpaces = pageSpace.getListSpaces();
             if (!listSpaces.isEmpty())
@@ -125,7 +121,7 @@ public class SpaceController {
                 return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
 
             // find default status pending
-            Optional<Status> statusOptional = statusRepository.findById(3);
+            Optional<Status> statusOptional = statusService.findBySpaceStatusId(3);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
 
@@ -135,7 +131,7 @@ public class SpaceController {
             Space savedSpace = spaceServiceImpl.saveSpace(space);
             // handle upload image on cloudinary server
             List<Map> results = cloudinaryService.uploadMultiple(images);
-            if (results.size() > 0) {
+            if (!results.isEmpty()) {
                 // loop and save info in image Object
                 for (Map result : results) {
                     Image image = new Image();
