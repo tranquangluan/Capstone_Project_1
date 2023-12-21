@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookings(Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<Booking> getAllBookings(Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         try {
             // Create Sorted instance
             Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
@@ -42,11 +42,11 @@ public class BookingServiceImpl implements BookingService {
 
             Page<Booking> pageBooking = bookingRepository.getAllBooking(status,pageable);
 
-            return pageBooking.getContent();
+            return pageBooking;
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new ArrayList<>();
+            return Page.empty();
         }
     }
 }

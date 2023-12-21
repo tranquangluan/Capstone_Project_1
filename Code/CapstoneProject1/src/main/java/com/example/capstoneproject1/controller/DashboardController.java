@@ -2,20 +2,25 @@ package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.dto.response.CountByRoleAndCountPostByStatus;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
+import com.example.capstoneproject1.dto.response.dashboard.StaticResponse;
 import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.services.space.SpaceService;
+import com.example.capstoneproject1.services.space.SpaceServiceImpl;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
 @PreAuthorize("hasAnyAuthority('Admin')")
 @RestController
 @RequestMapping("/api/dashboard")
@@ -24,6 +29,10 @@ public class DashboardController {
     SpaceService spaceService;
     @Autowired
     UserService userService;
+    @Autowired
+    SpaceRepository spaceRepository;
+
+    SpaceServiceImpl spaceServiceImpl;
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/overview")
@@ -60,13 +69,23 @@ public class DashboardController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @PostMapping("/static")
-    public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "categoryId") Integer categoryId,
-                                           @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
-                                           @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
-                                           @RequestParam(required = false, name = "searchByWard") String searchByWard,
-                                           @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+    public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "date") Integer date,
+                                           @RequestParam(required = false, name = "month") Integer month,
+                                           @RequestParam(required = false, name = "year") Integer year) {
         try {
-            return new ResponseEntity<>(new ResponseMessage(1, "", 400), HttpStatus.BAD_REQUEST);
+            List<Object[]> result = new ArrayList<>();
+            if (date!=null){
+                result = spaceService.getStaticDashboardByDate(date);
+            } else if (month!=null) {
+                result = spaceService.getStaticDashboardByMonthAndYear(month, year);
+            } else if (year !=null){
+                result = spaceService.getStaticDashboardByYear(year);
+            }
+            Map<String, Integer> staticMap = spaceService.convertToMap(result);
+            if (!staticMap.isEmpty()){
+                return new ResponseEntity<>(new StaticResponse(0,"Get Static Successfully!",staticMap,200), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }

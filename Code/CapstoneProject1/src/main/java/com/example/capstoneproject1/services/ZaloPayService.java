@@ -70,7 +70,7 @@ public class ZaloPayService {
         String data = order.get("appid") +"|"+ order.get("apptransid") +"|"+ order.get("appuser") +"|"+ order.get("amount")
                 +"|"+ order.get("apptime") +"|"+ order.get("embeddata") +"|"+ order.get("item") ;
         order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConstant.KEY1, data));
-        System.out.println(order.get("mac"));
+
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost post = new HttpPost(ZalopayConstant.ORDER_CREATE_ENDPOINT);
 
@@ -186,51 +186,51 @@ public class ZaloPayService {
 //    }
     //---------------------------------------------------------------------------------------------------------------------
     //sendRefund
-    public Map<String, Object> sendRefund(RefundRequestDTO refundRequestDTO) throws JSONException, IOException {
-
-        Map<String, Object> order = new HashMap<String, Object>(){{
-            put("app_id", ZalopayConstant.APP_ID);
-            put("zp_trans_id", refundRequestDTO.getZpTransId());
-            put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ ZalopayConstant.APP_ID +"_"+
-                    System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
-            put("timestamp", System.currentTimeMillis());
-            put("amount", refundRequestDTO.getAmount());
-            put("description", refundRequestDTO.getDescription());
-        }};
-
-        String data = order.get("app_id") +"|"+ order.get("zp_trans_id") +"|"+ order.get("amount")
-                +"|"+ order.get("description") +"|"+ order.get("timestamp");
-        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConstant.KEY1, data));
-
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(ZalopayConstant.REFUND_PAYMENT_ENDPOINT);
-
-        List<NameValuePair> params = new ArrayList<>();
-        for (Map.Entry<String, Object> e : order.entrySet()) {
-            params.add(new BasicNameValuePair(e.getKey(), e.getValue().toString()));
-        }
-
-        post.setEntity(new UrlEncodedFormEntity(params));
-
-        CloseableHttpResponse res = client.execute(post);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
-        StringBuilder resultJsonStr = new StringBuilder();
-        String line;
-
-        while ((line = rd.readLine()) != null) {
-            resultJsonStr.append(line);
-        }
-
-        JSONObject jsonResult = new JSONObject(resultJsonStr.toString());
-        Map<String, Object> finalResult = new HashMap<>();
-        for (Iterator it = jsonResult.keys(); it.hasNext(); ) {
-
-            String key = (String) it.next();
-            finalResult.put(key, jsonResult.get(key));
-        }
-
-        return finalResult;
-    }
+//    public Map<String, Object> sendRefund(RefundRequestDTO refundRequestDTO) throws JSONException, IOException {
+//
+//        Map<String, Object> order = new HashMap<String, Object>(){{
+//            put("app_id", ZalopayConstant.APP_ID);
+//            put("zp_trans_id", refundRequestDTO.getZpTransId());
+//            put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ ZalopayConstant.APP_ID +"_"+
+//                    System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
+//            put("timestamp", System.currentTimeMillis());
+//            put("amount", refundRequestDTO.getAmount());
+//            put("description", refundRequestDTO.getDescription());
+//        }};
+//
+//        String data = order.get("app_id") +"|"+ order.get("zp_trans_id") +"|"+ order.get("amount")
+//                +"|"+ order.get("description") +"|"+ order.get("timestamp");
+//        order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConstant.KEY1, data));
+//
+//        CloseableHttpClient client = HttpClients.createDefault();
+//        HttpPost post = new HttpPost(ZalopayConstant.REFUND_PAYMENT_ENDPOINT);
+//
+//        List<NameValuePair> params = new ArrayList<>();
+//        for (Map.Entry<String, Object> e : order.entrySet()) {
+//            params.add(new BasicNameValuePair(e.getKey(), e.getValue().toString()));
+//        }
+//
+//        post.setEntity(new UrlEncodedFormEntity(params));
+//
+//        CloseableHttpResponse res = client.execute(post);
+//        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
+//        StringBuilder resultJsonStr = new StringBuilder();
+//        String line;
+//
+//        while ((line = rd.readLine()) != null) {
+//            resultJsonStr.append(line);
+//        }
+//
+//        JSONObject jsonResult = new JSONObject(resultJsonStr.toString());
+//        Map<String, Object> finalResult = new HashMap<>();
+//        for (Iterator it = jsonResult.keys(); it.hasNext(); ) {
+//
+//            String key = (String) it.next();
+//            finalResult.put(key, jsonResult.get(key));
+//        }
+//
+//        return finalResult;
+//    }
     //--------------------------------------------------------------------------------------------------------------------
     //refund status
 //    public Map<String, Object> getStatusRefund(RefundStatusRequestDTO refundStatusDTO) throws IOException, URISyntaxException, JSONException {

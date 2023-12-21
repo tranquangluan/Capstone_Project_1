@@ -6,12 +6,15 @@ import com.example.capstoneproject1.dto.response.booking.BookingResponse;
 import com.example.capstoneproject1.dto.response.booking.ListBookingResponse;
 import com.example.capstoneproject1.models.Booking;
 import com.example.capstoneproject1.models.Space;
+import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.services.ZaloPayService;
 import com.example.capstoneproject1.services.booking.BookingService;
 import com.example.capstoneproject1.services.space.SpaceService;
+import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,18 +35,20 @@ public class BookingController {
     @Autowired
     SpaceService spaceService;
     @Autowired
+    StatusService statusService;
+    @Autowired
     private ZaloPayService zaloPayService;
 
-    @GetMapping(value = "")
+    @GetMapping(value = "list-bookings")
     public ResponseEntity<?> getAllBookings(@RequestParam(defaultValue = "0", required = false, name = "page") Integer page,
                                             @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
                                             @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
                                             @RequestParam(defaultValue = "ASC", required = false, name = "sortDir") String sortDir,
                                             @RequestParam(defaultValue = "1", required = false, name = "status") Integer status) {
         try {
-            List<Booking> bookingList = bookingService.getAllBookings(status, page, limit, sortBy, sortDir);
+            Page<Booking> bookingList = bookingService.getAllBookings(status, page, limit, sortBy, sortDir);
             if (!bookingList.isEmpty()) {
-                return new ResponseEntity<>(new ListBookingResponse(0, "Get Booking Successfully", bookingList.size(), bookingList, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListBookingResponse(0, "Get Booking Successfully", (int) bookingList.getTotalElements(), bookingList.getTotalPages(), bookingList.getContent(), 200), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new ListBookingResponse(1, "Booking Not Found", 0, 404), HttpStatus.NOT_FOUND);
             }
@@ -52,7 +57,7 @@ public class BookingController {
         }
     }
 
-    @PostMapping
+    @PostMapping("create-booking")
     public @ResponseBody ResponseEntity<?> createBooking(@Valid BookingForm bookingForm) {
         try {
             Optional<User> userOptional = userService.findById(bookingForm.getUserId());
@@ -61,9 +66,12 @@ public class BookingController {
             Optional<Space> spaceOptional = spaceService.findById(bookingForm.getSpaceId());
             if (!spaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-
-            Booking booking = new Booking(userOptional.get(), spaceOptional.get(), bookingForm.getTotalPrice(), bookingForm.getStatus(), Date.valueOf(String.valueOf(LocalDateTime.now())));
+            Optional<Status> statusOptional = statusService.findById(1);
+            if (!statusOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
+            Booking booking = new Booking(userOptional.get(), spaceOptional.get(), bookingForm.getTotalPrice(), statusOptional.get(), Date.valueOf(String.valueOf(LocalDateTime.now())));
             bookingService.update(booking);
+            spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get());
             return new ResponseEntity<>(new BookingResponse(0, "Create Booking Successful!", booking, 201), HttpStatus.CREATED);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -71,15 +79,15 @@ public class BookingController {
         }
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/delete-booking")
     public ResponseEntity<?> deleteBooking(@RequestParam(name = "id") Integer id) {
         try {
             Booking booking = bookingService.findBookingById(id);
-            if (booking.equals(null)) {
-                return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 201), HttpStatus.NOT_FOUND);
+            if (booking == null) {
+                return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 404), HttpStatus.NOT_FOUND);
             } else
                 bookingService.deleteBookingById(id);
-            return new ResponseEntity<>(new BookingResponse(0, "Delete Booking Successfully!", booking, 201), HttpStatus.OK);
+            return new ResponseEntity<>(new BookingResponse(0, "Delete Booking Successfully!", 200), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(new BookingResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);

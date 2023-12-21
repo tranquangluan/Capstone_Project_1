@@ -18,8 +18,9 @@ public class Booking {
     private  Space spaceId;
     @Column(name = "totalPrice")
     private BigDecimal totalPrice;
-    @Column(name = "status")
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "status")
+    private Status status;
     @Column(name = "bookingDate", nullable = false)
     private Date date;
 
@@ -32,7 +33,7 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice, String status, Date date) {
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date date) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
@@ -40,7 +41,7 @@ public class Booking {
         this.date = date;
     }
 
-    public Booking(Integer id, User userId, Space spaceId, BigDecimal totalPrice, String status) {
+    public Booking(Integer id, User userId, Space spaceId, BigDecimal totalPrice, Status status) {
         this.id = id;
         this.userId = userId;
         this.spaceId = spaceId;
@@ -80,11 +81,11 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

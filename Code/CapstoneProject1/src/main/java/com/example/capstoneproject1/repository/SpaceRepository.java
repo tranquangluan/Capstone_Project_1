@@ -14,8 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Integer> {
@@ -130,5 +129,27 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("ownerId") Integer ownerId,
             Pageable pageable
     );
+
+    @Query(value = "SELECT DATE(created_at) AS date, COUNT(*) AS count\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and created_at >= DATE_SUB(CURDATE(), INTERVAL :date DAY)\n" +
+            "GROUP BY DATE(created_at)\n" +
+            "ORDER BY DATE(created_at) DESC;", nativeQuery = true)
+    List<Object[]> getStaticDashboardByDate(@Param("date") Integer date);
+    @Query(value = "SELECT DATE(created_at) AS date,COUNT(*) AS total\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and month(created_at) =:month AND year(created_at) =:year\n" +
+            "GROUP BY DATE(created_at);;", nativeQuery = true)
+    List<Object[]> getStaticDashboardByMonthAndYear(
+            @Param("month") Integer month,
+            @Param("year") Integer year);
+    @Query(value = "SELECT EXTRACT(MONTH FROM created_at) AS month,COUNT(*) AS total\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and YEAR(created_at) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM created_at);", nativeQuery = true)
+    List<Object[]> getStaticDashboardByYear(@Param("year") Integer year);
+
+
+
 
 }

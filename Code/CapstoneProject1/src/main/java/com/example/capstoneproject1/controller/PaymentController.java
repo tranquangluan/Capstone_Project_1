@@ -24,7 +24,7 @@ public class PaymentController {
     @Autowired
     private ZaloPayService zaloPayService;
 
-    @PostMapping("/api/v1/create-order")
+    @PostMapping(value = "/api/v1/create-order")
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) throws JSONException, IOException {
 
         Map<String, Object> resultOrder = zaloPayService.createOrder(orderRequestDTO);
@@ -58,12 +58,12 @@ public class PaymentController {
 //        }
 //    }
 
-    @PostMapping("/api/v1/refund-payment")
-    public ResponseEntity<Map<String, Object>> sendRefundRequest(@RequestBody RefundRequestDTO refundRequestDTO)
-            throws JSONException, IOException {
-        Map<String, Object> result = zaloPayService.sendRefund(refundRequestDTO);
-        return new ResponseEntity<>(new HashMap<>(result), HttpStatus.OK);
-    }
+//    @PostMapping("/api/v1/refund-payment")
+//    public ResponseEntity<Map<String, Object>> sendRefundRequest(@RequestBody RefundRequestDTO refundRequestDTO)
+//            throws JSONException, IOException {
+//        Map<String, Object> result = zaloPayService.sendRefund(refundRequestDTO);
+//        return new ResponseEntity<>(new HashMap<>(result), HttpStatus.OK);
+//    }
 //    @PostMapping("/api/v1/get-refund-status")
 //    public ResponseEntity<Map<String, Object>> getStatusRefund(@RequestBody RefundStatusRequestDTO refundStatusDTO)
 //            throws JSONException, IOException, URISyntaxException {

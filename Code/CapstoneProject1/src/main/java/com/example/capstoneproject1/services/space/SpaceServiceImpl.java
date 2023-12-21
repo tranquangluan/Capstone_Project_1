@@ -20,8 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SpaceServiceImpl implements SpaceService {
@@ -199,4 +198,32 @@ public class SpaceServiceImpl implements SpaceService {
             return Page.empty();
         }
     }
+
+    @Override
+    public List<Object[]> getStaticDashboardByDate(Integer date) {
+        return spaceRepository.getStaticDashboardByDate(date);
+    }
+    @Override
+    public List<Object[]> getStaticDashboardByMonthAndYear(Integer month, Integer year) {
+        return spaceRepository.getStaticDashboardByMonthAndYear(month,year);
+    }
+
+    @Override
+    public List<Object[]> getStaticDashboardByYear(Integer year) {
+        return spaceRepository.getStaticDashboardByYear(year);
+    }
+    @Override
+    public Map<String, Integer> convertToMap(List<Object[]> result) {
+        Map<String, Integer> resultMap = new LinkedHashMap<>();
+        for (Object[] row : result) {
+            String date = row[0].toString();
+            Integer count = Integer.parseInt(row[1].toString());
+            resultMap.put(date, count);
+        }
+        return resultMap;
+    }
+
+
+
+
 }
