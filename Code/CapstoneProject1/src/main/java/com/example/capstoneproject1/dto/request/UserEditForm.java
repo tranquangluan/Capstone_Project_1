@@ -1,7 +1,7 @@
 package com.example.capstoneproject1.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -9,7 +9,7 @@ public class UserEditForm {
     @Value("${rest.client.url}")
     private String fullName;
     private Boolean gender;
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd/MM/yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
     private String phone;
     private String province;

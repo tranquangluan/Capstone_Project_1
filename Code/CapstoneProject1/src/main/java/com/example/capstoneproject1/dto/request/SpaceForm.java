@@ -31,6 +31,7 @@ public class SpaceForm {
     private String address;
     @NotNull
     private Integer categoryId;
+    @NotNull
     private Integer ownerId;
 
 

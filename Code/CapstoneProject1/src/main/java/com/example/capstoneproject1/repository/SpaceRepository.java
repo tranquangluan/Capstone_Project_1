@@ -35,7 +35,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "AND (:priceTo IS NULL OR s.price <= :priceTo) " +
             "AND (:areaFrom IS NULL OR s.area >= :areaFrom) " +
             "AND (:areaTo IS NULL OR s.area <= :areaTo) " +
-            "AND (:spaceId IS NULL OR s.id = :spaceId) " +
+            "AND (:spaceId IS NULL OR s.id = :spaceId) " +  
             "AND (:ownerId IS NULL OR s.ownerId.id = :ownerId)")
     Page<Space> findSpacesByConditions(
             @Param("status") Integer status,

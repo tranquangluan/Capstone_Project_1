@@ -6,12 +6,14 @@ import com.example.capstoneproject1.dto.response.feedback.FeedbackResponse;
 import com.example.capstoneproject1.dto.response.feedback.HasFeedback;
 import com.example.capstoneproject1.dto.response.feedback.ListFeedbackResponse;
 import com.example.capstoneproject1.dto.response.feedback.PageFeedback;
+import com.example.capstoneproject1.dto.response.space.SpaceResponse;
 import com.example.capstoneproject1.models.Feedback;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.booking.BookingServiceImpl;
 import com.example.capstoneproject1.services.feedback.FeedbackServiceImpl;
+import com.example.capstoneproject1.services.notification.NotificationServiceImpl;
 import com.example.capstoneproject1.services.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,9 @@ public class FeedbackController {
 
     @Autowired
     FeedbackServiceImpl feedbackService;
+
+    @Autowired
+    NotificationServiceImpl notificationService;
 
     public Optional<User> getUserFromToken(HttpServletRequest request) {
         String token = jwtTokenFilter.getJwtFromRequest(request);
@@ -80,6 +85,7 @@ public class FeedbackController {
             if (!isExistingBooking)
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot rate until you have booked with this owner!", 400), HttpStatus.BAD_REQUEST);
 
+            // Set properties from
             // check existing feedback
             Boolean isExistingFeedbackWithOwner = feedbackService.existsFeedbackBySenderAnsReceiver(sender, receiver);
             if (isExistingFeedbackWithOwner)
@@ -87,6 +93,12 @@ public class FeedbackController {
 
             Feedback feedback = new Feedback(sender, receiver, rate, comment);
             feedbackService.saveFeedback(feedback);
+
+            // add the notification
+            Boolean isCreated = notificationService.createMessage(sender, receiver, "Feedback", "Have a feedback about you.");
+            if(!isCreated)
+                return new ResponseEntity<>(new SpaceResponse(0, "Create new feedback fail!", 400), HttpStatus.BAD_REQUEST);
+
             return new ResponseEntity<>(new FeedbackResponse(0, "Create feedback successful!", feedback, 201), HttpStatus.CREATED);
 
 
