@@ -1,5 +1,7 @@
 package com.example.capstoneproject1.models;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -21,33 +23,32 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "status")
     private Status status;
-    @Column(name = "bookingDate", nullable = false)
+    @Column(name = "bookingDate", nullable = false, updatable = false)
+    @CreationTimestamp
     private Date date;
+    @Column(name = "paid")
+    private BigDecimal paid;
 
-    public Booking() {
-    }
-
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice) {
-        this.userId = userId;
-        this.spaceId = spaceId;
-        this.totalPrice = totalPrice;
-    }
-
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date date) {
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date date, BigDecimal paid) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
         this.status = status;
         this.date = date;
+        this.paid = paid;
     }
 
-    public Booking(Integer id, User userId, Space spaceId, BigDecimal totalPrice, Status status) {
-        this.id = id;
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, BigDecimal paid) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
         this.status = status;
+        this.paid = paid;
     }
+
+    public Booking() {
+    }
+
 
     public Integer getId() {
         return id;
@@ -73,6 +74,7 @@ public class Booking {
         this.spaceId = spaceId;
     }
 
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -95,5 +97,13 @@ public class Booking {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public BigDecimal getPaid() {
+        return paid;
+    }
+
+    public void setPaid(BigDecimal paid) {
+        this.paid = paid;
     }
 }

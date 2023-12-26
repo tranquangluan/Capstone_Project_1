@@ -93,6 +93,15 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("spaceId") Integer spaceId,
             @Param("statusId") Status status
     );
+    @Transactional
+    @Modifying
+    @Query("UPDATE Space s SET " +
+            "s.ownerId = :ownerId " +
+            "WHERE s.id = :spaceId")
+    void updateOwnerId(
+            @Param("spaceId") Integer spaceId,
+            @Param("ownerId") User ownerId
+    );
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
 

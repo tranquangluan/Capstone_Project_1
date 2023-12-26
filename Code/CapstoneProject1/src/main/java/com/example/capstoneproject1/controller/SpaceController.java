@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/spaces")
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class SpaceController {
 
     @Autowired

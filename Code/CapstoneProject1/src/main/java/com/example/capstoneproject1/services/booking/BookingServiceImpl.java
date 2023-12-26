@@ -1,23 +1,28 @@
 package com.example.capstoneproject1.services.booking;
 
+import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.models.Booking;
+import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 public class BookingServiceImpl implements BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
     @Override
-    public void update(Booking booking) {
+    public void saveBooking(Booking booking) {
         bookingRepository.save(booking);
     }
 
@@ -32,17 +37,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Page<Booking> getAllBookings(Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+    public Page<Booking> getAllBookings(Integer pageNo, Integer pageSize, String sortBy, String sortDir, BigDecimal priceFrom, BigDecimal priceTo, Integer status, Integer ownerId) {
         try {
-            // Create Sorted instance
-            Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
-            // create Pageable instance
-            Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-            Page<Booking> pageBooking = bookingRepository.getAllBooking(status,pageable);
-
-            return pageBooking;
+            if (sortDir != "None") {
+                // Create Sorted instance
+                Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+                // create Pageable instance
+                Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+                Page<Booking> bookingPage = bookingRepository.getAllBooking(priceFrom, priceTo, status, ownerId, pageable);
+                return bookingPage;
+            } else {
+                Pageable pageable = PageRequest.of(pageNo, pageSize);
+                Page<Booking> bookingPage = bookingRepository.getAllBooking(priceFrom, priceTo, status, ownerId, pageable);
+                return bookingPage;
+            }
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
