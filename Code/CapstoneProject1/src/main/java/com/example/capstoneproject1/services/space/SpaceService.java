@@ -5,9 +5,15 @@ import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface SpaceService {
@@ -29,5 +35,15 @@ public interface SpaceService {
     Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
     Boolean updateStatus(Integer spaceId, Status status);
-
+    Integer countSpaceByStatus0();
+    Integer countSpaceByStatus1();
+    Integer countSpaceByStatus2();
+    Integer countSpaceByStatus3();
+    Integer countSpaceByStatus4();
+    Integer countSpaceByStatus5();
+    Page<Space> getPostSpaceByConditions(Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, Integer ownerId);
+    List<Object[]> getStaticDashboardByDate(Integer date);
+    List<Object[]> getStaticDashboardByMonthAndYear(Integer month, Integer year);
+    List<Object[]> getStaticDashboardByYear(Integer year);
+    Map<String, Integer> convertToMap(List<Object[]> result);
 }

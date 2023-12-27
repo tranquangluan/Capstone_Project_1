@@ -12,9 +12,12 @@ import com.example.capstoneproject1.repository.*;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
-import com.example.capstoneproject1.services.notification.NotificationServiceImpl;
+import com.example.capstoneproject1.services.category.CategoryService;
+import com.example.capstoneproject1.services.image.ImageService;
+import com.example.capstoneproject1.services.notification.NotificationService;
+import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.space.SpaceServiceImpl;
-import com.example.capstoneproject1.services.status.StatusServiceImpl;
+import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,19 +56,17 @@ public class SpaceController {
     UserRepository userRepository;
 
     @Autowired
-    CategorySpaceRepository categorySpaceRepository;
-
+    StatusRepository statusRepository;
+    @Autowired
+    CategoryService categoryService;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
     @Autowired
-    StatusServiceImpl statusService;
-
+    StatusService statusService;
     @Autowired
-    NotificationServiceImpl notificationService;
+    NotificationService notificationService;
 
 
     @GetMapping(value = "/list-spaces")
@@ -73,7 +74,7 @@ public class SpaceController {
                                        @RequestParam(defaultValue = "6", required = false, name = "limit") Integer limit,
                                        @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
                                        @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
-                                       @RequestParam( required = false, name = "status") Integer status,
+                                       @RequestParam(required = false, name = "status") Integer status,
                                        @RequestParam(required = false, name = "categoryId") Integer categoryId,
                                        @RequestParam(required = false, name = "searchByProvince") String searchByProvince,
                                        @RequestParam(required = false, name = "searchByDistrict") String searchByDistrict,
@@ -90,7 +91,7 @@ public class SpaceController {
             Integer totalPages = pageSpace.getTotalPages();
             List<Space> listSpaces = pageSpace.getListSpaces();
             if (!listSpaces.isEmpty())
-                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", totalPages,listSpaces.size(), listSpaces, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListSpaceResponse(0, "Get Spaces Successfully", listSpaces.size(), totalPages, listSpaces, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
@@ -116,7 +117,7 @@ public class SpaceController {
             if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
-            Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceForm.getCategoryId());
+            Optional<CategorySpace> categorySpaceOptional = categoryService.findById(spaceForm.getCategoryId());
             if (!categorySpaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
 
@@ -131,7 +132,7 @@ public class SpaceController {
             Space savedSpace = spaceServiceImpl.saveSpace(space);
             // handle upload image on cloudinary server
             List<Map> results = cloudinaryService.uploadMultiple(images);
-            if (!results.isEmpty()) {
+            if (results.size() > 0) {
                 // loop and save info in image Object
                 for (Map result : results) {
                     Image image = new Image();
@@ -177,13 +178,14 @@ public class SpaceController {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
-            if (!userOptional.isPresent())
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-
+            }
             if (spaceUpdateForm.getCategoryId() != null) {
-                Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceUpdateForm.getCategoryId());
-                if (!categorySpaceOptional.isPresent())
+                Optional<CategorySpace> categorySpaceOptional = categoryService.findById(spaceUpdateForm.getCategoryId());
+                if (!categorySpaceOptional.isPresent()) {
                     return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
+                }
             }
 
             Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);

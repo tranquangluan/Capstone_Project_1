@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface StatusService {
     Optional<Status> findBySpaceStatusId(Integer spaceStatusId);
+    Optional<Status> findById(Integer integer);
 }

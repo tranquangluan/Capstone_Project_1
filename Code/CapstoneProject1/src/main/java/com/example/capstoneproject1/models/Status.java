@@ -9,8 +9,6 @@ public class Status {
     private Integer id;
     @Column(name="status")
     private String status;
-
-
     public Status() {
     }
 

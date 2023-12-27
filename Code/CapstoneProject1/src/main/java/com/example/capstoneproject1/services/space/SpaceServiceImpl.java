@@ -6,7 +6,7 @@ import com.example.capstoneproject1.models.CategorySpace;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.repository.CategorySpaceRepository;
+import com.example.capstoneproject1.repository.CategoryRepository;
 import com.example.capstoneproject1.repository.SpaceRepository;
 import com.example.capstoneproject1.repository.StatusRepository;
 import com.example.capstoneproject1.repository.UserRepository;
@@ -20,8 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SpaceServiceImpl implements SpaceService {
@@ -36,7 +35,7 @@ public class SpaceServiceImpl implements SpaceService {
     StatusRepository statusRepository;
 
     @Autowired
-    CategorySpaceRepository categorySpaceRepository;
+    CategoryRepository categoryRepository;
 
     @Autowired
     ImageServiceImpl imageServiceImpl;
@@ -103,7 +102,7 @@ public class SpaceServiceImpl implements SpaceService {
 
         CategorySpace categorySpace = null;
         if (spaceUpdateForm.getCategoryId() != null) {
-            Optional<CategorySpace> categorySpaceOptional = categorySpaceRepository.findById(spaceUpdateForm.getCategoryId());
+            Optional<CategorySpace> categorySpaceOptional = categoryRepository.findById(spaceUpdateForm.getCategoryId());
             if (categorySpaceOptional.isPresent()) {
                 categorySpace = categorySpaceOptional.get();
             }
@@ -138,6 +137,87 @@ public class SpaceServiceImpl implements SpaceService {
             return false;
         }
     }
+
+    @Override
+    public Integer countSpaceByStatus0() {
+        return spaceRepository.countSpaceByStatus0();
+    }
+
+    @Override
+    public Integer countSpaceByStatus1() {
+        return spaceRepository.countSpaceByStatus1();
+    }
+
+    @Override
+    public Integer countSpaceByStatus2() {
+        return spaceRepository.countSpaceByStatus2();
+    }
+
+    @Override
+    public Integer countSpaceByStatus3() {
+        return spaceRepository.countSpaceByStatus3();
+    }
+
+    @Override
+    public Integer countSpaceByStatus4() {
+        return spaceRepository.countSpaceByStatus4();
+    }
+
+    @Override
+    public Integer countSpaceByStatus5() {
+        return spaceRepository.countSpaceByStatus5();
+    }
+
+    @Override
+    public Page<Space> getPostSpaceByConditions(Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, Integer ownerId) {
+        try {
+            if (sortDir.toUpperCase().equals("DESC")) {
+                Sort sort = Sort.by(sortBy).descending();
+                Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
+                return pageSpace;
+            } else if (sortDir.toUpperCase().equals("ASC")) {
+                Sort sort = Sort.by(sortBy).ascending();
+                Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
+                return pageSpace;
+            } else {
+                Pageable pageable = PageRequest.of(pageNo, pageSize);
+                Page<Space> pageSpace = spaceRepository.getPostSpaceByConditions(categoryId, province, district, ward, ownerId, pageable);
+                return pageSpace;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return Page.empty();
+        }
+    }
+
+    @Override
+    public List<Object[]> getStaticDashboardByDate(Integer date) {
+        return spaceRepository.getStaticDashboardByDate(date);
+    }
+    @Override
+    public List<Object[]> getStaticDashboardByMonthAndYear(Integer month, Integer year) {
+        return spaceRepository.getStaticDashboardByMonthAndYear(month,year);
+    }
+
+    @Override
+    public List<Object[]> getStaticDashboardByYear(Integer year) {
+        return spaceRepository.getStaticDashboardByYear(year);
+    }
+    @Override
+    public Map<String, Integer> convertToMap(List<Object[]> result) {
+        Map<String, Integer> resultMap = new LinkedHashMap<>();
+        for (Object[] row : result) {
+            String date = row[0].toString();
+            Integer count = Integer.parseInt(row[1].toString());
+            resultMap.put(date, count);
+        }
+        return resultMap;
+    }
+
+
 
 
 }

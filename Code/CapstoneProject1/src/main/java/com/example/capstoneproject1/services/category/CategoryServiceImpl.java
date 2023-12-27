@@ -1,7 +1,7 @@
 package com.example.capstoneproject1.services.category;
 
 import com.example.capstoneproject1.models.CategorySpace;
-import com.example.capstoneproject1.repository.CategorySpaceRepository;
+import com.example.capstoneproject1.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,22 +12,25 @@ import java.util.Optional;
 public class CategoryServiceImpl implements  CategoryService{
 
     @Autowired
-    CategorySpaceRepository categorySpaceRep;
-
-
+    CategoryRepository categoryRepository;
     @Override
     public List<CategorySpace> findAllCategory() {
-        return categorySpaceRep.findAll();
+        return categoryRepository.findAll();
     }
 
     @Override
     public CategorySpace getCategoryById(Integer categoryId) {
-        return categorySpaceRep.getById(categoryId);
+        return categoryRepository.getById(categoryId);
     }
 
     @Override
     public Boolean existsCategory(Integer categoryId) {
-        Optional<CategorySpace> categorySpace = categorySpaceRep.findById(categoryId);
+        Optional<CategorySpace> categorySpace = categoryRepository.findById(categoryId);
         return categorySpace.isPresent();
+    }
+
+    @Override
+    public Optional<CategorySpace> findById(Integer categoryId) {
+        return categoryRepository.findById(categoryId);
     }
 }

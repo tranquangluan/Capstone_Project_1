@@ -35,8 +35,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.3'
     implementation 'org.springframework.session:spring-session-data-redis:2.7.0'
     implementation 'com.google.zxing:core:3.4.1'
-
-
+    implementation group: 'org.json', name: 'json', version: '20231013'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 }
 
 tasks.named('test') {

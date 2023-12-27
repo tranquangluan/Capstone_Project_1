@@ -35,22 +35,14 @@ public class UserController {
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    UserRepository userRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     CloudinaryService cloudinaryService;
-
     @Autowired
     JwtTokenFilter jwtTokenFilter;
-
     @Autowired
     UserService userService;
-
     @Autowired
     RoleService roleService;
 
@@ -58,7 +50,6 @@ public class UserController {
     @GetMapping("/current-user")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request, HttpServletResponse response) {
         try {
-
             String bearerToken = request.getHeader("Authorization");
             String token = "";
             if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -66,15 +57,16 @@ public class UserController {
             }
             if (jwtTokenProvider.validateToken(token)) {
                 String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-                Optional<User> userOptional = userRepository.findByEmail(userEmail);
+                Optional<User> userOptional = userService.findByEmail(userEmail);
                 if (userOptional.isPresent()) {
                     User user = userOptional.get();
                     return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(new ResponseMessage(1, "User not found!", 404), HttpStatus.NOT_FOUND);
                 }
-            } else
+            } else {
                 return new ResponseEntity<>(new ResponseMessage(1, jwtTokenProvider.getMessage(), 400), HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -93,16 +85,13 @@ public class UserController {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-            Optional<User> userOptional = userRepository.findByEmail(userEmail);
-
+            Optional<User> userOptional = userService.findByEmail(userEmail);
             if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             }
-
             if (userEditForm.getFullName() != null) {
                 userOptional.get().setName(userEditForm.getFullName());
             }
-
             if (userEditForm.getAddress() != null) {
                 userOptional.get().setProvince(userEditForm.getProvince());
                 userOptional.get().setDistrict(userEditForm.getDistrict());
@@ -111,16 +100,13 @@ public class UserController {
             }
             if (userEditForm.getGender() != null)
                 userOptional.get().setGender(userEditForm.getGender());
-
             if (userEditForm.getDateOfBirth() != null) {
                 java.sql.Date sqlDate = new java.sql.Date(userEditForm.getDateOfBirth().getTime());
                 userOptional.get().setDateOfBirth(sqlDate);
             }
-
             if (userEditForm.getPhone() != null) {
                 userOptional.get().setPhone(userEditForm.getPhone());
             }
-
             if (userEditForm.getOldPassword() != null && userEditForm.getNewPassword() != null) {
                 String oldPassword = userEditForm.getOldPassword();
                 String storedPassword = userOptional.get().getPassword();
@@ -130,8 +116,6 @@ public class UserController {
                     return new ResponseEntity<>(new ResponseMessage(1, "Old Password Was Incorrect!", 400), HttpStatus.BAD_REQUEST);
                 }
             }
-
-
             if (avartar != null) {
                 if (!avartar.isEmpty()) {
                     // delete in cloudinary before updating
@@ -151,8 +135,7 @@ public class UserController {
                     }
                 }
             }
-
-            userRepository.save(userOptional.get());
+            userService.save(userOptional.get());
             return new ResponseEntity<>(new ResponseMessage(0, "Update Profile Successfully!", 200), HttpStatus.OK);
 
         } catch (Exception e) {
@@ -169,13 +152,13 @@ public class UserController {
                                          @RequestParam(required = false, name = "searchByEmail") String searchByEmail,
                                          @RequestParam(required = false, name = "searchByName") String searchByName,
                                          @RequestParam(required = false, name = "searchById") Integer searchById,
-                                         @RequestParam( defaultValue = "None",required = false, name = "searchByRole") String searchByRole) {
+                                         @RequestParam(defaultValue = "None", required = false, name = "searchByRole") String searchByRole) {
         try {
-            PageUser pageUser = userService.getAllUsers(searchById, searchByEmail, searchByName, page - 1, limit, sortBy, sortDir,searchByRole);
+            PageUser pageUser = userService.getAllUsers(searchById, searchByEmail, searchByName, page - 1, limit, sortBy, sortDir, searchByRole);
             Integer totalPages = pageUser.getTotalPages();
             List<User> listUsers = pageUser.getListUsers();
             if (!listUsers.isEmpty())
-                return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!",listUsers.size() ,totalPages, listUsers, 200), HttpStatus.OK);
+                return new ResponseEntity<>(new ListUsersResponse(0, "Get List Users Successfully!", listUsers.size(), totalPages, listUsers, 200), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
@@ -191,20 +174,20 @@ public class UserController {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-            Optional<User> adminOptional = userRepository.findByEmail(userEmail);
-            Optional<User> userOptional = userRepository.findById(userId);
+            Optional<User> adminOptional = userService.findByEmail(userEmail);
+            Optional<User> userOptional = userService.findById(userId);
             // user not found
-            if( !userOptional.isPresent() || !adminOptional.isPresent() )
+            if (!userOptional.isPresent() || !adminOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
             System.out.println(userOptional.get().getId() + ">>>>" + userId);
             // can not update yourself
-            if(Objects.equals(adminOptional.get().getId(), userOptional.get().getId()))
+            if (Objects.equals(adminOptional.get().getId(), userOptional.get().getId()))
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot update yourself!", 400), HttpStatus.BAD_REQUEST);
 
 
             Optional<Role> roleUser = roleService.findByRoleCode(role);
-            if(!roleUser.isPresent()) {
+            if (!roleUser.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Role Not Found!", 404), HttpStatus.NOT_FOUND);
             }
             //  delete old role
@@ -216,7 +199,7 @@ public class UserController {
             userOptional.get().setRoles(roles);
             // Update User
             userService.save(userOptional.get());
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get() ,200), HttpStatus.OK);
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Update User Successful!", userOptional.get(), 200), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
@@ -224,25 +207,25 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @DeleteMapping("/delete-user")
-    public ResponseEntity<?> getAllUsers(@RequestParam( required = true, name = "userId") Integer userId, HttpServletRequest request) {
+    public ResponseEntity<?> getAllUsers(@RequestParam(required = true, name = "userId") Integer userId, HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-            Optional<User> userOptional = userRepository.findById(userId);
+            Optional<User> userOptional = userService.findById(userId);
             // user not found
-            if( !userOptional.isPresent() )
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+            }
             // check can not delete yourself
-            if(Objects.equals(userOptional.get().getEmail(), userEmail))
+            if (Objects.equals(userOptional.get().getEmail(), userEmail)) {
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete yourself!", 400), HttpStatus.BAD_REQUEST);
-
+            }
             User userDeleted = userOptional.get();
             // delete user by user id
-            if(userService.deleteUserByUserId(userId))
-                return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!",userDeleted ,200), HttpStatus.OK);
-            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete User Fail!",400), HttpStatus.BAD_REQUEST);
-
-
+            if (userService.deleteUserByUserId(userId)) {
+                return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Delete User Successful!", userDeleted, 200), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete User Fail!", 400), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }

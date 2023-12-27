@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, String> {
     List<Image> findBySpaceId(Space spaceId);
+
 }

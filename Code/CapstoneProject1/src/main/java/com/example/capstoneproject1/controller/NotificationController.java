@@ -11,8 +11,11 @@ import com.example.capstoneproject1.repository.NotificationRepository;
 import com.example.capstoneproject1.repository.StatusRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
+import com.example.capstoneproject1.services.notification.NotificationService;
 import com.example.capstoneproject1.services.notification.NotificationServiceImpl;
+import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.status.StatusServiceImpl;
+import com.example.capstoneproject1.services.user.UserService;
 import com.example.capstoneproject1.services.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,35 +33,24 @@ import java.util.Optional;
 public class NotificationController {
 
     @Autowired
-    NotificationServiceImpl notificationService;
-
+    NotificationService notificationService;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
     @Autowired
-    UserServiceImpl userService;
-
+    UserService userService;
     @Autowired
-    StatusServiceImpl statusService;
-
-
-    @Autowired
-    StatusRepository statusRepository;
-
-    @Autowired
-    NotificationRepository notificationRepository;
+    StatusService statusService;
 
     @PreAuthorize("hasAnyAuthority('Admin','Owner')")
     @GetMapping(value = "/list-notifications")
     public ResponseEntity<?> getNotification(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
-                                       @RequestParam(defaultValue = "4", required = false, name = "limit") Integer limit,
-                                       @RequestParam(defaultValue = "notificationId", required = false, name = "sortBy") String sortBy,
-                                       @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
-                                       @RequestParam(required = false, name = "senderId") Integer senderId,
-                                       HttpServletRequest request) {
+                                             @RequestParam(defaultValue = "4", required = false, name = "limit") Integer limit,
+                                             @RequestParam(defaultValue = "notificationId", required = false, name = "sortBy") String sortBy,
+                                             @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
+                                             @RequestParam(required = false, name = "senderId") Integer senderId,
+                                             HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -87,7 +79,7 @@ public class NotificationController {
     @PreAuthorize("hasAnyAuthority('Admin','Owner')")
     @PutMapping(value = "/update-notification")
     public ResponseEntity<?> updateNotification(@RequestParam(name = "notificationId") Long notificationId,
-                                       HttpServletRequest request) {
+                                                HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -97,13 +89,12 @@ public class NotificationController {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
             // find default status pending
-            Optional<Status> statusOptional = statusRepository.findById(7);
+            Optional<Status> statusOptional = statusService.findById(7);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
 
 
-
-            Optional<Notification> notificationOptional = notificationRepository.findById(notificationId);
+            Optional<Notification> notificationOptional = notificationService.findById(notificationId);
             if (!notificationOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Notification Not Found!", 404), HttpStatus.NOT_FOUND);
 
@@ -125,7 +116,7 @@ public class NotificationController {
     @PreAuthorize("hasAnyAuthority('Admin','Owner')")
     @DeleteMapping(value = "/delete-notification")
     public ResponseEntity<?> deleteNotification(@RequestParam(name = "notificationId") Long notificationId,
-                                       HttpServletRequest request) {
+                                                HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -135,7 +126,7 @@ public class NotificationController {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
 
 
-            Optional<Notification> notificationOptional = notificationRepository.findById(notificationId);
+            Optional<Notification> notificationOptional = notificationService.findById(notificationId);
             if (!notificationOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Notification Not Found!", 404), HttpStatus.NOT_FOUND);
 

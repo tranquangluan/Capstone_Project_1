@@ -7,11 +7,13 @@ import com.example.capstoneproject1.models.Sharing;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
+import com.example.capstoneproject1.repository.CategoryRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
+import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.sharing.SharingService;
 import com.example.capstoneproject1.services.space.SpaceService;
-import com.example.capstoneproject1.services.status.StatusServiceImpl;
+import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +38,10 @@ public class SharingController {
 
     @Autowired
     UserService userService;
-
+    @Autowired
+    CloudinaryService cloudinaryService;
+    @Autowired
+    CategoryRepository categoryRepository;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
 
@@ -65,8 +70,7 @@ public class SharingController {
                                               @RequestParam(required = false, name = "spaceId") Integer spaceId,
                                               @RequestParam(required = false, name = "sharingId") Integer sharingId,
                                               @RequestParam(required = false, name = "userSharingId") Integer userSharingId,
-                                              @RequestParam(required = false, name = "ownerId") Integer ownerId,
-                                              HttpServletRequest request) {
+                                              @RequestParam(required = false, name = "ownerId") Integer ownerId) {
         try {
             Integer statusSharing = 2;
             List<Sharing> listSpaces = sharingServiceImpl.getAllSpaces(ownerId, userSharingId, sharingId, spaceId, statusSharing, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
@@ -93,7 +97,7 @@ public class SharingController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public @ResponseBody ResponseEntity<?> createSharing(@RequestParam(name = "spaceId") Integer spaceId, @NotNull String content ,  HttpServletRequest request) {
+    public @ResponseBody ResponseEntity<?> createSharing(@RequestParam(name = "spaceId") Integer spaceId, @NotNull String content, HttpServletRequest request) {
         try {
             // handle check user
             Optional<User> userOptional = getUserFromToken(request);
@@ -111,17 +115,17 @@ public class SharingController {
 
             // handle check user has sharing
             Boolean existsSharing = sharingServiceImpl.existsSharingBySpaceAndUser(spaceOptional.get(), userOptional.get());
-            if(existsSharing)
+            if (existsSharing)
                 return new ResponseEntity<>(new ResponseMessage(1, "You have shared this space!", 400), HttpStatus.BAD_REQUEST);
 
             // handle check user has sharing
             Boolean existsSharingByUser = sharingServiceImpl.existsSharingByUser(userOptional.get());
-            if(existsSharingByUser)
+            if (existsSharingByUser)
                 return new ResponseEntity<>(new ResponseMessage(1, "You can only share once!", 400), HttpStatus.BAD_REQUEST);
 
 
-            Sharing sharing = new Sharing(spaceOptional.get(),userOptional.get(),content,statusOptional.get());
-            Sharing sharingCreated =  sharingServiceImpl.saveSharing(sharing);
+            Sharing sharing = new Sharing(spaceOptional.get(), userOptional.get(), content, statusOptional.get());
+            Sharing sharingCreated = sharingServiceImpl.saveSharing(sharing);
             return new ResponseEntity<>(new SharingResponse(0, "Create sharing successful!", sharingCreated, 401), HttpStatus.CREATED);
 
         } catch (Exception e) {
@@ -136,7 +140,7 @@ public class SharingController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId , @Valid @NotNull String content , HttpServletRequest request) {
+    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId, @Valid @NotNull String content, HttpServletRequest request) {
         try {
             // handle check user
             Optional<User> userOptional = getUserFromToken(request);

@@ -1,6 +1,5 @@
 package com.example.capstoneproject1.models;
 
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;

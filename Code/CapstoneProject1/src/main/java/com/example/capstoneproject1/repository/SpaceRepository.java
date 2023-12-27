@@ -14,13 +14,15 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Integer> {
 
     Optional<Space> findById(Integer spaceId);
+
     Integer countByCategoryId_Id(Integer category);
+
     void deleteAllByOwnerId_Id(Integer userId);
 
     @Query("SELECT DISTINCT s FROM Space s " +
@@ -97,4 +99,61 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
     );
 
     Optional<Space> findSpaceByIdAndOwnerId(Integer id, User owner);
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=0", nativeQuery = true)
+    Integer countSpaceByStatus0();
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=1", nativeQuery = true)
+    Integer countSpaceByStatus1();
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=2", nativeQuery = true)
+    Integer countSpaceByStatus2();
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=3", nativeQuery = true)
+    Integer countSpaceByStatus3();
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=4", nativeQuery = true)
+    Integer countSpaceByStatus4();
+
+    @Query(value = "SELECT COUNT(*) FROM space WHERE status_id=5", nativeQuery = true)
+    Integer countSpaceByStatus5();
+
+    @Query("SELECT s FROM Space s " +
+            "WHERE s.status.id = 0 " +
+            "AND (:categoryId IS NULL OR s.categoryId.id = :categoryId) " +
+            "AND (:searchByProvince IS NULL OR s.province = :searchByProvince) " +
+            "AND (:searchByDistrict IS NULL OR s.district = :searchByDistrict) " +
+            "AND (:searchByWard IS NULL OR s.ward = :searchByWard) " +
+            "AND (:ownerId IS NULL OR s.ownerId.id = :ownerId)")
+    Page<Space> getPostSpaceByConditions(
+            @Param("categoryId") Integer categoryId,
+            @Param("searchByProvince") String searchByProvince,
+            @Param("searchByDistrict") String searchByDistrict,
+            @Param("searchByWard") String searchByWard,
+            @Param("ownerId") Integer ownerId,
+            Pageable pageable
+    );
+
+    @Query(value = "SELECT DATE(created_at) AS date, COUNT(*) AS count\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and created_at >= DATE_SUB(CURDATE(), INTERVAL :date DAY)\n" +
+            "GROUP BY DATE(created_at)\n" +
+            "ORDER BY DATE(created_at) DESC;", nativeQuery = true)
+    List<Object[]> getStaticDashboardByDate(@Param("date") Integer date);
+    @Query(value = "SELECT DATE(created_at) AS date,COUNT(*) AS total\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and month(created_at) =:month AND year(created_at) =:year\n" +
+            "GROUP BY DATE(created_at);;", nativeQuery = true)
+    List<Object[]> getStaticDashboardByMonthAndYear(
+            @Param("month") Integer month,
+            @Param("year") Integer year);
+    @Query(value = "SELECT EXTRACT(MONTH FROM created_at) AS month,COUNT(*) AS total\n" +
+            "FROM space\n" +
+            "WHERE status_id = 0 and YEAR(created_at) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM created_at);", nativeQuery = true)
+    List<Object[]> getStaticDashboardByYear(@Param("year") Integer year);
+
+
+
+
 }

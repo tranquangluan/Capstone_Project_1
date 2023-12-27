@@ -3,11 +3,13 @@ package com.example.capstoneproject1.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -52,7 +54,9 @@ public class Space {
     @ManyToOne
     @JoinColumn(name = "ownerId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_space_user"))
     private User ownerId ;
-
+    @Column(name = "createdAt", nullable = true, updatable = false)
+    @CreationTimestamp
+    private Date createdAt;
     @OneToMany(mappedBy = "space", orphanRemoval = true)
     @JsonIgnore
     private List<Favourite> favourites = new ArrayList<>();
@@ -94,6 +98,27 @@ public class Space {
         this.address = address;
         this.categoryId = categoryId;
         this.ownerId = ownerId;
+    }
+
+    public Space(Integer id, String title, Status status, BigDecimal price, List<Image> images, String description, Integer bathroomNumbers, Integer bedroomNumbers, Integer peopleNumbers, float area, String province, String district, String ward, String address, CategorySpace categoryId, User ownerId, Date createdAt, List<Favourite> favourites) {
+        this.id = id;
+        this.title = title;
+        this.status = status;
+        this.price = price;
+        this.images = images;
+        this.description = description;
+        this.bathroomNumbers = bathroomNumbers;
+        this.bedroomNumbers = bedroomNumbers;
+        this.peopleNumbers = peopleNumbers;
+        this.area = area;
+        this.province = province;
+        this.district = district;
+        this.ward = ward;
+        this.address = address;
+        this.categoryId = categoryId;
+        this.ownerId = ownerId;
+        this.createdAt = createdAt;
+        this.favourites = favourites;
     }
 
     public Integer getId() {
@@ -222,5 +247,21 @@ public class Space {
 
     public void setOwnerId(User ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<Favourite> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(List<Favourite> favourites) {
+        this.favourites = favourites;
     }
 }

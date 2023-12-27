@@ -26,17 +26,13 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
-    private UserRepository userRepository;
-
+    UserRepository userRepository;
     @Autowired
-    private RoleRepository roleRepository;
-
+    RoleRepository roleRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     FavoriteRepository favoriteRepository;
-
     @Autowired
     SpaceRepository spaceRepository;
 
@@ -76,7 +72,7 @@ public class UserServiceImpl implements UserService {
     public Boolean existsById(Integer userId) {
         return userRepository.existsById(userId);
     }
-
+    @Override
     public String getRoleCode(String role) {
         switch (role) {
             case "Admin":
@@ -150,6 +146,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteRoleByUserId(Integer userId) {
         userRepository.deleteRole(userId);
+    }
+
+    @Override
+    public Integer countUsersRoleAdmin() {
+        return userRepository.countUsersRoleAdmin();
+    }
+
+    @Override
+    public Integer countUsersRoleOwner() {
+        return userRepository.countUsersRoleOwner();
+    }
+
+    @Override
+    public Integer countUsersRoleUser() {
+        return userRepository.countUsersRoleUser();
     }
 
     @Override

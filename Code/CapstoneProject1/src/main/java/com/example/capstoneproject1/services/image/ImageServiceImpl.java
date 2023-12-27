@@ -21,6 +21,16 @@ public class ImageServiceImpl implements ImageService{
     @Autowired
     CloudinaryService cloudinaryService;
 
+    @Override
+    public Image save(Image image) {
+        return imageRepository.save(image);
+    }
+
+    @Override
+    public boolean existsById(String imageId) {
+        return imageRepository.existsById(imageId);
+    }
+
     @Transactional
     @Override
     public void deleteImageBySpaceId(Space space) throws IOException {
@@ -32,5 +42,10 @@ public class ImageServiceImpl implements ImageService{
                     cloudinaryService.delete(image.getImageId());
             }
         }
+    }
+
+    @Override
+    public void deleteById(String imageId) {
+        imageRepository.deleteById(imageId);
     }
 }
