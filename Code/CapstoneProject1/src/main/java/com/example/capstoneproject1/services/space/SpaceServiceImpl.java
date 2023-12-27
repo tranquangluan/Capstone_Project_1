@@ -139,6 +139,17 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     @Override
+    public Boolean updateOwnerId(Integer spaceId, User ownerId) {
+        try {
+            spaceRepository.updateOwnerId(spaceId, ownerId);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Lỗi Đây: >>>>" + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
     public Integer countSpaceByStatus0() {
         return spaceRepository.countSpaceByStatus0();
     }

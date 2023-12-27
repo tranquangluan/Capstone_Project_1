@@ -1,5 +1,7 @@
 package com.example.capstoneproject1.models;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -18,35 +20,35 @@ public class Booking {
     private  Space spaceId;
     @Column(name = "totalPrice")
     private BigDecimal totalPrice;
-    @Column(name = "status")
-    private String status;
-    @Column(name = "bookingDate", updatable = false ,nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "status")
+    private Status status;
+    @Column(name = "bookingDate", nullable = false, updatable = false)
+    @CreationTimestamp
     private Date date;
+    @Column(name = "paid")
+    private BigDecimal paid;
 
-    public Booking() {
-    }
-
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice) {
-        this.userId = userId;
-        this.spaceId = spaceId;
-        this.totalPrice = totalPrice;
-    }
-
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice, String status, Date date) {
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date date, BigDecimal paid) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
         this.status = status;
         this.date = date;
+        this.paid = paid;
     }
 
-    public Booking(Integer id, User userId, Space spaceId, BigDecimal totalPrice, String status) {
-        this.id = id;
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, BigDecimal paid) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
         this.status = status;
+        this.paid = paid;
     }
+
+    public Booking() {
+    }
+
 
     public Integer getId() {
         return id;
@@ -72,6 +74,7 @@ public class Booking {
         this.spaceId = spaceId;
     }
 
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -80,11 +83,11 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -94,5 +97,13 @@ public class Booking {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public BigDecimal getPaid() {
+        return paid;
+    }
+
+    public void setPaid(BigDecimal paid) {
+        this.paid = paid;
     }
 }

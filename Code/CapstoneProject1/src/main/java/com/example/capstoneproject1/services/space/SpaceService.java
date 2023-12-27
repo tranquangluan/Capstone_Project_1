@@ -35,6 +35,8 @@ public interface SpaceService {
     Optional<Space> findByIdAndOwnerId(Integer spaceId, User owner);
 
     Boolean updateStatus(Integer spaceId, Status status);
+    Boolean updateOwnerId(Integer spaceId, User ownerId);
+
     Integer countSpaceByStatus0();
     Integer countSpaceByStatus1();
     Integer countSpaceByStatus2();
