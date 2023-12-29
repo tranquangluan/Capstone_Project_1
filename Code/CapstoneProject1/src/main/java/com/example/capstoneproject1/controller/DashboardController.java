@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.time.Year;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,6 @@ public class DashboardController {
     @Autowired
     SpaceRepository spaceRepository;
 
-    SpaceServiceImpl spaceServiceImpl;
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/overview")
@@ -74,11 +74,16 @@ public class DashboardController {
                                            @RequestParam(required = false, name = "year") Integer year) {
         try {
             List<Object[]> result = new ArrayList<>();
-            if (date!=null){
+            if (date!=null && month == null && year == null){
                 result = spaceService.getStaticDashboardByDate(date);
-            } else if (month!=null) {
-                result = spaceService.getStaticDashboardByMonthAndYear(month, year);
-            } else if (year !=null){
+            } else if (date == null && month!=null) {
+                if (year == null){
+                    year = Year.now().getValue();
+                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
+                }else {
+                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
+                }
+            } else if (date==null && month == null && year !=null){
                 result = spaceService.getStaticDashboardByYear(year);
             }
             Map<String, Integer> staticMap = spaceService.convertToMap(result);
