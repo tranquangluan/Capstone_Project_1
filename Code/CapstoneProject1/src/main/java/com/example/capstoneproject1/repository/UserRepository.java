@@ -23,10 +23,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Boolean existsByEmail(String email);
     Boolean existsByPassword(String password);
     Boolean existsByRefreshToken(String refreshToken);
-    Page<User> findByEmailContaining(String email, Pageable pageable);
-    Page<User> findByIdAndEmailContaining(Integer userId, String email, Pageable pageable);
-    Page<User> findByIdAndNameContaining(Integer userId, String name, Pageable pageable);
-    Page<User> findByNameContaining(String name, Pageable pageable);
 
     @Modifying
     @Query(value = "DELETE FROM users_role WHERE users_id = :userId", nativeQuery = true)

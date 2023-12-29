@@ -38,7 +38,8 @@ public class ImageServiceImpl implements ImageService{
         if(!listImages.isEmpty()) {
             for (Image image : listImages) {
                 imageRepository.deleteById(image.getImageId());
-                cloudinaryService.delete(image.getImageId());
+                if(space.getId() > 60)
+                    cloudinaryService.delete(image.getImageId());
             }
         }
     }

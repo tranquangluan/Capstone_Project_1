@@ -2,6 +2,7 @@ package com.example.capstoneproject1.services.booking;
 
 import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.models.Booking;
+import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -26,10 +29,12 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
     }
 
-    @Override
-    public Booking findBookingById(Integer id) {
-        return bookingRepository.findBookingById(id);
-    }
+//    @Override
+//    public Booking findBookingById(Integer id) {
+//        return bookingRepository.findBookingById(id);
+//    }
+
+
 
     @Override
     public void deleteBookingById(Integer id) {
@@ -57,5 +62,10 @@ public class BookingServiceImpl implements BookingService {
             System.out.println(e.getMessage());
             return Page.empty();
         }
+    }
+
+    @Override
+    public Boolean existsBookingWithUserAndOwner(User user, User owner) {
+        return bookingRepository.existsBookingByUserAndOwner(user, owner);
     }
 }

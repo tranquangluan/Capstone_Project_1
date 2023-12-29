@@ -53,28 +53,22 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     @Override
-    public PageSpace getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo) {
-
+    public PageSpace getAllSpaces(Integer ownerId, Integer spaceId, Integer status, Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, BigDecimal priceFrom, BigDecimal priceTo, Float areaFrom, Float areaTo, Integer topRate) {
         try {
+            System.out.println("SpaceIds >>>>>>>>>>>>>>>"+spaceId);
+            Pageable pageable = PageRequest.of(pageNo, pageSize);
             if (sortDir != "None") {
                 // Create Sorted instance
                 Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                         : Sort.by(sortBy).descending();
                 // create Pageable instance
-                Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-                Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                Integer totalPages = pageSpace.getTotalPages();
-                List<Space> listSpaces = pageSpace.getContent();
-                return new PageSpace(totalPages, listSpaces);
-            } else {
-                Pageable pageable = PageRequest.of(pageNo, pageSize);
-                Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId, pageable);
-                Integer totalPages = pageSpace.getTotalPages();
-                List<Space> listSpaces = pageSpace.getContent();
-                return new PageSpace(totalPages, listSpaces);
+                pageable = PageRequest.of(pageNo, pageSize, sort);
+
             }
-
-
+            Page<Space> pageSpace = spaceRepository.findSpacesByConditions(status, categoryId, province, district, ward, priceFrom, priceTo, areaFrom, areaTo, spaceId, ownerId,topRate, pageable);
+            Integer totalPages = pageSpace.getTotalPages();
+            List<Space> listSpaces = pageSpace.getContent();
+            return new PageSpace(totalPages, listSpaces);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new PageSpace();

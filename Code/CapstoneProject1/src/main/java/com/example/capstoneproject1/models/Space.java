@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class Space {
     @JoinColumn(name = "statusId")
     private Status status;
     @Column(name = "price")
+    @Min(1)
     private BigDecimal price;
     @OneToMany(mappedBy = "spaceId")
     private List<Image> images;
@@ -36,6 +38,7 @@ public class Space {
     @Column(name = "peopleNumbers")
     private Integer peopleNumbers;
     @Column(name = "area")
+    @Min(1)
     private float area;
     @Column(name = "province")
     private String province;

@@ -7,27 +7,27 @@ import java.util.List;
 public class ListSharesResponse {
     private Integer error;
     private String message;
-    private Integer spaceQuantity;
+    private Integer sharingQuantity;
 
-    private List<Sharing> listSpaces;
+    private List<Sharing> listSharing;
 
     private Integer status;
 
     public ListSharesResponse() {
     }
 
-    public ListSharesResponse(Integer error, String message, Integer spaceQuantity, List<Sharing> listSpaces, Integer status) {
+    public ListSharesResponse(Integer error, String message, Integer sharingQuantity, List<Sharing> listSharing, Integer status) {
         this.error = error;
         this.message = message;
-        this.spaceQuantity = spaceQuantity;
-        this.listSpaces = listSpaces;
+        this.sharingQuantity = sharingQuantity;
+        this.listSharing = listSharing;
         this.status = status;
     }
 
-    public ListSharesResponse(Integer error, String message, Integer spaceQuantity, Integer status) {
+    public ListSharesResponse(Integer error, String message, Integer sharingQuantity, Integer status) {
         this.error = error;
         this.message = message;
-        this.spaceQuantity = spaceQuantity;
+        this.sharingQuantity = sharingQuantity;
         this.status = status;
     }
 
@@ -47,20 +47,20 @@ public class ListSharesResponse {
         this.message = message;
     }
 
-    public Integer getSpaceQuantity() {
-        return spaceQuantity;
+    public Integer getSharingQuantity() {
+        return sharingQuantity;
     }
 
-    public void setSpaceQuantity(Integer spaceQuantity) {
-        this.spaceQuantity = spaceQuantity;
+    public void setSharingQuantity(Integer sharingQuantity) {
+        this.sharingQuantity = sharingQuantity;
     }
 
-    public List<Sharing> getListSpaces() {
-        return listSpaces;
+    public List<Sharing> getListSharing() {
+        return listSharing;
     }
 
-    public void setListSpaces(List<Sharing> listSpaces) {
-        this.listSpaces = listSpaces;
+    public void setListSharing(List<Sharing> listSharing) {
+        this.listSharing = listSharing;
     }
 
     public Integer getStatus() {

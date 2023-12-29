@@ -16,6 +16,7 @@ import com.example.capstoneproject1.services.category.CategoryService;
 import com.example.capstoneproject1.services.image.ImageService;
 import com.example.capstoneproject1.services.notification.NotificationService;
 import com.example.capstoneproject1.services.space.SpaceService;
+import com.example.capstoneproject1.services.space.SpaceServiceImpl;
 import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,15 +41,20 @@ import java.util.Optional;
 public class SpaceController {
 
     @Autowired
-    SpaceService spaceService;
+    SpaceServiceImpl spaceServiceImpl;
+
     @Autowired
     UserService userService;
+
     @Autowired
     CloudinaryService cloudinaryService;
+
     @Autowired
-    ImageService imageService;
+    ImageRepository imageRepository;
+
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     StatusRepository statusRepository;
     @Autowired
@@ -65,7 +71,7 @@ public class SpaceController {
 
     @GetMapping(value = "/list-spaces")
     public ResponseEntity<?> getSpaces(@RequestParam(defaultValue = "1", required = false, name = "page") Integer page,
-                                       @RequestParam(defaultValue = "8", required = false, name = "limit") Integer limit,
+                                       @RequestParam(defaultValue = "6", required = false, name = "limit") Integer limit,
                                        @RequestParam(defaultValue = "title", required = false, name = "sortBy") String sortBy,
                                        @RequestParam(defaultValue = "None", required = false, name = "sortDir") String sortDir,
                                        @RequestParam(required = false, name = "status") Integer status,
@@ -78,9 +84,10 @@ public class SpaceController {
                                        @RequestParam(required = false, name = "areaFrom") Float areaFrom,
                                        @RequestParam(required = false, name = "areaTo") Float areaTo,
                                        @RequestParam(required = false, name = "spaceId") Integer spaceId,
-                                       @RequestParam(required = false, name = "ownerId") Integer ownerId) {
+                                       @RequestParam(required = false, name = "ownerId") Integer ownerId,
+                                       @RequestParam(required = false, name = "topRate") Integer topRate) {
         try {
-            PageSpace pageSpace = spaceService.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo);
+            PageSpace pageSpace = spaceServiceImpl.getAllSpaces(ownerId, spaceId, status, page - 1, limit, sortBy, sortDir, categoryId, searchByProvince, searchByDistrict, searchByWard, priceFrom, priceTo, areaFrom, areaTo,topRate);
             Integer totalPages = pageSpace.getTotalPages();
             List<Space> listSpaces = pageSpace.getListSpaces();
             if (!listSpaces.isEmpty())
@@ -115,14 +122,14 @@ public class SpaceController {
                 return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
 
             // find default status pending
-            Optional<Status> statusOptional = statusRepository.findById(3);
+            Optional<Status> statusOptional = statusService.findBySpaceStatusId(3);
             if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
 
             // Set properties from spaceForm
             Space space = new Space(spaceForm.getTitle(), statusOptional.get(), spaceForm.getPrice(), spaceForm.getDescription(), spaceForm.getBathroomsNumber(), spaceForm.getBedroomsNumber(), spaceForm.getPeopleNumber(), spaceForm.getArea(), spaceForm.getProvince(), spaceForm.getDistrict(), spaceForm.getWard(), spaceForm.getAddress(), categorySpaceOptional.get(), userOptional.get());
             // Save the space entity to get the ID
-            Space savedSpace = spaceService.saveSpace(space);
+            Space savedSpace = spaceServiceImpl.saveSpace(space);
             // handle upload image on cloudinary server
             List<Map> results = cloudinaryService.uploadMultiple(images);
             if (results.size() > 0) {
@@ -137,9 +144,9 @@ public class SpaceController {
                     // connect relationship Image and Space
                     image.setSpaceId(savedSpace);
                     // save the image in the database
-                    imageService.save(image);
+                    imageRepository.save(image);
                 }
-                spaceService.saveSpace(savedSpace);
+                spaceServiceImpl.saveSpace(savedSpace);
             } else {
                 return new ResponseEntity<>(new ResponseMessage(1, "Required image in space!", 400), HttpStatus.BAD_REQUEST);
             }
@@ -149,11 +156,12 @@ public class SpaceController {
             // create message
             for (User admin : adminsList) {
                 Boolean isCreated = notificationService.createMessage(userSender, admin, "New Space Created", "A new space has been created.");
-                if (!isCreated)
+                if(!isCreated)
                     return new ResponseEntity<>(new SpaceResponse(0, "Create new space fail!", 400), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Create new space successful!", savedSpace, 201), HttpStatus.CREATED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
@@ -179,22 +187,23 @@ public class SpaceController {
                     return new ResponseEntity<>(new ResponseMessage(1, "Category Not Found!", 404), HttpStatus.NOT_FOUND);
                 }
             }
-            Optional<Space> spaceOptional = spaceService.findById(spaceId);
-            if (!spaceOptional.isPresent()) {
+
+            Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
+            if (!spaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-            }
+
             // delete Image in repository
             String[] imageIds = spaceUpdateForm.getImagesId();
             if (imageIds != null) {
                 for (String imageId : imageIds) {
-                    if (imageService.existsById(imageId)) {
-                        imageService.deleteById(imageId);
+                    if (imageRepository.existsById(imageId)) {
+                        imageRepository.deleteById(imageId);
                         cloudinaryService.delete(imageId);
                     }
                 }
             }
             // handle fields
-            spaceService.updateSpace(spaceUpdateForm, spaceId);
+            spaceServiceImpl.updateSpace(spaceUpdateForm, spaceId);
             // handle image
             if (images != null) {
                 List<Map> results = cloudinaryService.uploadMultiple(images);
@@ -210,15 +219,16 @@ public class SpaceController {
                         // connect relationship Image and Space
                         image.setSpaceId(spaceOptional.get());
                         // save the image in the database
-                        imageService.save(image);
+                        imageRepository.save(image);
                     }
-                    spaceService.saveSpace(spaceOptional.get());
+                    spaceServiceImpl.saveSpace(spaceOptional.get());
                 } else {
                     return new ResponseEntity<>(new ResponseMessage(1, "Requires at least 1 image!", 401), HttpStatus.BAD_REQUEST);
                 }
             }
             return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!", spaceOptional.get(), 200), HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(new SpaceResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
@@ -231,24 +241,27 @@ public class SpaceController {
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
             // user not found
-            if (!userOptional.isPresent()) {
+            if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-            }
+
             // space notfound
-            Optional<Space> spaceOptional = spaceService.findById(spaceId);
-            if (!spaceOptional.isPresent()) {
+            Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
+            if (!spaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-            }
+
             // You cannot delete space that is not yours
-            Optional<Space> spaceByOwnerId = spaceService.findByIdAndOwnerId(spaceId, userOptional.get());
-            if (!spaceByOwnerId.isPresent()) {
+            Optional<Space> spaceByOwnerId = spaceServiceImpl.findByIdAndOwnerId(spaceId, userOptional.get());
+            if (!spaceByOwnerId.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot delete space that is not yours!", 400), HttpStatus.CONFLICT);
-            }
-            if (spaceService.deleteSpace(spaceOptional.get())) {
+
+
+            if (spaceServiceImpl.deleteSpace(spaceOptional.get()))
                 return new ResponseEntity<>(new ResponseMessage(0, "Delete Space Successful!", 200), HttpStatus.OK);
-            }
             return new ResponseEntity<>(new UpdateAnDeleteUserResponse(1, "Delete Space Fail!", 400), HttpStatus.BAD_REQUEST);
+
+
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
@@ -258,27 +271,28 @@ public class SpaceController {
         String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
         Optional<User> userOptional = userRepository.findByEmail(userEmail);
         // user not found
-        if (!userOptional.isPresent()) {
+        if (!userOptional.isPresent())
             return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-        }
         // space not found
-        Optional<Space> spaceOptional = spaceService.findById(spaceId);
-        if (!spaceOptional.isPresent()) {
+        Optional<Space> spaceOptional = spaceServiceImpl.findById(spaceId);
+        if (!spaceOptional.isPresent())
             return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-        }
+
         // space not found
         Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
-        if (!statusOptional.isPresent()) {
+        if (!statusOptional.isPresent())
             return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
-        }
+
         Integer spaceStatusId = spaceOptional.get().getStatus().getId();
-        if (spaceStatusId != 3) {
+        if (spaceStatusId != 3)
             return new ResponseEntity<>(new ResponseMessage(1, "Space has updated!", 404), HttpStatus.NOT_FOUND);
-        }
+
         Status status = statusOptional.get();
-        if (spaceService.updateStatus(spaceId, status)) {
+
+        if (spaceServiceImpl.updateStatus(spaceId, status)) {
             return new ResponseEntity<>(new ResponseMessage(0, "Update space successfully!", 200), HttpStatus.OK);
         }
+
         return new ResponseEntity<>(new ResponseMessage(1, "Update space fail!", 400), HttpStatus.BAD_REQUEST);
     }
 

@@ -3,7 +3,6 @@ package com.example.capstoneproject1.controller;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.dto.response.sharing.ListSharesResponse;
 import com.example.capstoneproject1.dto.response.sharing.SharingResponse;
-import com.example.capstoneproject1.dto.response.space.ListSpaceResponse;
 import com.example.capstoneproject1.models.Sharing;
 import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.models.Status;
@@ -23,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +35,7 @@ public class SharingController {
 
     @Autowired
     SharingService sharingServiceImpl;
+
     @Autowired
     UserService userService;
     @Autowired
@@ -43,10 +44,13 @@ public class SharingController {
     CategoryRepository categoryRepository;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
+
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+
     @Autowired
-    StatusService statusService;
+    StatusServiceImpl statusService;
+
     @Autowired
     SpaceService spaceService;
 
@@ -73,7 +77,7 @@ public class SharingController {
             if (!listSpaces.isEmpty()) {
                 return new ResponseEntity<>(new ListSharesResponse(0, "Get Spaces Sharing Successfully", listSpaces.size(), listSpaces, 200), HttpStatus.OK);
             } else
-                return new ResponseEntity<>(new ListSpaceResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new ListSharesResponse(1, "Space Not Found", 0, 404), HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -136,35 +140,36 @@ public class SharingController {
     }, produces = {
             MediaType.APPLICATION_JSON_VALUE
     })
-    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId, @NotNull String content, HttpServletRequest request) {
+    public ResponseEntity<?> updateSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId, @Valid @NotNull String content, HttpServletRequest request) {
         try {
             // handle check user
             Optional<User> userOptional = getUserFromToken(request);
-            if (!userOptional.isPresent()) {
+            if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User not found!", 404), HttpStatus.NOT_FOUND);
-            }
             // handle check space
             Optional<Space> spaceOptional = spaceService.findById(spaceId);
-            if (!spaceOptional.isPresent()) {
+            if (!spaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Space not found!", 404), HttpStatus.NOT_FOUND);
-            }
             // handle check status
             Integer statusCode = 2;
             Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
-            if (!statusOptional.isPresent()) {
+            if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status not found!", 404), HttpStatus.NOT_FOUND);
-            }
+
             // handle check user has sharing
             Boolean existsSharing = sharingServiceImpl.existsSharingBySpaceAndUser(spaceOptional.get(), userOptional.get());
-            if (!existsSharing) {
+            if(!existsSharing)
                 return new ResponseEntity<>(new ResponseMessage(1, "You have not shared this space!", 400), HttpStatus.BAD_REQUEST);
-            }
-            // handle
-            Optional<Sharing> sharingOptional = sharingServiceImpl.findSharingBySpaceAndUser(spaceOptional.get(), userOptional.get());
+
+           // handle
+            Optional<Sharing> sharingOptional = sharingServiceImpl.findSharingBySpaceAndUser(spaceOptional.get() ,userOptional.get());
+
             Sharing sharing = sharingOptional.get();
             sharing.setInfoSharing(content);
-            Sharing sharingUpdated = sharingServiceImpl.saveSharing(sharing);
+            Sharing sharingUpdated =  sharingServiceImpl.saveSharing(sharing);
+
             return new ResponseEntity<>(new SharingResponse(0, "Update sharing successful!", sharingUpdated, 200), HttpStatus.OK);
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(new ResponseMessage(1, "Update Sharing Fail", 400), HttpStatus.BAD_REQUEST);
@@ -172,34 +177,33 @@ public class SharingController {
     }
 
     @DeleteMapping(value = "/delete-sharing")
-    public ResponseEntity<?> deleteSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId, HttpServletRequest request) {
+    public ResponseEntity<?> deleteSharing(@RequestParam(required = false, name = "spaceId") Integer spaceId , HttpServletRequest request) {
         try {
+
             // handle check user
             Optional<User> userOptional = getUserFromToken(request);
-            if (!userOptional.isPresent()) {
+            if (!userOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "User not found!", 404), HttpStatus.NOT_FOUND);
-            }
             // handle check space
             Optional<Space> spaceOptional = spaceService.findById(spaceId);
-            if (!spaceOptional.isPresent()) {
+            if (!spaceOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Space not found!", 404), HttpStatus.NOT_FOUND);
-            }
             // handle check status
             Integer statusCode = 2;
             Optional<Status> statusOptional = statusService.findBySpaceStatusId(statusCode);
-            if (!statusOptional.isPresent()) {
+            if (!statusOptional.isPresent())
                 return new ResponseEntity<>(new ResponseMessage(1, "Status not found!", 404), HttpStatus.NOT_FOUND);
-            }
+
             // handle check user has sharing
             Boolean existsSharing = sharingServiceImpl.existsSharingBySpaceAndUser(spaceOptional.get(), userOptional.get());
-            if (!existsSharing) {
+            if(!existsSharing)
                 return new ResponseEntity<>(new ResponseMessage(1, "This space is not yours to share!", 400), HttpStatus.BAD_REQUEST);
-            }
+
             Boolean isDeleteSharing = sharingServiceImpl.deleteSharing(spaceOptional.get());
-            if (isDeleteSharing) {
+            if(isDeleteSharing)
                 return new ResponseEntity<>(new ResponseMessage(0, "Delete sharing successful!", 200), HttpStatus.OK);
-            }
             return new ResponseEntity<>(new ResponseMessage(1, "Delete sharing fail!", 400), HttpStatus.BAD_REQUEST);
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(new ResponseMessage(1, "Delete sharing fail!", 400), HttpStatus.BAD_REQUEST);
