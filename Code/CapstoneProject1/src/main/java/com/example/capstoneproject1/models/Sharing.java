@@ -6,18 +6,18 @@ import javax.persistence.*;
 public class Sharing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sharingId")
+    @Column(name = "sharingId", columnDefinition = "int", nullable = false)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "spaceId")
+    @JoinColumn(name = "spaceId", columnDefinition = "int", nullable = false)
     private Space spaceId;
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", columnDefinition = "int", nullable = false)
     private User userId;
     @Column(name = "infoSharing", columnDefinition = "TEXT")
     private String infoSharing;
     @ManyToOne
-    @JoinColumn(name = "statusId")
+    @JoinColumn(name = "statusId", columnDefinition = "int", nullable = false)
     private Status status;
 
     public Sharing() {

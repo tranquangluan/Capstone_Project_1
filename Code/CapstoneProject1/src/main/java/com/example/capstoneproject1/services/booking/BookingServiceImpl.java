@@ -65,6 +65,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public Optional<Booking> findBookingById(Integer bookingId) {
+        return Optional.empty();
+    }
+    @Override
     public Boolean existsBookingWithUserAndOwner(User user, User owner) {
         return bookingRepository.existsBookingByUserAndOwner(user, owner);
     }

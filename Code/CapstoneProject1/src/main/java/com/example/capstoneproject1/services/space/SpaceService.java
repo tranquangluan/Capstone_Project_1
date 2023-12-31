@@ -44,8 +44,8 @@ public interface SpaceService {
     Integer countSpaceByStatus4();
     Integer countSpaceByStatus5();
     Page<Space> getPostSpaceByConditions(Integer pageNo, Integer pageSize, String sortBy, String sortDir, Integer categoryId, String province, String district, String ward, Integer ownerId);
-    List<Object[]> getStaticDashboardByDate(Integer date);
-    List<Object[]> getStaticDashboardByMonthAndYear(Integer month, Integer year);
-    List<Object[]> getStaticDashboardByYear(Integer year);
+    List<Object[]> getStaticPostByDate(Integer date);
+    List<Object[]> getStaticPostByMonthAndYear(Integer month, Integer year);
+    List<Object[]> getStaticPostByYear(Integer year);
     Map<String, Integer> convertToMap(List<Object[]> result);
 }

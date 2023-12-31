@@ -6,13 +6,13 @@ import javax.persistence.*;
 public class Favourite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "favouriteId")
+    @Column(name = "favouriteId", columnDefinition = "int", nullable = false)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "spaceId", referencedColumnName = "spaceId",foreignKey = @ForeignKey(name = "fk_favourite_space"))
+    @JoinColumn(name = "spaceId", columnDefinition = "int", referencedColumnName = "spaceId",foreignKey = @ForeignKey(name = "fk_favourite_space"))
     private Space space;
     @ManyToOne
-    @JoinColumn(name = "userId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_favourite_user"))
+    @JoinColumn(name = "userId", columnDefinition = "int",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_favourite_user"))
     private User user;
 
     public Favourite() {

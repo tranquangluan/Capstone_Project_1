@@ -5,9 +5,9 @@ import javax.persistence.*;
 @Entity
 public class Status {
     @Id
-    @Column(name="statusId")
+    @Column(name="statusId", columnDefinition = "int", nullable = false)
     private Integer id;
-    @Column(name="status")
+    @Column(name="status", columnDefinition = "nvarchar(30)")
     private String status;
     public Status() {
     }

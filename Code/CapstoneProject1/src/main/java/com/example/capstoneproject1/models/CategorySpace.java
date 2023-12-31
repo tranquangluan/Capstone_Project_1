@@ -5,9 +5,9 @@ import javax.persistence.*;
 @Entity
 public class CategorySpace {
     @Id
-    @Column(name = "categoryId")
+    @Column(name = "categoryId", columnDefinition = "int")
     private Integer id;
-    @Column(name = "categoryName")
+    @Column(name = "categoryName", columnDefinition = "nvarchar(50)")
     private String categoryName;
 
     public Integer getId() {

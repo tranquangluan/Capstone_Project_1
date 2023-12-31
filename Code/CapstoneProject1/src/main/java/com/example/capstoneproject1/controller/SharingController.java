@@ -49,7 +49,7 @@ public class SharingController {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    StatusServiceImpl statusService;
+    StatusService statusService;
 
     @Autowired
     SpaceService spaceService;
