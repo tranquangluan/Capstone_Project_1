@@ -8,14 +8,14 @@ import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.dto.response.space.SpaceResponse;
 import com.example.capstoneproject1.dto.response.user.UpdateAnDeleteUserResponse;
 import com.example.capstoneproject1.models.*;
-import com.example.capstoneproject1.repository.*;
+import com.example.capstoneproject1.repository.ImageRepository;
+import com.example.capstoneproject1.repository.StatusRepository;
+import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.category.CategoryService;
-import com.example.capstoneproject1.services.image.ImageService;
 import com.example.capstoneproject1.services.notification.NotificationService;
-import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.space.SpaceServiceImpl;
 import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
@@ -178,9 +178,11 @@ public class SpaceController {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userRepository.findByEmail(userEmail);
+
             if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
             }
+
             if (spaceUpdateForm.getCategoryId() != null) {
                 Optional<CategorySpace> categorySpaceOptional = categoryService.findById(spaceUpdateForm.getCategoryId());
                 if (!categorySpaceOptional.isPresent()) {
@@ -226,6 +228,13 @@ public class SpaceController {
                     return new ResponseEntity<>(new ResponseMessage(1, "Requires at least 1 image!", 401), HttpStatus.BAD_REQUEST);
                 }
             }
+            // update status when repost space
+            Space space = spaceOptional.get();
+            Integer deniedId = 5;
+            Integer pendingId = 3;
+            if(space.getStatus().getId().equals(deniedId))
+                space.setStatus(statusService.findBySpaceStatusId(pendingId).get());
+            spaceServiceImpl.saveSpace(space);
             return new ResponseEntity<>(new SpaceResponse(0, "Update space successfully!", spaceOptional.get(), 200), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -290,6 +299,13 @@ public class SpaceController {
         Status status = statusOptional.get();
 
         if (spaceServiceImpl.updateStatus(spaceId, status)) {
+            User sender = userOptional.get();
+            User receiver = spaceOptional.get().getOwnerId();
+            // add the notification
+            Boolean isCreated = notificationService.createMessage(sender, receiver, "Approve", "Your post has been " + (statusCode == 0 ? "accepted." : "rejected"));
+            if(!isCreated)
+                return new ResponseEntity<>(new SpaceResponse(0, "Create new feedback fail!", 400), HttpStatus.BAD_REQUEST);
+
             return new ResponseEntity<>(new ResponseMessage(0, "Update space successfully!", 200), HttpStatus.OK);
         }
 

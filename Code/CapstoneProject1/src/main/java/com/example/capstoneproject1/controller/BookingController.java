@@ -1,6 +1,5 @@
 package com.example.capstoneproject1.controller;
 
-import com.example.capstoneproject1.dto.request.BookingForm;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
 import com.example.capstoneproject1.dto.response.booking.BookingResponse;
 import com.example.capstoneproject1.dto.response.booking.ListBookingResponse;
@@ -10,7 +9,6 @@ import com.example.capstoneproject1.models.Status;
 import com.example.capstoneproject1.models.User;
 import com.example.capstoneproject1.services.ZaloPayService;
 import com.example.capstoneproject1.services.booking.BookingService;
-import com.example.capstoneproject1.services.booking.BookingServiceImpl;
 import com.example.capstoneproject1.services.space.SpaceService;
 import com.example.capstoneproject1.services.status.StatusService;
 import com.example.capstoneproject1.services.user.UserService;
@@ -21,14 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -119,7 +112,8 @@ public class BookingController {
     @DeleteMapping("/delete-booking")
     public ResponseEntity<?> deleteBooking(@RequestParam(name = "id") Integer id) {
         try {
-            Booking booking = bookingService.findBookingById(id);
+            Optional<Booking> bookingOptional = bookingService.findBookingById(id);
+            Booking booking = bookingOptional.get();
             if (booking == null) {
                 return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 404), HttpStatus.NOT_FOUND);
             } else if (booking.getPaid().compareTo(BigDecimal.ZERO) != 0) {

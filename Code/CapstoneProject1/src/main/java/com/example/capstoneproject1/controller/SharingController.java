@@ -13,7 +13,7 @@ import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
 import com.example.capstoneproject1.services.sharing.SharingService;
 import com.example.capstoneproject1.services.space.SpaceService;
-import com.example.capstoneproject1.services.status.StatusService;
+import com.example.capstoneproject1.services.status.StatusServiceImpl;
 import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

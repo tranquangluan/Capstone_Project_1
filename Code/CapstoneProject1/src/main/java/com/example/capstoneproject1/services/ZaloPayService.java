@@ -260,7 +260,7 @@ public class ZaloPayService {
         Map<String, Object> order = new HashMap<String, Object>(){{
             put("app_id", ZalopayConstant.APP_ID);
             put("zp_trans_id", refundRequestDTO.getZpTransId());
-            put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ ZalopayConstant.APP_ID +"_"+
+            put("m_refund_id", getCurrentTimeString("yyMMdd") +""+ ZalopayConstant.APP_ID +""+
                     System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
             put("timestamp", System.currentTimeMillis());
             put("amount", refundRequestDTO.getAmount());

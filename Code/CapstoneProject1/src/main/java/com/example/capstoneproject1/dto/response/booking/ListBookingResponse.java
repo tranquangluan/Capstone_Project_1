@@ -22,6 +22,14 @@ public class ListBookingResponse {
         this.status = status;
     }
 
+    public ListBookingResponse(Integer error, String message, Integer bookingQuantity, List<Booking> listBookings, Integer status) {
+        this.error = error;
+        this.message = message;
+        this.BookingQuantity = bookingQuantity;
+        this.listBookings = listBookings;
+        this.status = status;
+    }
+
     public ListBookingResponse(Integer error, String message, Integer bookingQuantity, Integer totalPages, List<Booking> listBookings, Integer status) {
         this.error = error;
         this.message = message;

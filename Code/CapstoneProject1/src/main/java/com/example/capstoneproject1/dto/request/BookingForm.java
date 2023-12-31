@@ -9,19 +9,16 @@ public class BookingForm {
     @NotNull
     private Integer spaceId;
     @NotNull
-    private Integer status;
+    private BigDecimal totalPrice;
     public BookingForm() {
     }
 
-
-
-    public Integer getStatus() {
-        return status;
+    public BookingForm(Integer userId, Integer spaceId, BigDecimal totalPrice) {
+        this.userId = userId;
+        this.spaceId = spaceId;
+        this.totalPrice = totalPrice;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 
     public Integer getUserId() {
         return userId;
@@ -39,6 +36,12 @@ public class BookingForm {
         this.spaceId = spaceId;
     }
 
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
 
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
 }
