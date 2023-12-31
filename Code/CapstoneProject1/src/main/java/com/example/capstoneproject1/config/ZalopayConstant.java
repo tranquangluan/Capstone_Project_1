@@ -8,6 +8,5 @@ public class ZalopayConstant {
     public static final String ORDER_CREATE_ENDPOINT = "https://sandbox.zalopay.com.vn/v001/tpe/createorder";
     public static final String ORDER_STATUS_ENDPOINT = "https://sandbox.zalopay.com.vn/v001/tpe/getstatusbyapptransid";
     public static final String REFUND_PAYMENT_ENDPOINT = "https://sandbox.zalopay.com.vn/v001/tpe/partialrefund";
-
     public static final String REFUND_STATUS_PAYMENT_ENDPOINT = "https://sandbox.zalopay.com.vn/v001/tpe/getpartialrefundstatus";
 }

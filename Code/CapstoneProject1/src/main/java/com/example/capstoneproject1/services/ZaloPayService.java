@@ -117,7 +117,7 @@ public class ZaloPayService {
         User user = userService.findByUserId(userId);
         String appUser = user.getName();
         Space space = spaceService.findSpaceById(id);
-
+        String appTransId = getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime();
         Map<String,Object> spa = new HashMap<String, Object>(){{
             put("id", space.getId());
             put("price",space.getPrice());
@@ -126,7 +126,7 @@ public class ZaloPayService {
         if(appUser != ""){
             Map<String, Object> order = new HashMap<String, Object>(){{
                 put("appid", ZalopayConstant.APP_ID);
-                put("apptransid", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime()); // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
+                put("apptransid", appTransId); // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
                 put("apptime", System.currentTimeMillis()); // miliseconds
                 put("appuser", appUser);
                 put("amount", space.getPrice().longValue());
@@ -169,6 +169,7 @@ public class ZaloPayService {
                 String key = (String) it.next();
                 finalResult.put(key, jsonResult.get(key));
             }
+            finalResult.put("apptransid", appTransId);
             return finalResult;
         }
 

@@ -13,6 +13,7 @@ public interface BookingService {
     Page<Booking> getAllBookings(Integer pageNo, Integer pageSize, String sortBy, String sortDir, BigDecimal priceFrom, BigDecimal priceTo, Integer status, Integer ownerId);
 
 
+
     Booking findById(Integer id);
     Optional<Booking> findBookingById(Integer bookingId);
     void delete(Integer id);

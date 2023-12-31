@@ -1,22 +1,27 @@
 package com.example.capstoneproject1.dto.response.dashboard;
 
-import com.example.capstoneproject1.models.Space;
-
-import java.util.List;
 import java.util.Map;
 
 public class StaticResponse {
     private Integer error;
     private String message;
 
-    private Map<String,Integer> totalMap;
+    private Map<String,Integer> mapStaticPost;
+    private Map<String,Integer> mapStaticBooking;
     private Integer status;
 
-
-    public StaticResponse(Integer error, String message, Map<String, Integer> totalMap, Integer status) {
+    public StaticResponse(Integer error, String message, Map<String, Integer> mapStaticPost, Map<String, Integer> mapStaticBooking, Integer status) {
         this.error = error;
         this.message = message;
-        this.totalMap = totalMap;
+        this.mapStaticPost = mapStaticPost;
+        this.mapStaticBooking = mapStaticBooking;
+        this.status = status;
+    }
+
+    public StaticResponse(Integer error, String message, Map<String, Integer> mapStaticPost, Integer status) {
+        this.error = error;
+        this.message = message;
+        this.mapStaticPost = mapStaticPost;
         this.status = status;
     }
 
@@ -44,11 +49,19 @@ public class StaticResponse {
         this.status = status;
     }
 
-    public Map<String, Integer> getTotalMap() {
-        return totalMap;
+    public Map<String, Integer> getMapStaticPost() {
+        return mapStaticPost;
     }
 
-    public void setTotalMap(Map<String, Integer> totalMap) {
-        this.totalMap = totalMap;
+    public void setMapStaticPost(Map<String, Integer> mapStaticPost) {
+        this.mapStaticPost = mapStaticPost;
+    }
+
+    public Map<String, Integer> getMapStaticBooking() {
+        return mapStaticBooking;
+    }
+
+    public void setMapStaticBooking(Map<String, Integer> mapStaticBooking) {
+        this.mapStaticBooking = mapStaticBooking;
     }
 }

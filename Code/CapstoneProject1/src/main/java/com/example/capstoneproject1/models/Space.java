@@ -17,44 +17,45 @@ import java.util.List;
 public class Space {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "spaceId")
+    @Column(name = "spaceId", columnDefinition = "int", nullable = false)
     private Integer id;
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "nvarchar(255)")
     private String title;
     @ManyToOne
-    @JoinColumn(name = "statusId")
+    @JoinColumn(name = "statusId", columnDefinition = "int", nullable = false)
     private Status status;
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "DECIMAL(10,2)", nullable = false)
     @Min(1)
     private BigDecimal price;
     @OneToMany(mappedBy = "spaceId")
     private List<Image> images;
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-    @Column(name = "bathroomNumbers")
+    @Column(name = "bathroomNumbers", columnDefinition = "int default 0")
     private Integer bathroomNumbers;
-    @Column(name = "bedroomNumbers")
+    @Column(name = "bedroomNumbers", columnDefinition = "int default 0")
     private Integer bedroomNumbers;
-    @Column(name = "peopleNumbers")
+    @Column(name = "peopleNumbers", columnDefinition = "int default 0")
     private Integer peopleNumbers;
-    @Column(name = "area")
+    @Column(name = "area", columnDefinition = "float")
     @Min(1)
     private float area;
-    @Column(name = "province")
+    @Column(name = "province", columnDefinition = "nvarchar(50)")
     private String province;
-    @Column(name = "district")
+    @Column(name = "district", columnDefinition = "nvarchar(50)")
     private String district;
-    @Column(name = "ward")
+    @Column(name = "ward", columnDefinition = "nvarchar(50)")
     private String ward;
-    @Column(name = "address")
+    @Column(name = "address", columnDefinition = "nvarchar(255)")
     private String address;
     @ManyToOne
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "categoryId", columnDefinition = "int", nullable = false)
     private CategorySpace categoryId;
     @ManyToOne
     @JoinColumn(name = "ownerId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_space_user"))
     private User ownerId ;
-    @Column(name = "createdAt", nullable = true, updatable = false)
+
+    @Column(name = "createdAt", columnDefinition = "DATETIME", nullable = true, updatable = false)
     @CreationTimestamp
     private Date createdAt;
     @OneToMany(mappedBy = "space", orphanRemoval = true)

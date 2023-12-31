@@ -7,9 +7,9 @@ import javax.persistence.Id;
 @Entity
 public class Role {
     @Id
-    @Column(name = "roleCode" , length = 10)
+    @Column(name = "roleCode", columnDefinition = "varchar(10)", length = 10)
     private String roleCode;
-    @Column(name = "roleValue" , length = 10)
+    @Column(name = "roleValue", columnDefinition = "varchar(10)" , length = 10)
     private String roleValue;
 
     public Role() {

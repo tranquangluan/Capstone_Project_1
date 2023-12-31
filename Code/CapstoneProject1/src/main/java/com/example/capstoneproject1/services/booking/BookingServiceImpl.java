@@ -67,6 +67,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.deleteBookingById(id);
     }
 
+
     @Override
     public Boolean existsBookingWithUserAndOwner(User user, User owner) {
         return bookingRepository.existsBookingByUserAndOwner(user, owner);

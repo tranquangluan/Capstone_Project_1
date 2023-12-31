@@ -205,17 +205,17 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     @Override
-    public List<Object[]> getStaticDashboardByDate(Integer date) {
-        return spaceRepository.getStaticDashboardByDate(date);
+    public List<Object[]> getStaticPostByDate(Integer date) {
+        return spaceRepository.getStaticPostByDate(date);
     }
     @Override
-    public List<Object[]> getStaticDashboardByMonthAndYear(Integer month, Integer year) {
-        return spaceRepository.getStaticDashboardByMonthAndYear(month,year);
+    public List<Object[]> getStaticPostByMonthAndYear(Integer month, Integer year) {
+        return spaceRepository.getStaticPostByMonthAndYear(month,year);
     }
 
     @Override
-    public List<Object[]> getStaticDashboardByYear(Integer year) {
-        return spaceRepository.getStaticDashboardByYear(year);
+    public List<Object[]> getStaticPostByYear(Integer year) {
+        return spaceRepository.getStaticPostByYear(year);
     }
     @Override
     public Map<String, Integer> convertToMap(List<Object[]> result) {

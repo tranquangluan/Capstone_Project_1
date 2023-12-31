@@ -1,40 +1,46 @@
 package com.example.capstoneproject1.models;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookingId")
+    @Column(name = "bookingId", columnDefinition = "int")
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", columnDefinition = "int")
     private  User userId;
     @ManyToOne
-    @JoinColumn(name = "spaceId")
+    @JoinColumn(name = "spaceId", columnDefinition = "int")
     private  Space spaceId;
-    @Column(name = "totalPrice")
+    @Column(name = "totalPrice", columnDefinition = "DECIMAL(10,2)")
     private BigDecimal totalPrice;
     @ManyToOne
     @JoinColumn(name = "status")
     private Status status;
-    @Column(name = "bookingDate", nullable = false, updatable = false)
+    @Column(name = "bookingDate", columnDefinition = "DATETIME", nullable = false, updatable = false)
     @CreationTimestamp
     private Date date;
-    @Column(name = "paid")
+    @Column(name = "dateArrive", columnDefinition = "DATETIME", nullable = false)
+    private Date dateArrive;
+    @Column(name = "comment", columnDefinition = "nvarchar(255)")
+    private String comment;
+    @Column(name = "paid", columnDefinition = "DECIMAL(10,2)")
     private BigDecimal paid;
 
-    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date date, BigDecimal paid) {
+    public Booking(User userId, Space spaceId, BigDecimal totalPrice, Status status, Date dateArrive, String comment, BigDecimal paid) {
         this.userId = userId;
         this.spaceId = spaceId;
         this.totalPrice = totalPrice;
         this.status = status;
-        this.date = date;
+        this.dateArrive = dateArrive;
+        this.comment = comment;
         this.paid = paid;
     }
 
@@ -105,5 +111,21 @@ public class Booking {
 
     public void setPaid(BigDecimal paid) {
         this.paid = paid;
+    }
+
+    public Date getDateArrive() {
+        return dateArrive;
+    }
+
+    public void setDateArrive(Date dateArrive) {
+        this.dateArrive = dateArrive;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

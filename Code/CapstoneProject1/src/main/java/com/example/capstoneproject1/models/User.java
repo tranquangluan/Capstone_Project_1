@@ -3,6 +3,8 @@ package com.example.capstoneproject1.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,40 +15,44 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userID")
+    @Column(name = "userID", columnDefinition = "int", nullable = false)
     private Integer id;
-    @Column(name = "userName", length = 50)
+    @Column(name = "userName", columnDefinition = "nvarchar(30)")
     private String name;
     @Column(name = "gender")
     private Boolean gender;
     @Column(name = "dateOfBirth")
     private Date dateOfBirth;
-    @Column(name = "phone", length = 11)
+    @Column(name = "phone", columnDefinition = "varchar(11)")
+    @Size(min = 10, max = 11, message = "Phone number must be between 10 and 11 digits.")
+    @Pattern(regexp = "\\d{10,11}", message = "Phone number must contain only digits.")
     private String phone;
-    @Column(name = "email",unique = true,nullable = false)
+    @Column(name = "email", columnDefinition = "varchar(50)", unique = true, nullable = false)
     private String email;
-    @Column(name = "avatarId")
+    @Column(name = "avatarId", columnDefinition = "varchar(50)")
     private String avatarId;
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "varchar(255)")
     private String avatar;
-    @Column(name = "province")
+    @Column(name = "province", columnDefinition = "varchar(50)")
     private String province;
-    @Column(name = "district")
+    @Column(name = "district", columnDefinition = "varchar(50)")
     private String district;
-    @Column(name = "ward")
+    @Column(name = "ward", columnDefinition = "varchar(50)")
     private String ward;
-    @Column(name = "address")
+    @Column(name = "address", columnDefinition = "varchar(255)")
     private String address;
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", columnDefinition = "varchar(255)", nullable = false)
+    @Size(min = 6, message = "Password must be at least 6 characters long.")
     @JsonIgnore
     private String password;
-    @Column(name = "refreshToken")
+    @Column(name = "refreshToken", columnDefinition = "varchar(255)")
     @JsonIgnore
     private String refreshToken;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Column(columnDefinition = "nvarchar(10)")
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)

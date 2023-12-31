@@ -12,7 +12,7 @@ public class Image {
     @Column(name = "imageUrl")
     private String imageUrl;
     @ManyToOne
-    @JoinColumn(name = "spaceId")
+    @JoinColumn(name = "spaceId", columnDefinition = "int")
     @JsonIgnore
     private Space spaceId;
 

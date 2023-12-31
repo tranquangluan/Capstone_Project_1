@@ -97,6 +97,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             @Param("spaceId") Integer spaceId,
             @Param("statusId") Status status
     );
+
     @Transactional
     @Modifying
     @Query("UPDATE Space s SET " +
@@ -143,26 +144,89 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             Pageable pageable
     );
 
-    @Query(value = "SELECT DATE(created_at) AS date, COUNT(*) AS count\n" +
-            "FROM space\n" +
-            "WHERE status_id = 0 and created_at >= DATE_SUB(CURDATE(), INTERVAL :date DAY)\n" +
-            "GROUP BY DATE(created_at)\n" +
-            "ORDER BY DATE(created_at) DESC;", nativeQuery = true)
-    List<Object[]> getStaticDashboardByDate(@Param("date") Integer date);
-    @Query(value = "SELECT DATE(created_at) AS date,COUNT(*) AS total\n" +
-            "FROM space\n" +
-            "WHERE status_id = 0 and month(created_at) =:month AND year(created_at) =:year\n" +
-            "GROUP BY DATE(created_at);;", nativeQuery = true)
-    List<Object[]> getStaticDashboardByMonthAndYear(
+    @Query(value = "SELECT dates.date, COUNT(s.space_id) AS count " +
+            "FROM (SELECT CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY AS date " +
+            "      FROM (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "            UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS a " +
+            "      CROSS JOIN (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS b " +
+            "      CROSS JOIN (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS c " +
+            "     ) AS dates " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "WHERE dates.date >= DATE_SUB(CURDATE(), INTERVAL :date DAY) " +
+            "GROUP BY dates.date " +
+            "ORDER BY dates.date DESC", nativeQuery = true)
+    List<Object[]> getStaticPostByDate(@Param("date") Integer date);
+
+    @Query(value = "SELECT DATE(dates.date) AS date, COUNT(s.space_id) AS total " +
+            "FROM " +
+            "(SELECT DATE(DATE_SUB(CONCAT(:year, '-', :month, '-01'), INTERVAL 1 DAY) + INTERVAL a + b DAY) AS date " +
+            "FROM " +
+            "(SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS a, " +
+            "(SELECT 0 AS b UNION ALL SELECT 10 UNION ALL SELECT 20 UNION ALL SELECT 30) AS b) AS dates " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "WHERE MONTH(dates.date) = :month AND YEAR(dates.date) = :year " +
+            "GROUP BY dates.date " +
+            "ORDER BY dates.date", nativeQuery = true)
+    List<Object[]> getStaticPostByMonthAndYear(
             @Param("month") Integer month,
             @Param("year") Integer year);
-    @Query(value = "SELECT EXTRACT(MONTH FROM created_at) AS month,COUNT(*) AS total\n" +
-            "FROM space\n" +
-            "WHERE status_id = 0 and YEAR(created_at) = :year " +
-            "GROUP BY EXTRACT(MONTH FROM created_at);", nativeQuery = true)
-    List<Object[]> getStaticDashboardByYear(@Param("year") Integer year);
 
+    @Query(value = "SELECT months.month, COALESCE(totals.total, 0) AS total " +
+            "FROM " +
+            "(SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 " +
+            "UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months " +
+            "LEFT JOIN " +
+            "(SELECT EXTRACT(MONTH FROM created_at) AS month, COUNT(*) AS total " +
+            "FROM space " +
+            "WHERE YEAR(created_at) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM created_at)) AS totals " +
+            "ON months.month = totals.month " +
+            "ORDER BY months.month", nativeQuery = true)
+    List<Object[]> getStaticPostByYear(@Param("year") Integer year);
 
+    @Query(value = "SELECT dates.date, COUNT(s.space_id) AS count " +
+            "FROM (SELECT CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY AS date " +
+            "      FROM (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "            UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS a " +
+            "      CROSS JOIN (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS b " +
+            "      CROSS JOIN (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS c " +
+            "     ) AS dates " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "WHERE dates.date >= DATE_SUB(CURDATE(), INTERVAL :date DAY) " +
+            "GROUP BY dates.date " +
+            "ORDER BY dates.date DESC", nativeQuery = true)
+    List<Object[]> getStaticBookingByDate(@Param("date") Integer date);
 
+    @Query(value = "SELECT DATE(dates.date) AS date, COUNT(s.space_id) AS total " +
+            "FROM " +
+            "(SELECT DATE(DATE_SUB(CONCAT(:year, '-', :month, '-01'), INTERVAL 1 DAY) + INTERVAL a + b DAY) AS date " +
+            "FROM " +
+            "(SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS a, " +
+            "(SELECT 0 AS b UNION ALL SELECT 10 UNION ALL SELECT 20 UNION ALL SELECT 30) AS b) AS dates " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "WHERE MONTH(dates.date) = :month AND YEAR(dates.date) = :year " +
+            "GROUP BY dates.date " +
+            "ORDER BY dates.date", nativeQuery = true)
+    List<Object[]> getStaticBookingByMonthAndYear(
+            @Param("month") Integer month,
+            @Param("year") Integer year);
 
+    @Query(value = "SELECT months.month, COALESCE(totals.total, 0) AS total " +
+            "FROM " +
+            "(SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 " +
+            "UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months " +
+            "LEFT JOIN " +
+            "(SELECT EXTRACT(MONTH FROM created_at) AS month, COUNT(*) AS total " +
+            "FROM space " +
+            "WHERE YEAR(created_at) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM created_at)) AS totals " +
+            "ON months.month = totals.month " +
+            "ORDER BY months.month", nativeQuery = true)
+    List<Object[]> getStaticBookingByYear(@Param("year") Integer year);
 }

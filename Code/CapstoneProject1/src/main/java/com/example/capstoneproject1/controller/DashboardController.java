@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.time.Year;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,6 @@ public class DashboardController {
     @Autowired
     SpaceRepository spaceRepository;
 
-    SpaceServiceImpl spaceServiceImpl;
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/overview")
@@ -68,18 +68,51 @@ public class DashboardController {
     }
 
     @PreAuthorize("hasAnyAuthority('Admin')")
+//    @PostMapping("/static")
+//    public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "date") Integer date,
+//                                           @RequestParam(required = false, name = "month") Integer month,
+//                                           @RequestParam(required = false, name = "year") Integer year) {
+//        try {
+//            List<Object[]> result = new ArrayList<>();
+//            if (date!=null && month == null && year == null){
+//                result = spaceService.getStaticDashboardByDate(date);
+//            } else if (date == null && month!=null) {
+//                if (year == null){
+//                    year = Year.now().getValue();
+//                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
+//                }else {
+//                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
+//                }
+//            } else if (date==null && month == null && year !=null){
+//                result = spaceService.getStaticDashboardByYear(year);
+//            }
+//            Map<String, Integer> staticMap = spaceService.convertToMap(result);
+//            if (!staticMap.isEmpty()){
+//                return new ResponseEntity<>(new StaticResponse(0,"Get Static Successfully!",staticMap,200), HttpStatus.OK);
+//            }
+//            return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+//        }
+//    }
     @PostMapping("/static")
     public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "date") Integer date,
                                            @RequestParam(required = false, name = "month") Integer month,
                                            @RequestParam(required = false, name = "year") Integer year) {
         try {
             List<Object[]> result = new ArrayList<>();
-            if (date!=null){
-                result = spaceService.getStaticDashboardByDate(date);
-            } else if (month!=null) {
-                result = spaceService.getStaticDashboardByMonthAndYear(month, year);
-            } else if (year !=null){
-                result = spaceService.getStaticDashboardByYear(year);
+            List<Object[]> result1 = new ArrayList<>();
+            if (date!=null && month == null && year == null){
+                result = spaceService.getStaticPostByDate(date);
+            } else if (date == null && month!=null) {
+                if (year == null){
+                    year = Year.now().getValue();
+                    result = spaceService.getStaticPostByMonthAndYear(month, year);
+                }else {
+                    result = spaceService.getStaticPostByMonthAndYear(month, year);
+                }
+            } else if (date==null && month == null && year !=null){
+                result = spaceService.getStaticPostByYear(year);
             }
             Map<String, Integer> staticMap = spaceService.convertToMap(result);
             if (!staticMap.isEmpty()){

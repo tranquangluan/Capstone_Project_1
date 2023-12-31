@@ -11,22 +11,21 @@ import java.sql.Timestamp;
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "feedBackId")
+    @Column(name = "feedBackId", columnDefinition = "int", nullable = false)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "senderFeedBackId")
+    @JoinColumn(name = "senderFeedBackId", columnDefinition = "int", nullable = false)
     private User userSendFeedBack;
     @ManyToOne
-    @JoinColumn(name = "receiverFeedBackId")
+    @JoinColumn(name = "receiverFeedBackId", columnDefinition = "int", nullable = false)
     private User userReceiveFeedBack;
-    @Column(name = "rate")
+    @Column(name = "rate", columnDefinition = "int")
     @Min(0)
     @Max(5)
     private Integer rate;
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
-
-    @Column(name = "createdAt", nullable = false, updatable = false)
+    @Column(name = "createdAt", columnDefinition = "DATETIME", nullable = false, updatable = false)
     @CreationTimestamp
     private Timestamp createdAt;
 

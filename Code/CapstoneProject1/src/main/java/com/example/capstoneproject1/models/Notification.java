@@ -7,27 +7,27 @@ import java.sql.Date;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notificationId")
+    @Column(name = "notificationId", columnDefinition = "int")
     private Long notificationId;
 
     @ManyToOne
-    @JoinColumn(name = "senderId")
+    @JoinColumn(name = "senderId", columnDefinition = "int")
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "receiverId")
+    @JoinColumn(name = "receiverId", columnDefinition = "int")
     private User receiver;
 
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "TEXT")
     private String type;
     @Column(name = "content")
     private  String content;
 
     @ManyToOne
-    @JoinColumn(name = "statusId")
+    @JoinColumn(name = "statusId", columnDefinition = "int")
     private Status status;
 
-    @Column(name = "createdAt", nullable = false, updatable = false)
+    @Column(name = "createdAt", columnDefinition = "DATETIME", nullable = false, updatable = false)
     @CreationTimestamp
     private Date createdAt;
 
