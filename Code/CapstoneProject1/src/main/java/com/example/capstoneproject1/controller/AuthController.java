@@ -15,11 +15,8 @@ import com.example.capstoneproject1.security.userPrincal.UserDetailService;
 import com.example.capstoneproject1.security.userPrincal.UserPrinciple;
 import com.example.capstoneproject1.services.auth.AuthService;
 import com.example.capstoneproject1.services.email.EmailService;
-import com.example.capstoneproject1.services.email.EmailServiceImpl;
 import com.example.capstoneproject1.services.role.RoleService;
-import com.example.capstoneproject1.services.role.RoleServiceImpl;
 import com.example.capstoneproject1.services.user.UserService;
-import com.example.capstoneproject1.services.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +44,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
+@Validated
 public class AuthController {
 
     @Autowired
@@ -134,21 +133,24 @@ public class AuthController {
             MediaType.APPLICATION_JSON_VALUE
     })
     public @ResponseBody ResponseEntity<?> login(@Valid SignInForm signInForm) {
-        System.out.println(signInForm.getEmail());
-        System.out.println(signInForm.getPassword());
-        Optional<User> userOptional = userService.findByEmail(signInForm.getEmail());
-        if (!userOptional.isPresent()) {
-            return new ResponseEntity<>(new ResponseMessage(1, "Email Hasn't Been Registered!", 404), HttpStatus.NOT_FOUND);
+
+        try {
+            Optional<User> userOptional = userService.findByEmail(signInForm.getEmail());
+            if (!userOptional.isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Email Hasn't Been Registered!", 404), HttpStatus.NOT_FOUND);
+            }
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtTokenProvider.generateToken(authentication);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+            if (refreshToken != null) {
+                authService.saveRefreshToken(signInForm.getEmail(), refreshToken);
+            }
+            UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+            return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken, "Bearer", userPrinciple.getAuthorities()));
+        }catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(1, "Login fail!", 400), HttpStatus.BAD_REQUEST);
         }
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getEmail(), signInForm.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.generateToken(authentication);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
-        if (refreshToken != null) {
-            authService.saveRefreshToken(signInForm.getEmail(), refreshToken);
-        }
-        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return ResponseEntity.ok(new JwtResponse("Login Successful", token, refreshToken, "Bearer", userPrinciple.getAuthorities()));
     }
 
     @PostMapping(value = "/refresh-token", consumes = {
@@ -263,6 +265,7 @@ public class AuthController {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
 
 
 }

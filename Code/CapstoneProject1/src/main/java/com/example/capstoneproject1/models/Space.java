@@ -54,7 +54,8 @@ public class Space {
     @ManyToOne
     @JoinColumn(name = "ownerId",referencedColumnName = "userId",foreignKey = @ForeignKey(name = "fk_space_user"))
     private User ownerId ;
-    @Column(name = "createdAt", columnDefinition = "DATETIME", nullable = false, updatable = false)
+
+    @Column(name = "createdAt", columnDefinition = "DATETIME", nullable = true, updatable = false)
     @CreationTimestamp
     private Date createdAt;
     @OneToMany(mappedBy = "space", orphanRemoval = true)

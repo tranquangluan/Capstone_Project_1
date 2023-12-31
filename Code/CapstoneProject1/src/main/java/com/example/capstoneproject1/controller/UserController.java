@@ -1,19 +1,18 @@
 package com.example.capstoneproject1.controller;
 
 import com.example.capstoneproject1.dto.request.UserEditForm;
-import com.example.capstoneproject1.dto.response.user.ListUsersResponse;
 import com.example.capstoneproject1.dto.response.ResponseMessage;
+import com.example.capstoneproject1.dto.response.user.ListUsersResponse;
 import com.example.capstoneproject1.dto.response.user.PageUser;
 import com.example.capstoneproject1.dto.response.user.UpdateAnDeleteUserResponse;
 import com.example.capstoneproject1.dto.response.user.UserResponse;
 import com.example.capstoneproject1.models.Role;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.repository.UserRepository;
 import com.example.capstoneproject1.security.jwt.JwtTokenFilter;
 import com.example.capstoneproject1.security.jwt.JwtTokenProvider;
 import com.example.capstoneproject1.services.CloudinaryService;
-import com.example.capstoneproject1.services.user.UserService;
 import com.example.capstoneproject1.services.role.RoleService;
+import com.example.capstoneproject1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -169,7 +168,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @PutMapping("/update-user")
-    public ResponseEntity<?> getAllUsers(@RequestParam(required = true, name = "userId") Integer userId,
+    public ResponseEntity<?> updateUser(@RequestParam(required = true, name = "userId") Integer userId,
                                          @RequestParam(required = true, name = "role") String role, HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
@@ -207,7 +206,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @DeleteMapping("/delete-user")
-    public ResponseEntity<?> getAllUsers(@RequestParam(required = true, name = "userId") Integer userId, HttpServletRequest request) {
+    public ResponseEntity<?> deleteUser(@RequestParam(required = true, name = "userId") Integer userId, HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -230,5 +229,40 @@ public class UserController {
             return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
+    // update role
+    @PreAuthorize("hasAnyAuthority('User')")
+    @PutMapping("/register-owner")
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
+        try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userService.findByEmail(userEmail);
+
+            // user not found
+            if (!userOptional.isPresent())
+                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+
+            Optional<Role> roleUser = roleService.findByRoleCode("R2");
+            if (!roleUser.isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Role Not Found!", 404), HttpStatus.NOT_FOUND);
+            }
+            //  delete old role
+            Integer userId = userOptional.get().getId();
+            userService.deleteRoleByUserId(userId);
+
+            Set<Role> roles = userOptional.get().getRoles();
+            // Set role
+            roles.add(roleUser.get());
+            userOptional.get().setRoles(roles);
+            // Update User
+            userService.save(userOptional.get());
+            return new ResponseEntity<>(new UpdateAnDeleteUserResponse(0, "Register owner Successful!", userOptional.get(), 200), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println( e.getMessage());
+            return new ResponseEntity<>(new ResponseMessage(1,"Register owner fail!", 400), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 }

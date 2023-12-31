@@ -1,22 +1,21 @@
 package com.example.capstoneproject1.services.booking;
 
-import com.example.capstoneproject1.dto.response.space.PageSpace;
 import com.example.capstoneproject1.models.Booking;
 import com.example.capstoneproject1.models.User;
-import com.example.capstoneproject1.models.Space;
 import com.example.capstoneproject1.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import java.util.Optional;
 
 
@@ -29,13 +28,6 @@ public class BookingServiceImpl implements BookingService {
     public void saveBooking(Booking booking) {
         bookingRepository.save(booking);
     }
-
-//    @Override
-//    public Booking findBookingById(Integer id) {
-//        return bookingRepository.findBookingById(id);
-//    }
-
-
 
     @Override
     public void deleteBookingById(Integer id) {
@@ -65,10 +57,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Override
-    public Optional<Booking> findBookingById(Integer bookingId) {
-        return bookingRepository.findById(bookingId);
-    }
+
 
     @Override
     public Boolean updateBookingDateArrive(Integer id, Date dayArrive) {
@@ -80,6 +69,22 @@ public class BookingServiceImpl implements BookingService {
             return false;
         }
     }
+
+    public Booking findById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Optional<Booking> findBookingById(Integer bookingId) {
+        return bookingRepository.findById(bookingId);
+    }
+
+    @Override
+    public void delete(Integer id) {
+        bookingRepository.deleteBookingById(id);
+    }
+
+
 
     @Override
     public Boolean existsBookingWithUserAndOwner(User user, User owner) {

@@ -22,6 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URISyntaxException;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -152,11 +157,12 @@ public class BookingController {
             return new ResponseEntity<>(new BookingResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping("/create-booking1")
     public ResponseEntity<?> createBooking1(@RequestParam(name = "id") Integer id,
-                                           @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
-                                           @RequestParam(name = "comment", required = false) String comment,
-                                           HttpServletRequest request) {
+                                            @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
+                                            @RequestParam(name = "comment", required = false) String comment,
+                                            HttpServletRequest request) {
         try {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
@@ -168,7 +174,7 @@ public class BookingController {
             if (!spaceOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
             }
-            if (spaceOptional.get().getOwnerId().getId() == userOptional.get().getId()){
+            if (spaceOptional.get().getOwnerId().getId() == userOptional.get().getId()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "You cannot book your own space!", 400), HttpStatus.BAD_REQUEST);
             }
             Date now = new Date();
@@ -259,4 +265,5 @@ public class BookingController {
             return new ResponseEntity<>(new ResponseMessage(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
+
 }
