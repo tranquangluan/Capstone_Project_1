@@ -241,29 +241,6 @@ public class BookingController {
             return new ResponseEntity<>(new ResponseMessage(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
         }
     }
-
-    @DeleteMapping("/delete-booking")
-    public ResponseEntity<?> deleteBooking(@RequestParam(name = "id") Integer id) {
-        try {
-            Optional<Booking> bookingOptional = bookingService.findBookingById(id);
-            if (!bookingOptional.isPresent()) {
-                return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 404), HttpStatus.NOT_FOUND);
-            } else if (bookingOptional.get().getPaid().compareTo(BigDecimal.ZERO) != 0) {
-                return new ResponseEntity<>(new BookingResponse(1, "You cannot delete a Booking you have already paid for!!!", bookingOptional.get(), 400), HttpStatus.BAD_REQUEST);
-            } else {
-//                Optional<Space> spaceOptional = spaceService.findById(bookingOptional.getSpaceId().getId());
-                Optional<Status> statusOptional = statusService.findById(0);
-                if (spaceService.updateStatus(bookingOptional.get().getSpaceId().getId(), statusOptional.get()) == false) {
-                    return new ResponseEntity<>(new BookingResponse(1, "Delete Booking Fail!, Don't return spacestatus", 400), HttpStatus.BAD_REQUEST);
-                } else {
-                    bookingService.deleteBookingById(id);
-                    return new ResponseEntity<>(new BookingResponse(0, "Delete Booking Successfully!", 200), HttpStatus.OK);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>(new ResponseMessage(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
-        }
-    }
+    
 
 }
