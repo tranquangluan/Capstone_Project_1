@@ -1,6 +1,7 @@
 package com.example.capstoneproject1.repository;
 
 import com.example.capstoneproject1.models.Booking;
+import com.example.capstoneproject1.models.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,10 +10,12 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.capstoneproject1.models.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import java.util.Optional;
@@ -31,6 +34,15 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             @Param("status") Integer status,
             @Param("ownerId") Integer ownerId,
             Pageable pageable
+    );
+    @Transactional
+    @Modifying
+    @Query("UPDATE Booking b SET " +
+            "b.dateArrive = :dayArrive " +
+            "WHERE b.id = :id")
+    void updateDayArrive(
+            @Param("id") Integer id,
+            @Param("dayArrive")@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive
     );
     @Transactional
     @Modifying

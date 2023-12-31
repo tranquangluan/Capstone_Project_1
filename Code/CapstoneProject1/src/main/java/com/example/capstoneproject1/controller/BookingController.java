@@ -76,7 +76,6 @@ public class BookingController {
     @PostMapping(value = "/create-order")
     public ResponseEntity<?> createOrder(@RequestParam(name = "id") Integer id,
                                          @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
-//                                         @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayArrive,
                                          @RequestParam(name = "comment", required = false) String comment,
                                          HttpServletRequest request) throws JSONException, IOException {
         String token = jwtTokenFilter.getJwtFromRequest(request);
@@ -98,7 +97,7 @@ public class BookingController {
         if (dayArrive.before(now)) {
             return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be after the current time!", 400), HttpStatus.BAD_REQUEST);
         } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
-            return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 3 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 5 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
         }
         Optional<Status> statusOptional = statusService.findById(8); // param status
         if (!statusOptional.isPresent()) {
@@ -116,7 +115,6 @@ public class BookingController {
 //                                            @RequestParam(name = "userId") Integer userId,
                                             @RequestParam(name = "id") Integer id,
                                             @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
-//                                            @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayArrive,
                                             @RequestParam(name = "comment", required = false) String comment,
                                             HttpServletRequest request) throws JSONException, URISyntaxException, IOException {
         try {
@@ -137,46 +135,65 @@ public class BookingController {
         }
     }
 
-    //    @PostMapping("/order-status")
-//    public ResponseEntity<?> getStatusOrder(@RequestParam(name = "appTransId") String appTransId,
-//                                            @RequestParam(name = "id") Integer id,
-//                                            @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayArrive,
-//                                            @RequestParam(name = "comment", required = false) String comment,
-//                                            HttpServletRequest request) throws JSONException, URISyntaxException, IOException {
-//        try {
-//            Map<String,Object> result = zaloPayService.statusOrder(appTransId);
-//            if ((int)result.get("returncode") == 1 && result.get("returnmessage").toString().equals("Giao dịch thành công")){
-//                String token = jwtTokenFilter.getJwtFromRequest(request);
-//                String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-//                Optional<User> userOptional = userService.findByEmail(userEmail);
-//                return createBooking(userOptional.get().getId(),id,dayArrive,comment,result);
-//            }else {
-//                return new ResponseEntity<>(new BookingResponse(0, "System Failed", result,400), HttpStatus.BAD_REQUEST);
-//            }
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return new ResponseEntity<>(new ResponseMessage(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
-//        }
-//    }
     public ResponseEntity<?> createBooking(Integer userId, Integer id, Date dayArrive, String comment, Map<String, Object> result) {
         try {
             Optional<User> userOptional = userService.findById(userId);
             Optional<Space> spaceOptional = spaceService.findById(id);
             Optional<Status> statusOptional = statusService.findById(8); // param status
-//            if (!statusOptional.isPresent()) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
-//            }
             BigDecimal paid = spaceOptional.get().getPrice();
             Booking booking = new Booking(userOptional.get(), spaceOptional.get(), spaceOptional.get().getPrice(), statusOptional.get(), dayArrive, comment, paid);
-//            if (spaceOptional.get().getStatus().getId() == 0) {
             if (spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get()) == false || spaceService.updateOwnerId(spaceOptional.get().getId(), userOptional.get()) == false) {
                 return new ResponseEntity<>(new BookingResponse(1, "Create Booking Fail!", booking, result, 400), HttpStatus.BAD_REQUEST);
             }
             bookingService.saveBooking(booking);
             return new ResponseEntity<>(new BookingResponse(0, "Create Booking Successful!", booking, result, 201), HttpStatus.CREATED);
-//            } else {
-//                return new ResponseEntity<>(new BookingResponse(1, "This space cannot be booked at this time!", booking, 400), HttpStatus.BAD_REQUEST);
-//            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new BookingResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/create-booking1")
+    public ResponseEntity<?> createBooking1(@RequestParam(name = "id") Integer id,
+                                           @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
+                                           @RequestParam(name = "comment", required = false) String comment,
+                                           HttpServletRequest request) {
+        try {
+            String token = jwtTokenFilter.getJwtFromRequest(request);
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
+            Optional<User> userOptional = userService.findByEmail(userEmail);
+            if (!userOptional.isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
+            }
+            Optional<Space> spaceOptional = spaceService.findById(id);
+            if (!spaceOptional.isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
+            }
+            if (spaceOptional.get().getOwnerId().getId() == userOptional.get().getId()){
+                return new ResponseEntity<>(new ResponseMessage(1, "You cannot book your own space!", 400), HttpStatus.BAD_REQUEST);
+            }
+            Date now = new Date();
+            long currentTimeMillis = now.getTime(); // current date time
+            long minimumBookingTimeMillis = currentTimeMillis + (3 * 60 * 60 * 1000); // current date time + 3 hours
+            if (dayArrive.before(now)) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be after the current time!", 400), HttpStatus.BAD_REQUEST);
+            } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 3 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
+            }
+            Optional<Status> statusOptional = statusService.findById(7); // param status
+            if (!statusOptional.isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
+            }
+            BigDecimal paid = spaceOptional.get().getPrice();
+            Booking booking = new Booking(userOptional.get(), spaceOptional.get(), spaceOptional.get().getPrice(), statusOptional.get(), dayArrive, comment, paid);
+            if (spaceOptional.get().getStatus().getId() == 0) {
+                if (spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get()) == false || spaceService.updateOwnerId(spaceOptional.get().getId(), userOptional.get()) == false) {
+                    return new ResponseEntity<>(new BookingResponse(1, "Create Booking Fail!", booking, 400), HttpStatus.BAD_REQUEST);
+                }
+                bookingService.saveBooking(booking);
+                return new ResponseEntity<>(new BookingResponse(0, "Create Booking Successful!", booking, 201), HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(new BookingResponse(1, "This space cannot be booked at this time!", booking, 400), HttpStatus.BAD_REQUEST);
+            }
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -184,96 +201,7 @@ public class BookingController {
         }
     }
 
-    //    @PostMapping("/create-booking")
-//    public ResponseEntity<?> createBooking(@RequestParam(name = "id") Integer id,
-//                                           @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayArrive,
-//                                           @RequestParam(name = "comment", required = false) String comment,
-//                                           HttpServletRequest request) {
-//        try {
-//            String token = jwtTokenFilter.getJwtFromRequest(request);
-//            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-//            Optional<User> userOptional = userService.findByEmail(userEmail);
-//            if (!userOptional.isPresent()) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-//            }
-//            Optional<Space> spaceOptional = spaceService.findById(id);
-//            if (!spaceOptional.isPresent()) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-//            }
-//            if (spaceOptional.get().getOwnerId().getId() == userOptional.get().getId()){
-//                return new ResponseEntity<>(new ResponseMessage(1, "You cannot book your own space!", 400), HttpStatus.BAD_REQUEST);
-//            }
-//            Date now = new Date();
-//            long currentTimeMillis = now.getTime(); // current date time
-//            long minimumBookingTimeMillis = currentTimeMillis + (3 * 60 * 60 * 1000); // current date time + 3 hours
-//            if (dayArrive.before(now)) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be after the current time!", 400), HttpStatus.BAD_REQUEST);
-//            } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 3 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
-//            }
-//            Optional<Status> statusOptional = statusService.findById(8); // param status
-//            if (!statusOptional.isPresent()) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
-//            }
-//            BigDecimal paid = spaceOptional.get().getPrice();
-//            Booking booking = new Booking(userOptional.get(), spaceOptional.get(), spaceOptional.get().getPrice(), statusOptional.get(), dayArrive, comment, paid);
-//            if (spaceOptional.get().getStatus().getId() == 0) {
-//                if (spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get()) == false || spaceService.updateOwnerId(spaceOptional.get().getId(), userOptional.get()) == false) {
-//                    return new ResponseEntity<>(new BookingResponse(1, "Create Booking Fail!", booking, 400), HttpStatus.BAD_REQUEST);
-//                }
-//                bookingService.saveBooking(booking);
-//                return new ResponseEntity<>(new BookingResponse(0, "Create Booking Successful!", booking, 201), HttpStatus.CREATED);
-//            } else {
-//                return new ResponseEntity<>(new BookingResponse(1, "This space cannot be booked at this time!", booking, 400), HttpStatus.BAD_REQUEST);
-//            }
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return new ResponseEntity<>(new BookingResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//    @PostMapping("/create-booking")
-//    public ResponseEntity<?> createBooking(@RequestParam(name = "id") Integer id,
-//                                           @RequestParam(name = "dayArrive")@DateTimeFormat(pattern = "yyyy-MM-dd") Date dayArrive,
-//                                           @RequestParam(name = "comment", required = false) String comment,
-//                                           @RequestParam(name = "status") Integer status,
-//                                           HttpServletRequest request) {
-//        try {
-//            String token = jwtTokenFilter.getJwtFromRequest(request);
-//            String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-//            Optional<User> userOptional = userService.findByEmail(userEmail);
-//            if (!userOptional.isPresent())
-//                return new ResponseEntity<>(new ResponseMessage(1, "User Not Found!", 404), HttpStatus.NOT_FOUND);
-//            Optional<Space> spaceOptional = spaceService.findById(id);
-//            if (!spaceOptional.isPresent())
-//                return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-//
-//            BigDecimal paid = BigDecimal.valueOf(0);
-//            Optional<Status> statusOptional = statusService.findById(status); // param status
-//            if (!statusOptional.isPresent()) {
-//                return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
-//            } else if (statusOptional.get().getId() == 1) {
-//                paid = spaceOptional.get().getPrice();
-//            } else if (statusOptional.get().getId() == 6) {
-//                paid = BigDecimal.valueOf(0);
-//            }
-//            Booking booking = new Booking(userOptional.get(), spaceOptional.get(), spaceOptional.get().getPrice(), statusOptional.get(), dayArrive, comment,paid);
-//            if (spaceOptional.get().getStatus().getId() == 0) {
-//                if (spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get()) == false || spaceService.updateOwnerId(spaceOptional.get().getId(), userOptional.get()) == false) {
-//                    return new ResponseEntity<>(new BookingResponse(1, "Create Booking Fail!", booking, 400), HttpStatus.BAD_REQUEST);
-//                }
-//                bookingService.saveBooking(booking);
-//                return new ResponseEntity<>(new BookingResponse(0, "Create Booking Successful!", booking, 201), HttpStatus.CREATED);
-//            } else {
-//                return new ResponseEntity<>(new BookingResponse(1, "Space has been booked!", booking, 400), HttpStatus.BAD_REQUEST);
-//            }
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return new ResponseEntity<>(new BookingResponse(0, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-    @DeleteMapping("/update-booking")
+    @PostMapping("/update-booking")
     public ResponseEntity<?> UpdateBookingDateArrive(@RequestParam(name = "id") Integer id,
                                                      @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
                                                      HttpServletRequest request) {
@@ -281,20 +209,25 @@ public class BookingController {
             String token = jwtTokenFilter.getJwtFromRequest(request);
             String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
             Optional<User> userOptional = userService.findByEmail(userEmail);
-            if (userOptional == null) {
+            Date now = new Date();
+            long currentTimeMillis = now.getTime(); // current date time
+            long minimumBookingTimeMillis = currentTimeMillis + (5 * 60 * 60 * 1000); // current date time + 5 hours
+            if (dayArrive.before(now)) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be after the current time!", 400), HttpStatus.BAD_REQUEST);
+            } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
+                return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 5 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
+            }
+            if (!userOptional.isPresent()) {
                 return new ResponseEntity<>(new BookingResponse(1, "User not found!", 404), HttpStatus.NOT_FOUND);
             }
             Optional<Booking> bookingOptional = bookingService.findBookingById(id);
-            if (bookingOptional == null) {
+            if (!bookingOptional.isPresent()) {
                 return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 404), HttpStatus.NOT_FOUND);
             } else {
-//                Optional<Space> spaceOptional = spaceService.findById(booking.getSpaceId().getId());
-                Optional<Status> statusOptional = statusService.findById(0);
-                if (spaceService.updateStatus(bookingOptional.get().getSpaceId().getId(), statusOptional.get()) == false) {
-                    return new ResponseEntity<>(new BookingResponse(1, "Delete Booking Fail!, Don't return spacestatus", 400), HttpStatus.BAD_REQUEST);
+                if (bookingService.updateBookingDateArrive(id, dayArrive) == false) {
+                    return new ResponseEntity<>(new BookingResponse(1, "Update Booking Fail!", 400), HttpStatus.BAD_REQUEST);
                 } else {
-                    bookingService.deleteBookingById(id);
-                    return new ResponseEntity<>(new BookingResponse(0, "Delete Booking Successfully!", 200), HttpStatus.OK);
+                    return new ResponseEntity<>(new BookingResponse(0, "Update Booking Successfully!", 200), HttpStatus.OK);
                 }
             }
         } catch (Exception e) {
@@ -306,15 +239,15 @@ public class BookingController {
     @DeleteMapping("/delete-booking")
     public ResponseEntity<?> deleteBooking(@RequestParam(name = "id") Integer id) {
         try {
-            Optional<Booking> booking = bookingService.findBookingById(id);
-            if (booking == null) {
+            Optional<Booking> bookingOptional = bookingService.findBookingById(id);
+            if (!bookingOptional.isPresent()) {
                 return new ResponseEntity<>(new BookingResponse(1, "Booking not found!", 404), HttpStatus.NOT_FOUND);
-            } else if (booking.get().getPaid().compareTo(BigDecimal.ZERO) != 0) {
-                return new ResponseEntity<>(new BookingResponse(1, "You cannot delete a Booking you have already paid for!!!", booking.get(), 400), HttpStatus.BAD_REQUEST);
+            } else if (bookingOptional.get().getPaid().compareTo(BigDecimal.ZERO) != 0) {
+                return new ResponseEntity<>(new BookingResponse(1, "You cannot delete a Booking you have already paid for!!!", bookingOptional.get(), 400), HttpStatus.BAD_REQUEST);
             } else {
-//                Optional<Space> spaceOptional = spaceService.findById(booking.getSpaceId().getId());
+//                Optional<Space> spaceOptional = spaceService.findById(bookingOptional.getSpaceId().getId());
                 Optional<Status> statusOptional = statusService.findById(0);
-                if (spaceService.updateStatus(booking.get().getSpaceId().getId(), statusOptional.get()) == false) {
+                if (spaceService.updateStatus(bookingOptional.get().getSpaceId().getId(), statusOptional.get()) == false) {
                     return new ResponseEntity<>(new BookingResponse(1, "Delete Booking Fail!, Don't return spacestatus", 400), HttpStatus.BAD_REQUEST);
                 } else {
                     bookingService.deleteBookingById(id);

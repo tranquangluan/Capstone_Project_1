@@ -68,55 +68,33 @@ public class DashboardController {
     }
 
     @PreAuthorize("hasAnyAuthority('Admin')")
-//    @PostMapping("/static")
-//    public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "date") Integer date,
-//                                           @RequestParam(required = false, name = "month") Integer month,
-//                                           @RequestParam(required = false, name = "year") Integer year) {
-//        try {
-//            List<Object[]> result = new ArrayList<>();
-//            if (date!=null && month == null && year == null){
-//                result = spaceService.getStaticDashboardByDate(date);
-//            } else if (date == null && month!=null) {
-//                if (year == null){
-//                    year = Year.now().getValue();
-//                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
-//                }else {
-//                    result = spaceService.getStaticDashboardByMonthAndYear(month, year);
-//                }
-//            } else if (date==null && month == null && year !=null){
-//                result = spaceService.getStaticDashboardByYear(year);
-//            }
-//            Map<String, Integer> staticMap = spaceService.convertToMap(result);
-//            if (!staticMap.isEmpty()){
-//                return new ResponseEntity<>(new StaticResponse(0,"Get Static Successfully!",staticMap,200), HttpStatus.OK);
-//            }
-//            return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(new ResponseMessage(1, e.getMessage(), 400), HttpStatus.BAD_REQUEST);
-//        }
-//    }
     @PostMapping("/static")
     public ResponseEntity<?> viewDashBoard(@RequestParam(required = false, name = "date") Integer date,
                                            @RequestParam(required = false, name = "month") Integer month,
                                            @RequestParam(required = false, name = "year") Integer year) {
         try {
-            List<Object[]> result = new ArrayList<>();
-            List<Object[]> result1 = new ArrayList<>();
+            List<Object[]> resultPost = new ArrayList<>();
+            List<Object[]> resultBooking = new ArrayList<>();
             if (date!=null && month == null && year == null){
-                result = spaceService.getStaticPostByDate(date);
+                resultPost = spaceService.getStaticPostByDate(date);
+                resultBooking = spaceService.getStaticBookingByDate(date);
             } else if (date == null && month!=null) {
                 if (year == null){
                     year = Year.now().getValue();
-                    result = spaceService.getStaticPostByMonthAndYear(month, year);
+                    resultPost = spaceService.getStaticPostByMonthAndYear(month, year);
+                    resultBooking = spaceService.getStaticBookingByMonthAndYear(month, year);
                 }else {
-                    result = spaceService.getStaticPostByMonthAndYear(month, year);
+                    resultPost = spaceService.getStaticPostByMonthAndYear(month, year);
+                    resultBooking = spaceService.getStaticBookingByMonthAndYear(month, year);
                 }
             } else if (date==null && month == null && year !=null){
-                result = spaceService.getStaticPostByYear(year);
+                resultPost = spaceService.getStaticPostByYear(year);
+                resultBooking = spaceService.getStaticBookingByYear(year);
             }
-            Map<String, Integer> staticMap = spaceService.convertToMap(result);
-            if (!staticMap.isEmpty()){
-                return new ResponseEntity<>(new StaticResponse(0,"Get Static Successfully!",staticMap,200), HttpStatus.OK);
+            Map<String, Integer> staticPost = spaceService.convertToMap(resultPost);
+            Map<String, Integer> staticBooking = spaceService.convertToMap(resultBooking);
+            if (!staticPost.isEmpty() && !staticBooking.isEmpty()){
+                return new ResponseEntity<>(new StaticResponse(0,"Get Static Successfully!",staticPost,staticBooking,200), HttpStatus.OK);
             }
             return new ResponseEntity<>(new ResponseMessage(1, "Space Not Found!", 404), HttpStatus.NOT_FOUND);
         } catch (Exception e) {

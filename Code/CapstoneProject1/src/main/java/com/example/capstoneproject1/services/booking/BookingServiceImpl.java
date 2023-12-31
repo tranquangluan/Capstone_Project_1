@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,8 +67,20 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Optional<Booking> findBookingById(Integer bookingId) {
-        return Optional.empty();
+        return bookingRepository.findById(bookingId);
     }
+
+    @Override
+    public Boolean updateBookingDateArrive(Integer id, Date dayArrive) {
+        try {
+            bookingRepository.updateDayArrive(id, dayArrive);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Lỗi Đây: >>>>" + e.getMessage());
+            return false;
+        }
+    }
+
     @Override
     public Boolean existsBookingWithUserAndOwner(User user, User owner) {
         return bookingRepository.existsBookingByUserAndOwner(user, owner);
