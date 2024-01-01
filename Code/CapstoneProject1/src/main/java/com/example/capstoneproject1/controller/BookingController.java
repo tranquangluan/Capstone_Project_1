@@ -22,11 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URISyntaxException;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -80,7 +75,7 @@ public class BookingController {
 
     @PostMapping(value = "/create-order")
     public ResponseEntity<?> createOrder(@RequestParam(name = "id") Integer id,
-                                         @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
+                                         @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date dayArrive,
                                          @RequestParam(name = "comment", required = false) String comment,
                                          HttpServletRequest request) throws JSONException, IOException {
         String token = jwtTokenFilter.getJwtFromRequest(request);
@@ -104,7 +99,7 @@ public class BookingController {
         } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
             return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 5 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
         }
-        Optional<Status> statusOptional = statusService.findById(8); // param status
+        Optional<Status> statusOptional = statusService.findById(1); // param status
         if (!statusOptional.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
         }
@@ -119,7 +114,7 @@ public class BookingController {
     public ResponseEntity<?> getStatusOrder(@RequestParam(name = "appTransId") String appTransId,
 //                                            @RequestParam(name = "userId") Integer userId,
                                             @RequestParam(name = "id") Integer id,
-                                            @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date dayArrive,
+                                            @RequestParam(name = "dayArrive") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date dayArrive,
                                             @RequestParam(name = "comment", required = false) String comment,
                                             HttpServletRequest request) throws JSONException, URISyntaxException, IOException {
         try {
@@ -144,7 +139,7 @@ public class BookingController {
         try {
             Optional<User> userOptional = userService.findById(userId);
             Optional<Space> spaceOptional = spaceService.findById(id);
-            Optional<Status> statusOptional = statusService.findById(8); // param status
+            Optional<Status> statusOptional = statusService.findById(1); // param status
             BigDecimal paid = spaceOptional.get().getPrice();
             Booking booking = new Booking(userOptional.get(), spaceOptional.get(), spaceOptional.get().getPrice(), statusOptional.get(), dayArrive, comment, paid);
             if (spaceService.updateStatus(spaceOptional.get().getId(), statusOptional.get()) == false || spaceService.updateOwnerId(spaceOptional.get().getId(), userOptional.get()) == false) {
@@ -185,7 +180,7 @@ public class BookingController {
             } else if (dayArrive.getTime() <= minimumBookingTimeMillis) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Your arrival time must be at least 3 hours away from the current time!", 400), HttpStatus.BAD_REQUEST);
             }
-            Optional<Status> statusOptional = statusService.findById(7); // param status
+            Optional<Status> statusOptional = statusService.findById(1); // param status
             if (!statusOptional.isPresent()) {
                 return new ResponseEntity<>(new ResponseMessage(1, "Status Not Found!", 404), HttpStatus.NOT_FOUND);
             }
