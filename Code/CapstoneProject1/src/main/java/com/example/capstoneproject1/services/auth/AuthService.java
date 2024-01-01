@@ -26,10 +26,8 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(userEmail);
 
         if (user.isPresent()) {
-            System.out.println(user.get().getRefreshToken());
             user.get().setRefreshToken(refreshToken);
             userRepository.save(user.get());
-            System.out.println(user.get().getRefreshToken());
         }else
             logger.error("Can Not save refresh token");
     }
