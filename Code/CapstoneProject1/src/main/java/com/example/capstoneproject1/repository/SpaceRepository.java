@@ -180,8 +180,8 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months " +
             "LEFT JOIN " +
             "(SELECT EXTRACT(MONTH FROM created_at) AS month, COUNT(*) AS total " +
-            "FROM space " +
-            "WHERE YEAR(created_at) = :year " +
+            "FROM space s " +
+            "WHERE YEAR(created_at) = :year AND s.status_id = 0 " +
             "GROUP BY EXTRACT(MONTH FROM created_at)) AS totals " +
             "ON months.month = totals.month " +
             "ORDER BY months.month", nativeQuery = true)
@@ -196,7 +196,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "      CROSS JOIN (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
             "                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS c " +
             "     ) AS dates " +
-            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 1 " +
             "WHERE dates.date >= DATE_SUB(CURDATE(), INTERVAL :date DAY) " +
             "GROUP BY dates.date " +
             "ORDER BY dates.date DESC", nativeQuery = true)
@@ -209,7 +209,7 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "(SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
             "UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS a, " +
             "(SELECT 0 AS b UNION ALL SELECT 10 UNION ALL SELECT 20 UNION ALL SELECT 30) AS b) AS dates " +
-            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 0 " +
+            "LEFT JOIN space s ON DATE(s.created_at) = dates.date AND s.status_id = 1 " +
             "WHERE MONTH(dates.date) = :month AND YEAR(dates.date) = :year " +
             "GROUP BY dates.date " +
             "ORDER BY dates.date", nativeQuery = true)
@@ -223,8 +223,8 @@ public interface SpaceRepository extends JpaRepository<Space, Integer> {
             "UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months " +
             "LEFT JOIN " +
             "(SELECT EXTRACT(MONTH FROM created_at) AS month, COUNT(*) AS total " +
-            "FROM space " +
-            "WHERE YEAR(created_at) = :year " +
+            "FROM space s " +
+            "WHERE YEAR(created_at) = :year AND status_id = 1 " +
             "GROUP BY EXTRACT(MONTH FROM created_at)) AS totals " +
             "ON months.month = totals.month " +
             "ORDER BY months.month", nativeQuery = true)

@@ -217,6 +217,22 @@ public class SpaceServiceImpl implements SpaceService {
     public List<Object[]> getStaticPostByYear(Integer year) {
         return spaceRepository.getStaticPostByYear(year);
     }
+
+    @Override
+    public List<Object[]> getStaticBookingByDate(Integer date) {
+        return spaceRepository.getStaticBookingByDate(date);
+    }
+
+    @Override
+    public List<Object[]> getStaticBookingByMonthAndYear(Integer month, Integer year) {
+        return spaceRepository.getStaticBookingByMonthAndYear(month,year);
+    }
+
+    @Override
+    public List<Object[]> getStaticBookingByYear(Integer year) {
+        return spaceRepository.getStaticBookingByYear(year);
+    }
+
     @Override
     public Map<String, Integer> convertToMap(List<Object[]> result) {
         Map<String, Integer> resultMap = new LinkedHashMap<>();

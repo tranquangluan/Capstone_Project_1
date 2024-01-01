@@ -11,6 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import java.util.Optional;
 
 
@@ -52,7 +57,19 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+
+
     @Override
+    public Boolean updateBookingDateArrive(Integer id, Date dayArrive) {
+        try {
+            bookingRepository.updateDayArrive(id, dayArrive);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Lỗi Đây: >>>>" + e.getMessage());
+            return false;
+        }
+    }
+
     public Booking findById(Integer id) {
         return null;
     }
@@ -66,6 +83,7 @@ public class BookingServiceImpl implements BookingService {
     public void delete(Integer id) {
         bookingRepository.deleteBookingById(id);
     }
+
 
 
     @Override

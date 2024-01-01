@@ -47,5 +47,8 @@ public interface SpaceService {
     List<Object[]> getStaticPostByDate(Integer date);
     List<Object[]> getStaticPostByMonthAndYear(Integer month, Integer year);
     List<Object[]> getStaticPostByYear(Integer year);
+    List<Object[]> getStaticBookingByDate(Integer date);
+    List<Object[]> getStaticBookingByMonthAndYear(Integer month, Integer year);
+    List<Object[]> getStaticBookingByYear(Integer year);
     Map<String, Integer> convertToMap(List<Object[]> result);
 }

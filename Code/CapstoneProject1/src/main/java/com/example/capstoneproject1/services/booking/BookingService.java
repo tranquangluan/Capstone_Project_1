@@ -2,6 +2,11 @@ package com.example.capstoneproject1.services.booking;
 
 import com.example.capstoneproject1.models.Booking;
 import com.example.capstoneproject1.models.User;
+
+
+import java.util.Date;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -17,6 +22,8 @@ public interface BookingService {
     Booking findById(Integer id);
     Optional<Booking> findBookingById(Integer bookingId);
     void delete(Integer id);
+
+    Boolean updateBookingDateArrive(Integer id, Date dayArrive);
 
     Boolean existsBookingWithUserAndOwner(User user, User owner);
 }
